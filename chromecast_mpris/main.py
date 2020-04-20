@@ -9,7 +9,7 @@ import sys
 
 from gi.repository import GLib
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def register_adapters_and_listeners():

@@ -65,12 +65,10 @@ class CastEventMprisAdapter(DbusEventAdapter,
       self.on_volume()
 
   def new_media_status(self, status: MediaStatus):
-    # pprint(status.__dict__)
     self.check_volume(status)
     self.on_playback()
 
   def new_cast_status(self, status: CastStatus):
-    # pprint(status)
     self.check_volume(status)
 
 
