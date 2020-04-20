@@ -1,8 +1,19 @@
+from enum import auto
 from typing import List, NamedTuple, Optional
 
 import pychromecast
 
-from mpris_server.adapter import PlayState, Track
+from mpris_server.adapter import PlayState, Track, AutoName
+
+DEFAULT_THUMB = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
+
+
+class ChromecastMediaType(AutoName):
+  GENERIC = auto()
+  MOVIE = auto()
+  MUSICTRACK = auto()
+  PHOTO = auto()
+  TVSHOW = auto()
 
 
 class ChromecastState(NamedTuple):

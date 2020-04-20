@@ -1,18 +1,21 @@
 from typing import List
 from mimetypes import guess_type
 
-from main import main
 from mpris_server import adapter
 import pychromecast
 
 from mpris_server.constants import URI, MIME_TYPES
 from mpris_server.player import PlayState
 
+from .base import ChromecastMediaType, DEFAULT_THUMB
+
 
 class ChromecastAdapter(adapter.Adapter):
   def __init__(self, chromecast: pychromecast.Chromecast):
     self.chromecast = chromecast
     self.cc = chromecast
+
+    super().__init__(chromecast.name, )
 
   def get_uri_schemes(self) -> List[str]:
     return URI
@@ -21,10 +24,10 @@ class ChromecastAdapter(adapter.Adapter):
     return MIME_TYPES
 
   def get_current_postion(self) -> int:
-    pass
+    return self.cc.media_controller.status.adjusted_current_time
 
   def next(self):
-    self.cc.media_controller.skip()
+    self.cc.media_controller.queue_next()
 
   def previous(self):
     self.cc.media_controller.queue_prev()
@@ -58,10 +61,10 @@ class ChromecastAdapter(adapter.Adapter):
     self.cc.media_controller.play_media(uri, mimetype)
 
   def is_repeating(self) -> bool:
-    pass
+    return False
 
   def is_playlist(self) -> bool:
-    pass
+    return self.can_go_next() or self.can_go_previous()
 
   def set_repeating(self, val: bool):
     pass
@@ -76,64 +79,104 @@ class ChromecastAdapter(adapter.Adapter):
     pass
 
   def get_shuffle(self) -> bool:
-    pass
+    return False
 
   def set_shuffle(self, val: bool):
-    pass
+    return False
 
-  def get_art_url(self, track: int) -> str:
-    pass
+  def get_art_url(self, track: int = None) -> str:
+    thumb = self.cc.media_controller.thumbnail
+    return thumb if thumb else DEFAULT_THUMB
 
   def get_volume(self) -> int:
-    pass
+    return self.cc.status.volume_level
 
   def set_volume(self, val: int):
-    pass
+    curr = self.get_volume()
+    diff = val - curr
+
+    if diff > 0:  # vol up
+      self.cc.volume_up(diff)
+
+    else:
+      self.cc.volume_down(abs(diff))
 
   def is_mute(self) -> bool:
-    pass
+    return self.cc.status.volume_muted
 
   def set_mute(self, val: bool):
-    pass
+    self.cc.set_volume_muted(val)
 
-  def get_position(self) -> int:
-    pass
+  def get_position(self) -> float:
+    return self.get_current_postion() / 1000
 
   def can_go_next(self) -> bool:
-    pass
+    return self.cc.media_controller.status.supports_queue_next
 
   def can_go_previous(self) -> bool:
-    pass
+    return self.cc.media_controller.status.supports_queue_prev
 
   def can_play(self) -> bool:
-    pass
+    return True
 
   def can_pause(self) -> bool:
-    pass
+    return self.cc.media_controller.status.supports_pause
 
   def can_seek(self) -> bool:
-    pass
+    return self.cc.media_controller.status.supports_seek
 
   def can_control(self) -> bool:
+    return True
+
+  def get_stream_title(self) -> str:
+    return self.cc.media_controller.title
+
+  def get_current_track(self) -> adapter.Track:
+    art_url = self.get_art_url()
+    content_id = self.cc.media_controller.status.content_id
+    name = self.cc.media_controller.status.artist
+
+    artist = adapter.Artist(name)
+
+    album = adapter.Album(
+      name=self.cc.media_controller.status.album_name,
+      artists=[artist],
+      art_url=art_url,
+    )
+
+    track = adapter.Track(
+      track_id='/tracks/1',
+      name=self.get_stream_title(),
+      track_no=self.cc.media_controller.status.track,
+      length=self.cc.media_controller.status.duration,
+      uri=content_id,
+      artists=[artist],
+      album=album,
+      art_url=art_url,
+      disc_no=1,
+      type=get_media_type(self.cc)
+    )
+
+    return track
+
+  def get_previous_track(self) -> adapter.Track:
     pass
 
-    ## needed for metadata
+  def get_next_track(self) -> adapter.Track:
+    pass
 
   def metadata(self):
     pass
 
-  def get_stream_title(self) -> str:
-    pass
+def get_media_type(cc: pychromecast.Chromecast):
+  if cc.media_controller.status.media_is_movie:
+    return ChromecastMediaType.MOVIE
+  elif cc.media_controller.status.media_is_tvshow:
+    return ChromecastMediaType.TVSHOW
+  elif cc.media_controller.status.media_is_photo:
+    return ChromecastMediaType.PHOTO
+  elif cc.media_controller.status.media_is_musictrack:
+    return ChromecastMediaType.MUSICTRACK
+  elif cc.media_controller.status.media_is_generic:
+    return ChromecastMediaType.GENERIC
 
-  def get_current_track(self) -> Track:
-    pass
-
-  def get_previous_track(self) -> Track:
-    pass
-
-  def get_next_track(self) -> Track:
-    pass
-
-
-if __name__ == "__main__":
-  main()
