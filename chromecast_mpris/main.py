@@ -20,7 +20,8 @@ def register_adapters_and_listeners():
     sys.exit(1)
 
   chromecast_adapter = ChromecastAdapter(chromecast)
-  mpris = server.Server(adapter=chromecast_adapter)
+  mpris = server.Server(name=chromecast.name,
+                        adapter=chromecast_adapter)
   mpris.publish()
 
   register_mpris_adapter(chromecast, mpris, chromecast_adapter)

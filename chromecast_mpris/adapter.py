@@ -1,23 +1,21 @@
 from typing import List
 from mimetypes import guess_type
 
-from mpris_server import adapter
+from mpris_server import adapters
 import pychromecast
 
-from mpris_server.constants import URI, MIME_TYPES
-from mpris_server.player import PlayState
+from mpris_server.base import URI, MIME_TYPES
+from mpris_server.adapters import Metadata, PlayState
 
 from .base import ChromecastMediaType, DEFAULT_THUMB
 
 SEC_TO_US = 1_000_000
 
 
-class ChromecastAdapter(adapter.Adapter):
+class ChromecastAdapter(adapters.MprisAdapter):
   def __init__(self, chromecast: pychromecast.Chromecast):
-    self.chromecast = chromecast
     self.cc = chromecast
-
-    super().__init__(chromecast.name, )
+    super().__init__(chromecast.name)
 
   def get_uri_schemes(self) -> List[str]:
     return URI
@@ -25,7 +23,7 @@ class ChromecastAdapter(adapter.Adapter):
   def get_mime_types(self) -> List[str]:
     return MIME_TYPES
 
-  def get_current_postion(self) -> int:
+  def get_current_position(self) -> int:
     curr = self.cc.media_controller.status.adjusted_current_time
 
     if curr:
@@ -61,7 +59,8 @@ class ChromecastAdapter(adapter.Adapter):
     return PlayState.STOPPED
 
   def seek(self, time: int):
-    self.cc.media_controller.seek(int(time / SEC_TO_US))
+    seconds = int(time / SEC_TO_US)
+    self.cc.media_controller.seek(seconds)
 
   def open_uri(self, uri: str):
     mimetype, _ = guess_type(uri)
@@ -95,10 +94,10 @@ class ChromecastAdapter(adapter.Adapter):
     thumb = self.cc.media_controller.thumbnail
     return thumb if thumb else DEFAULT_THUMB
 
-  def get_volume(self) -> int:
+  def get_volume(self) -> float:
     return self.cc.status.volume_level
 
-  def set_volume(self, val: int):
+  def set_volume(self, val: float):
     curr = self.get_volume()
     diff = val - curr
 
@@ -113,9 +112,6 @@ class ChromecastAdapter(adapter.Adapter):
 
   def set_mute(self, val: bool):
     self.cc.set_volume_muted(val)
-
-  def get_position(self) -> float:
-    return self.get_current_postion()
 
   def can_go_next(self) -> bool:
     return self.cc.media_controller.status.supports_queue_next
@@ -136,9 +132,15 @@ class ChromecastAdapter(adapter.Adapter):
     return True
 
   def get_stream_title(self) -> str:
-    return self.cc.media_controller.title
+    title = self.cc.media_controller.title
+    metadata = self.cc.media_controller.status.media_metadata
 
-  def get_current_track(self) -> adapter.Track:
+    if 'subtitle' in metadata:
+      title = ' - '.join((title, metadata['subtitle']))
+
+    return title
+
+  def get_current_track(self) -> adapters.Track:
     art_url = self.get_art_url()
     content_id = self.cc.media_controller.status.content_id
     name = self.cc.media_controller.status.artist
@@ -150,16 +152,16 @@ class ChromecastAdapter(adapter.Adapter):
     else:
       duration = 0
 
-    artist = adapter.Artist(name)
+    artist = adapters.Artist(name)
 
-    album = adapter.Album(
+    album = adapters.Album(
       name=self.cc.media_controller.status.album_name,
       artists=[artist],
       art_url=art_url,
     )
 
-    track = adapter.Track(
-      track_id='/tracks/1',
+    track = adapters.Track(
+      track_id=f'/tracks/1',
       name=self.get_stream_title(),
       track_no=self.cc.media_controller.status.track,
       length=int(duration),
@@ -173,24 +175,28 @@ class ChromecastAdapter(adapter.Adapter):
 
     return track
 
-  def get_previous_track(self) -> adapter.Track:
+  def get_previous_track(self) -> adapters.Track:
     pass
 
-  def get_next_track(self) -> adapter.Track:
+  def get_next_track(self) -> adapters.Track:
     pass
 
-  def metadata(self):
+  def metadata(self) -> Metadata:
     pass
 
 
-def get_media_type(cc: pychromecast.Chromecast):
+def get_media_type(cc: pychromecast.Chromecast) -> ChromecastMediaType:
   if cc.media_controller.status.media_is_movie:
     return ChromecastMediaType.MOVIE
+
   elif cc.media_controller.status.media_is_tvshow:
     return ChromecastMediaType.TVSHOW
+
   elif cc.media_controller.status.media_is_photo:
     return ChromecastMediaType.PHOTO
+
   elif cc.media_controller.status.media_is_musictrack:
     return ChromecastMediaType.MUSICTRACK
+
   elif cc.media_controller.status.media_is_generic:
     return ChromecastMediaType.GENERIC
