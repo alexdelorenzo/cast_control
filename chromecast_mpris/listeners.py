@@ -1,26 +1,12 @@
 from abc import ABC
+from typing import Union
 
-import pychromecast
+from mpris_server.adapters import EventAdapter, MprisAdapter
+from mpris_server.server import Server
+
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.socket_client import CastStatus
-
-from mpris_server import server, adapters
-from mpris_server.adapters import EventAdapter, MprisAdapter
-
-
-class ChromecastEventAdapter(EventAdapter):
-  def __init__(self,
-               name: str,
-               chromecast: pychromecast.Chromecast,
-               server: server.Server = None,
-               adapter: MprisAdapter = None):
-    self.name = name
-    self.chromecast = chromecast
-    self.server = server
-
-    self.adapter = adapter
-    self.cc = chromecast
-    super().__init__(self.server.player)
+from pychromecast import Chromecast
 
 
 class ChromecastEventListener(ABC):
@@ -34,9 +20,27 @@ class ChromecastEventListener(ABC):
     pass
 
 
+class ChromecastEventAdapter(EventAdapter):
+  def __init__(self,
+               name: str,
+               chromecast: Chromecast,
+               server: Server = None,
+               adapter: MprisAdapter = None):
+    self.name = name
+    self.chromecast = chromecast
+    self.server = server
+
+    self.adapter = adapter
+    self.cc = chromecast
+    super().__init__(self.server.player, self.server.root)
+
+
+Status = Union[MediaStatus, CastStatus]
+
+
 class ChromecastEventHandler(ChromecastEventAdapter,
                              ChromecastEventListener):
-  def check_volume(self, status):
+  def check_volume(self, status: Status):
     vol = status.volume_level
     muted = status.volume_muted
 
@@ -47,14 +51,15 @@ class ChromecastEventHandler(ChromecastEventAdapter,
   def new_media_status(self, status: MediaStatus):
     self.check_volume(status)
     self.on_playback()
+    self.on_options()
 
   def new_cast_status(self, status: CastStatus):
     self.check_volume(status)
 
 
-def register_mpris_adapter(chromecast: pychromecast.Chromecast,
-                           server: server.Server,
-                           adapter: adapters.MprisAdapter):
+def register_mpris_adapter(chromecast: Chromecast,
+                           server: Server,
+                           adapter: MprisAdapter):
   listenerMedia = ChromecastEventHandler(chromecast.name,
                                          chromecast,
                                          server,

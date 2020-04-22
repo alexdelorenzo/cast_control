@@ -9,6 +9,7 @@ from mpris_server.adapters import Metadata, PlayState
 
 from .base import ChromecastMediaType, DEFAULT_THUMB
 
+
 SEC_TO_US = 1_000_000
 
 
@@ -41,7 +42,7 @@ class ChromecastAdapter(adapters.MprisAdapter):
     self.cc.media_controller.pause()
 
   def resume(self):
-    self.cc.media_controller.play()
+    self.play()
 
   def stop(self):
     self.cc.media_controller.stop()
@@ -156,7 +157,7 @@ class ChromecastAdapter(adapters.MprisAdapter):
 
     album = adapters.Album(
       name=self.cc.media_controller.status.album_name,
-      artists=[artist],
+      artists=(artist,),
       art_url=art_url,
     )
 
@@ -166,7 +167,7 @@ class ChromecastAdapter(adapters.MprisAdapter):
       track_no=self.cc.media_controller.status.track,
       length=int(duration),
       uri=content_id,
-      artists=[artist],
+      artists=(artist,),
       album=album,
       art_url=art_url,
       disc_no=1,
