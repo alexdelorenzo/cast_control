@@ -11,8 +11,8 @@ Checkout [mpris_server](https://github.com/alexdelorenzo/mpris_server) if you wa
 ## Features
   * [x] Control generic music and video playback
   * [x] Control app playback
-  * [x]  View Chromecast information in real-time
-  * [x] Display Thumbnail and title
+  * [x] View playback information in real-time
+  * [x] Display thumbnail and title
   * [x] Display playback position and media end
   * [x] Seek forward and backward
   * [x] Play / Pause / Stop
