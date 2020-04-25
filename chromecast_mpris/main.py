@@ -36,4 +36,4 @@ if __name__ == "__main__":
   # from dbus.mainloop.glib import DBusGMainLoop
   # DBusGMainLoop(set_as_default=True)
 
-  main(sys.argv[1], )
+  main(sys.argv[1])
