@@ -8,7 +8,7 @@ from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-def create_server(chromecast_name: str) -> server.Server:
+def create_adapters_and_server(chromecast_name: str) -> server.Server:
   chromecast = get_chromecast(chromecast_name)
 
   if not chromecast:
@@ -28,7 +28,7 @@ def create_server(chromecast_name: str) -> server.Server:
 def main(name: str, log_level: int = logging.INFO):
   logging.basicConfig(level=log_level)
 
-  mpris = create_server(name)
+  mpris = create_adapters_and_server(name)
   mpris.loop()
 
 
