@@ -10,7 +10,7 @@ readme = Path('README.md').read_text()
 
 setup(
       name="chromecast_mpris",
-      version="0.0.2",
+      version="0.0.3",
       description="Control Chromecasts via MPRIS.",
       long_description=readme,
       long_description_content_type="text/markdown",
@@ -21,6 +21,6 @@ setup(
       zip_safe=True,
       install_requires=requirements,
       entry_points={"console_scripts":
-                      ["chromecast_mpris = chromecast_mpris.main:main"]},
+                      ["chromecast_mpris = chromecast_mpris.command:cmd"]},
       python_requires='~=3.6',
 )
