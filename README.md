@@ -3,15 +3,15 @@ Control your Chromecast via MPRIS media player controls.
 
 MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspace/tree/master/applets/mediacontroller) in Plasma Desktop, and [there are options for GNOME, too](https://extensions.gnome.org/extension/1379/mpris-indicator-button/).
 
+<img src="/assets/mpris_widget.png" width="350" />
+
 [`playerctl` provides a CLI](https://github.com/altdesktop/playerctl) for controlling media players through MPRIS.
 
 ## Installation
-
 Run `pip3 install -r requirements.txt`, followed by `python3 setup.py install`. 
 
 You'll get `chromecast_mpris` added to your `$PATH`.
 
-<img src="/assets/mpris_widget.png" width="350" />
 
 ### Requirements
  - Linux
