@@ -11,7 +11,7 @@ MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspac
 ## Installation
 Run `pip3 install -r requirements.txt`, followed by `python3 setup.py install`. 
 
-You'll get `chromecast_mpris` executable added to your `$PATH`.
+You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
 
 ### Requirements
