@@ -9,18 +9,18 @@ MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspac
 [`playerctl` provides a CLI](https://github.com/altdesktop/playerctl) for controlling media players through MPRIS.
 
 ## Features
-  # [x] Control generic music and video playback
-  # [x] Control app playback
-  # [x]  View Chromecast information in real-time
-  # [x] Display Thumbnail and title
-  # [x] Display playback position and media end
-  # [x] Seek forward and backward
-  # [x] Play / Pause / Stop
-  # [x] Volume up and down
-  # [x] Play next and previous
-  # [ ] Open media from MPRIS
-  # [ ] Playlist integration
-  # [ ] Quit Chromecast app / Shutdown
+  [x] Control generic music and video playback
+  [x] Control app playback
+  [x]  View Chromecast information in real-time
+  [x] Display Thumbnail and title
+  [x] Display playback position and media end
+  [x] Seek forward and backward
+  [x] Play / Pause / Stop
+  [x] Volume up and down
+  [x] Play next and previous
+  [ ] Open media from MPRIS
+  [ ] Playlist integration
+  [ ] Quit Chromecast app / Shutdown
 
 ## Installation
 Run `pip3 install -r requirements.txt`, followed by `python3 setup.py install`. 
