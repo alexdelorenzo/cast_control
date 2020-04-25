@@ -8,8 +8,8 @@ from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-def create_server(name: str) -> server.Server:
-  chromecast = get_chromecast(name)
+def create_server(chromecast_name: str) -> server.Server:
+  chromecast = get_chromecast(chromecast_name)
 
   if not chromecast:
     logging.warning("Chromecast not found.")
