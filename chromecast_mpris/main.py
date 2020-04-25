@@ -8,7 +8,7 @@ from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-def register_adapters_and_listeners(name: str):
+def register_adapters_and_listeners(name: str) -> server.Server:
   chromecast = get_chromecast(name)
 
   if not chromecast:
@@ -22,15 +22,14 @@ def register_adapters_and_listeners(name: str):
 
   register_mpris_adapter(chromecast, mpris, chromecast_adapter)
 
+  return mpris
+
 
 def main(name: str, log_level: int = logging.INFO):
   logging.basicConfig(level=log_level)
 
-  from gi.repository import GLib
-
-  register_adapters_and_listeners(name)
-  loop = GLib.MainLoop()
-  loop.run()
+  mpris = register_adapters_and_listeners(name)
+  mpris.loop()
 
 
 if __name__ == "__main__":
