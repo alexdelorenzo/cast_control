@@ -2,11 +2,11 @@
 Control your Chromecast via [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). MPRIS is the standard media player interface on Linux desktops.
 `chromecast_mpris` allows you to control media playback on Chromecasts, and provides an interface for playback information.
 
-MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspace/tree/master/applets/mediacontroller) in Plasma Desktop, and [there are options for GNOME, too](https://extensions.gnome.org/extension/1379/mpris-indicator-button/).
+MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspace/tree/master/applets/mediacontroller) in Plasma Desktop, and [there are options for GNOME, too](https://extensions.gnome.org/extension/1379/mpris-indicator-button/). [`playerctl` provides a CLI](https://github.com/altdesktop/playerctl) for controlling media players through MPRIS.
 
 <img src="/assets/mpris_widget.png" width="350" />
 
-[`playerctl` provides a CLI](https://github.com/altdesktop/playerctl) for controlling media players through MPRIS.
+Checkout [mpris_server](https://github.com/alexdelorenzo/mpris_server) if you want to integrate MPRIS support into your media player.
 
 ## Features
   * [x] Control generic music and video playback
