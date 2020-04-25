@@ -3,20 +3,17 @@ import sys
 
 from mpris_server import server
 
-from .base import get_chromecast
+from .base import get_chromecast, RC_NO_CHROMECAST
 from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-logging.basicConfig(level=logging.WARN)
-
-
-def register_adapters_and_listeners():
-  chromecast = get_chromecast(name="KILLA")
+def register_adapters_and_listeners(name: str):
+  chromecast = get_chromecast(name)
 
   if not chromecast:
     logging.warning("Chromecast not found.")
-    sys.exit(1)
+    sys.exit(RC_NO_CHROMECAST)
 
   chromecast_adapter = ChromecastAdapter(chromecast)
   mpris = server.Server(name=chromecast.name,
@@ -26,10 +23,12 @@ def register_adapters_and_listeners():
   register_mpris_adapter(chromecast, mpris, chromecast_adapter)
 
 
-def main():
+def main(name: str, log_level: int = logging.INFO):
+  logging.basicConfig(level=log_level)
+
   from gi.repository import GLib
 
-  register_adapters_and_listeners()
+  register_adapters_and_listeners(name)
   loop = GLib.MainLoop()
   loop.run()
 
@@ -38,4 +37,4 @@ if __name__ == "__main__":
   # from dbus.mainloop.glib import DBusGMainLoop
   # DBusGMainLoop(set_as_default=True)
 
-  main()
+  main(sys.argv[1], )

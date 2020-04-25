@@ -1,19 +1,21 @@
+from pathlib import Path
 from typing import List
 from mimetypes import guess_type
 
-from mpris_server import adapters
-import pychromecast
-
 from mpris_server.base import URI, MIME_TYPES
-from mpris_server.adapters import Metadata, PlayState
+from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
+  TimeInMicroseconds, VolumeAsDecimal, RateAsDecimal
+from mpris_server import adapters
+
+import pychromecast
 
 from .base import ChromecastMediaType, DEFAULT_THUMB
 
 
-SEC_TO_US = 1_000_000
+US_IN_SEC = 1_000_000  # seconds to microseconds
 
 
-class ChromecastAdapter(adapters.MprisAdapter):
+class ChromecastAdapter(MprisAdapter):
   def __init__(self, chromecast: pychromecast.Chromecast):
     self.cc = chromecast
     super().__init__(chromecast.name)
@@ -24,11 +26,11 @@ class ChromecastAdapter(adapters.MprisAdapter):
   def get_mime_types(self) -> List[str]:
     return MIME_TYPES
 
-  def get_current_position(self) -> int:
-    curr = self.cc.media_controller.status.adjusted_current_time
+  def get_current_position(self) -> TimeInMicroseconds:
+    position_secs = self.cc.media_controller.status.adjusted_current_time
 
-    if curr:
-      return int(curr * SEC_TO_US)
+    if position_secs:
+      return int(position_secs * US_IN_SEC)
 
     return 0
 
@@ -59,8 +61,8 @@ class ChromecastAdapter(adapters.MprisAdapter):
 
     return PlayState.STOPPED
 
-  def seek(self, time: int):
-    seconds = int(time / SEC_TO_US)
+  def seek(self, time: TimeInMicroseconds):
+    seconds = int(time / US_IN_SEC)
     self.cc.media_controller.seek(seconds)
 
   def open_uri(self, uri: str):
@@ -79,10 +81,10 @@ class ChromecastAdapter(adapters.MprisAdapter):
   def set_loop_status(self, val: str):
     pass
 
-  def get_rate(self) -> float:
+  def get_rate(self) -> RateAsDecimal:
     return 1.0
 
-  def set_rate(self, val: float):
+  def set_rate(self, val: RateAsDecimal):
     pass
 
   def get_shuffle(self) -> bool:
@@ -95,17 +97,17 @@ class ChromecastAdapter(adapters.MprisAdapter):
     thumb = self.cc.media_controller.thumbnail
     return thumb if thumb else DEFAULT_THUMB
 
-  def get_volume(self) -> float:
+  def get_volume(self) -> VolumeAsDecimal:
     return self.cc.status.volume_level
 
-  def set_volume(self, val: float):
+  def set_volume(self, val: VolumeAsDecimal):
     curr = self.get_volume()
     diff = val - curr
 
     if diff > 0:  # vol up
       self.cc.volume_up(diff)
 
-    else:
+    elif diff < 0:  # can't turn down by 0
       self.cc.volume_down(abs(diff))
 
   def is_mute(self) -> bool:
@@ -148,7 +150,7 @@ class ChromecastAdapter(adapters.MprisAdapter):
     duration = self.cc.media_controller.status.duration
 
     if duration:
-      duration *= SEC_TO_US
+      duration *= US_IN_SEC
 
     else:
       duration = 0
@@ -184,6 +186,9 @@ class ChromecastAdapter(adapters.MprisAdapter):
 
   def metadata(self) -> Metadata:
     pass
+
+  def get_desktop_entry(self) -> str:
+    return str(Path("chromecast_mpris.desktop").absolute())
 
 
 def get_media_type(cc: pychromecast.Chromecast) -> ChromecastMediaType:

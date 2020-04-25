@@ -9,6 +9,9 @@ from pychromecast.socket_client import CastStatus
 from pychromecast import Chromecast
 
 
+Status = Union[MediaStatus, CastStatus]
+
+
 class ChromecastEventListener(ABC):
   """
   Event listeners that conform to pychromecast's API
@@ -24,7 +27,7 @@ class ChromecastEventAdapter(EventAdapter):
   def __init__(self,
                name: str,
                chromecast: Chromecast,
-               server: Server = None,
+               server: Server,
                adapter: MprisAdapter = None):
     self.name = name
     self.chromecast = chromecast
@@ -33,9 +36,6 @@ class ChromecastEventAdapter(EventAdapter):
     self.adapter = adapter
     self.cc = chromecast
     super().__init__(self.server.player, self.server.root)
-
-
-Status = Union[MediaStatus, CastStatus]
 
 
 class ChromecastEventHandler(ChromecastEventAdapter,
