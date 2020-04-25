@@ -23,11 +23,6 @@ Checkout [mpris_server](https://github.com/alexdelorenzo/mpris_server) if you wa
   * [ ] Quit Chromecast app / Shutdown
 
 ## Installation
-Run `pip3 install -r requirements.txt`, followed by `python3 setup.py install`. 
-
-You'll get a `chromecast_mpris` executable added to your `$PATH`.
-
-
 ### Requirements
  - Linux
  - DBUS
@@ -35,6 +30,16 @@ You'll get a `chromecast_mpris` executable added to your `$PATH`.
  - python3-gi (Python GObject introspection)
  - `requirements.txt`
  
+### PyPI
+`pip3 install chromecast_mpris`
+
+You'll get a `chromecast_mpris` executable added to your `$PATH`.
+
+
+### Github
+Clone the repo, run `pip3 install -r requirements.txt`, followed by `python3 setup.py install`. 
+
+You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
 ## Usage
 You'll need to make sure that your computer is on the same network as your Chromecasts, and that you're able to make connections to them. 
