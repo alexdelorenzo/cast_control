@@ -1,14 +1,14 @@
 import logging
 import sys
 
-from mpris_server import server
+from mpris_server.server import Server
 
 from .base import get_chromecast, RC_NO_CHROMECAST
 from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-def create_adapters_and_server(chromecast_name: str) -> server.Server:
+def create_adapters_and_server(chromecast_name: str) -> Server:
   chromecast = get_chromecast(chromecast_name)
 
   if not chromecast:
@@ -16,8 +16,7 @@ def create_adapters_and_server(chromecast_name: str) -> server.Server:
     sys.exit(RC_NO_CHROMECAST)
 
   chromecast_adapter = ChromecastAdapter(chromecast)
-  mpris = server.Server(name=chromecast.name,
-                        adapter=chromecast_adapter)
+  mpris = Server(name=chromecast.name, adapter=chromecast_adapter)
   mpris.publish()
 
   register_mpris_adapter(chromecast, mpris, chromecast_adapter)
