@@ -10,7 +10,7 @@ MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspac
 Run `pip3 install -r requirements.txt`, followed by `python3 setup.py install`. 
 You'll get `chromecast_mpris` added to your `$PATH`.
 
-!![Screenshot of Plasma Desktop's mediacontroller widget](/assets/mpris_widget.png | width=200)
+<img src="/assets/mpris_widget.png" width="200" />
 
 ### Requirements
  - Linux
