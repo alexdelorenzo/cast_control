@@ -60,9 +60,7 @@ class ChromecastEventHandler(ChromecastEventAdapter,
 def register_mpris_adapter(chromecast: Chromecast,
                            server: Server,
                            adapter: MprisAdapter):
-  listenerMedia = ChromecastEventHandler(chromecast.name,
-                                         chromecast,
-                                         server,
-                                         adapter)
-  chromecast.media_controller.register_status_listener(listenerMedia)
-  chromecast.register_status_listener(listenerMedia)
+  event_listener = \
+    ChromecastEventHandler(chromecast.name, chromecast, server, adapter)
+  chromecast.media_controller.register_status_listener(event_listener)
+  chromecast.register_status_listener(event_listener)
