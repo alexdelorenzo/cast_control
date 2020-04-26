@@ -6,6 +6,8 @@ MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspac
 
 Checkout [▶️mpris_server](https://github.com/alexdelorenzo/mpris_server) if you want to integrate MPRIS support into your media player.
 
+## Screenshot
+
 Controlling a Chromecast via Plasma Desktop's Media Player widget:
 
 <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/assets/mpris_widget.png" height="350" /> <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/assets/mpris_bar.png" height="350" />
