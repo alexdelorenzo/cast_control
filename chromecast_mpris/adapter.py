@@ -25,6 +25,9 @@ class ChromecastAdapter(MprisAdapter):
 
   def get_mime_types(self) -> List[str]:
     return MIME_TYPES
+  
+  def quit(self):
+    self.cc.quit_app()
 
   def get_current_position(self) -> TimeInMicroseconds:
     position_secs = self.cc.media_controller.status.adjusted_current_time
