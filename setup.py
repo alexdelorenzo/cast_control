@@ -22,5 +22,5 @@ setup(
       install_requires=requirements,
       entry_points={"console_scripts":
                       ["chromecast_mpris = chromecast_mpris.command:cmd"]},
-      python_requires='~=3.6',
+      python_requires='>=3.6',
 )
