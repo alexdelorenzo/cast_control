@@ -2,15 +2,14 @@ from pathlib import Path
 from typing import List
 from mimetypes import guess_type
 
-from mpris_server.base import URI, MIME_TYPES
+from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   TimeInMicroseconds, VolumeAsDecimal, RateAsDecimal
 from mpris_server import adapters
 
 import pychromecast
 
-from .base import ChromecastMediaType, DEFAULT_THUMB
-
+from .base import ChromecastMediaType, DEFAULT_THUMB, YOUTUBE, NO_DURATION, NO_DELTA
 
 US_IN_SEC = 1_000_000  # seconds to microseconds
 
@@ -35,9 +34,12 @@ class ChromecastAdapter(MprisAdapter):
     if position_secs:
       return int(position_secs * US_IN_SEC)
 
-    return 0
+    return BEGINNING
 
   def next(self):
+    if self.cc.status.display_name == YOUTUBE:
+      self.cc.media_controller.skip()
+
     self.cc.media_controller.queue_next()
 
   def previous(self):
@@ -85,7 +87,7 @@ class ChromecastAdapter(MprisAdapter):
     pass
 
   def get_rate(self) -> RateAsDecimal:
-    return 1.0
+    return DEFAULT_RATE
 
   def set_rate(self, val: RateAsDecimal):
     pass
@@ -107,10 +109,11 @@ class ChromecastAdapter(MprisAdapter):
     curr = self.get_volume()
     diff = val - curr
 
-    if diff > 0:  # vol up
+    # can't adjust vol by 0
+    if diff > NO_DELTA:  # vol up
       self.cc.volume_up(diff)
 
-    elif diff < 0:  # can't turn down by 0
+    elif diff < NO_DELTA:
       self.cc.volume_down(abs(diff))
 
   def is_mute(self) -> bool:
@@ -156,7 +159,7 @@ class ChromecastAdapter(MprisAdapter):
       duration *= US_IN_SEC
 
     else:
-      duration = 0
+      duration = NO_DURATION
 
     artist = adapters.Artist(name)
 
