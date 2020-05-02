@@ -24,6 +24,9 @@ class ChromecastAdapter(MprisAdapter):
 
   def get_mime_types(self) -> List[str]:
     return MIME_TYPES
+
+  def can_quit(self) -> bool:
+    return True
   
   def quit(self):
     self.cc.quit_app()
