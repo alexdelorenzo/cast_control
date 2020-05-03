@@ -30,7 +30,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 ## Installation
 ### Requirements
  - Linux
- - DBUS
+ - DBus
  - Python >= 3.6
  - [PyGObject](https://pypi.org/project/PyGObject/)
  - `requirements.txt`
