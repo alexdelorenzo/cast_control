@@ -32,9 +32,14 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
  - Linux
  - DBUS
  - Python >= 3.6
- - python3-gi (Python GObject introspection)
+ - [PyGObject](https://pypi.org/project/PyGObject/)
  - `requirements.txt`
  
+#### Installing PyGObject
+On Debian-derived distributions like Ubuntu, install `python3-gi` with `apt`. On Arch, you'll want to install `python-gobject`.
+
+Use `pip` to install `PyGObject>=3.34.0` if there are no installation candidates available in your vendor's package repositories.
+
 ### PyPI
 `pip3 install chromecast_mpris`
 
