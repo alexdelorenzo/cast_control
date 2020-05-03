@@ -24,7 +24,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
   * [x] Volume up and down
   * [x] Play next and previous
   * [x] Quit Chromecast app
-  * [ ] Open media from MPRIS
+  * [x] Open media from MPRIS
   * [ ] Playlist integration
 
 ## Installation
