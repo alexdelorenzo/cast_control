@@ -6,7 +6,7 @@ MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspac
 
 Check out [▶️mpris_server](https://github.com/alexdelorenzo/mpris_server) if you want to integrate MPRIS support into your media player.
 
-## Screenshot
+## Screenshots
 
 Controlling a Chromecast via Plasma Desktop's Media Player widget:
 
@@ -29,7 +29,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 
 ## Installation
 ### Requirements
- - Linux
+ - Linux / *BSD / [macOS](https://github.com/zbentley/dbus-osx-examples)
  - DBus
  - Python >= 3.6
  - [PyGObject](https://pypi.org/project/PyGObject/)
