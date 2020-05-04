@@ -16,7 +16,8 @@ def create_adapters_and_server(chromecast_name: str) -> Server:
     sys.exit(RC_NO_CHROMECAST)
 
   chromecast_adapter = ChromecastAdapter(chromecast)
-  mpris = Server(name=chromecast.name, adapter=chromecast_adapter)
+  bus_name = chromecast.name.replace(" ", "_")
+  mpris = Server(name=bus_name, adapter=chromecast_adapter)
   mpris.publish()
 
   register_mpris_adapter(chromecast, mpris, chromecast_adapter)
