@@ -24,6 +24,7 @@ def get_chromecast(name: str) -> Optional[pychromecast.Chromecast]:
   chromecasts = pychromecast.get_chromecasts()
 
   if not name:
+    chromecasts[0].wait()
     return chromecasts[0] if chromecasts else None
 
   name = name.lower()
