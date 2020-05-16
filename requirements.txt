@@ -1,5 +1,5 @@
 PyChromecast>=5.0.0
 PyGObject>=3.34.0
 pydbus>=0.6.0
-mpris_server>=0.1.4
+mpris_server>=0.1.5
 click>=7.0
