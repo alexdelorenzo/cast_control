@@ -5,11 +5,14 @@ import pychromecast
 
 from mpris_server.base import AutoName
 
-DEFAULT_THUMB = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
 RC_NO_CHROMECAST = 1
-YOUTUBE = "YouTube"
 NO_DURATION = 0
 NO_DELTA = 0
+
+DESKTOP_FILE = "chromecast_mpris.desktop"
+DEFAULT_THUMB = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
+
+YOUTUBE = "YouTube"
 
 
 class ChromecastMediaType(AutoName):
