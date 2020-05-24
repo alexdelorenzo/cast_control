@@ -9,7 +9,8 @@ from mpris_server import adapters
 
 import pychromecast
 
-from .base import ChromecastMediaType, DEFAULT_THUMB, YOUTUBE, NO_DURATION, NO_DELTA
+from .base import ChromecastMediaType, DEFAULT_THUMB, YOUTUBE, NO_DURATION, \
+    NO_DELTA, DESKTOP_FILE
 
 US_IN_SEC = 1_000_000  # seconds to microseconds
 
@@ -27,7 +28,7 @@ class ChromecastAdapter(MprisAdapter):
 
   def can_quit(self) -> bool:
     return True
-  
+
   def quit(self):
     self.cc.quit_app()
 
@@ -40,8 +41,8 @@ class ChromecastAdapter(MprisAdapter):
     return BEGINNING
 
   def next(self):
-    if self.cc.status.display_name == YOUTUBE:
-      self.cc.media_controller.skip()
+    #if self.cc.status.display_name == YOUTUBE:
+      #self.cc.media_controller.skip()
 
     self.cc.media_controller.queue_next()
 
@@ -197,7 +198,7 @@ class ChromecastAdapter(MprisAdapter):
     pass
 
   def get_desktop_entry(self) -> str:
-    return str(Path("chromecast_mpris.desktop").absolute())
+    return str(Path(DESKTOP_FILE).absolute())
 
 
 def get_media_type(cc: pychromecast.Chromecast) -> ChromecastMediaType:
