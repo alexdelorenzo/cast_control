@@ -32,7 +32,6 @@ class ChromecastEventAdapter(EventAdapter):
     self.name = name
     self.chromecast = chromecast
     self.server = server
-
     self.adapter = adapter
     self.cc = chromecast
     super().__init__(self.server.player, self.server.root)

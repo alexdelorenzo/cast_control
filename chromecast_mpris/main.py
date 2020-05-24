@@ -1,3 +1,4 @@
+from typing import Optional
 import logging
 import sys
 
@@ -8,12 +9,11 @@ from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-def create_adapters_and_server(chromecast_name: str) -> Server:
+def create_adapters_and_server(chromecast_name: str) -> Optional[Server]:
   chromecast = get_chromecast(chromecast_name)
 
   if not chromecast:
-    logging.warning("Chromecast not found.")
-    sys.exit(RC_NO_CHROMECAST)
+    return None
 
   chromecast_adapter = ChromecastAdapter(chromecast)
   mpris = Server(name=chromecast.name, adapter=chromecast_adapter)
@@ -26,8 +26,12 @@ def create_adapters_and_server(chromecast_name: str) -> Server:
 
 def main(name: str, log_level: int = logging.INFO):
   logging.basicConfig(level=log_level)
-
   mpris = create_adapters_and_server(name)
+
+  if not mpris:
+    logging.warning("Chromecast not found.")
+    sys.exit(RC_NO_CHROMECAST)
+
   mpris.loop()
 
 
