@@ -13,7 +13,7 @@ def create_adapters_and_server(chromecast_name: str) -> Optional[Server]:
   chromecast = get_chromecast(chromecast_name)
 
   if not chromecast:
-    return None
+    return
 
   chromecast_adapter = ChromecastAdapter(chromecast)
   mpris = Server(name=chromecast.name, adapter=chromecast_adapter)
