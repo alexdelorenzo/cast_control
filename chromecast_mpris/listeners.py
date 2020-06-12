@@ -8,9 +8,7 @@ from pychromecast.controllers.media import MediaStatus
 from pychromecast.socket_client import CastStatus
 from pychromecast import Chromecast
 
-
-Status = Union[MediaStatus, CastStatus]
-
+from .base import Status
 
 class ChromecastEventListener(ABC):
   """

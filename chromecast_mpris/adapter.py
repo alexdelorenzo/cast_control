@@ -1,23 +1,27 @@
 from pathlib import Path
-from typing import List
+from typing import List, Callable, Iterable, Any, Optional
 from mimetypes import guess_type
+from functools import wraps
+from enum import Enum, auto
 
-from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE
+from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE, \
+  AutoName
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   TimeInMicroseconds, VolumeAsDecimal, RateAsDecimal
 from mpris_server import adapters
 
 import pychromecast
 
-from .base import ChromecastMediaType, DEFAULT_THUMB, YOUTUBE, NO_DURATION, \
+from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB, YOUTUBE, NO_DURATION, \
     NO_DELTA, DESKTOP_FILE
+
 
 US_IN_SEC = 1_000_000  # seconds to microseconds
 
 
 class ChromecastAdapter(MprisAdapter):
   def __init__(self, chromecast: pychromecast.Chromecast):
-    self.cc = chromecast
+    self.cc = ChromecastWrapper(chromecast)
     super().__init__(chromecast.name)
 
   def get_uri_schemes(self) -> List[str]:
@@ -31,9 +35,9 @@ class ChromecastAdapter(MprisAdapter):
 
   def quit(self):
     self.cc.quit_app()
-
+  
   def get_current_position(self) -> TimeInMicroseconds:
-    position_secs = self.cc.media_controller.status.adjusted_current_time
+    position_secs = self.cc.media_status.adjusted_current_time
 
     if position_secs:
       return int(position_secs * US_IN_SEC)
@@ -41,7 +45,7 @@ class ChromecastAdapter(MprisAdapter):
     return BEGINNING
 
   def next(self):
-    #if self.cc.status.display_name == YOUTUBE:
+    #if self.cc.cast_status.display_name == YOUTUBE:
       #self.cc.media_controller.skip()
 
     self.cc.media_controller.queue_next()
@@ -107,7 +111,7 @@ class ChromecastAdapter(MprisAdapter):
     return thumb if thumb else DEFAULT_THUMB
 
   def get_volume(self) -> VolumeAsDecimal:
-    return self.cc.status.volume_level
+    return self.cc.cast_status.volume_level
 
   def set_volume(self, val: VolumeAsDecimal):
     curr = self.get_volume()
@@ -121,32 +125,33 @@ class ChromecastAdapter(MprisAdapter):
       self.cc.volume_down(abs(diff))
 
   def is_mute(self) -> bool:
-    return self.cc.status.volume_muted
+    if self.cc.cast_status:
+      return self.cc.cast_status.volume_muted
 
   def set_mute(self, val: bool):
     self.cc.set_volume_muted(val)
 
   def can_go_next(self) -> bool:
-    return self.cc.media_controller.status.supports_queue_next
+    return self.cc.media_status.supports_queue_next
 
   def can_go_previous(self) -> bool:
-    return self.cc.media_controller.status.supports_queue_prev
+    return self.cc.media_status.supports_queue_prev
 
   def can_play(self) -> bool:
     return True
 
   def can_pause(self) -> bool:
-    return self.cc.media_controller.status.supports_pause
+    return self.cc.media_status.supports_pause
 
   def can_seek(self) -> bool:
-    return self.cc.media_controller.status.supports_seek
+    return self.cc.media_status.supports_seek
 
   def can_control(self) -> bool:
     return True
 
   def get_stream_title(self) -> str:
     title = self.cc.media_controller.title
-    metadata = self.cc.media_controller.status.media_metadata
+    metadata = self.cc.media_status.media_metadata
 
     if 'subtitle' in metadata:
       title = ' - '.join((title, metadata['subtitle']))
@@ -155,9 +160,9 @@ class ChromecastAdapter(MprisAdapter):
 
   def get_current_track(self) -> adapters.Track:
     art_url = self.get_art_url()
-    content_id = self.cc.media_controller.status.content_id
-    name = self.cc.media_controller.status.artist
-    duration = self.cc.media_controller.status.duration
+    content_id = self.cc.media_status.content_id
+    name = self.cc.media_status.artist
+    duration = self.cc.media_status.duration
 
     if duration:
       duration *= US_IN_SEC
@@ -168,7 +173,7 @@ class ChromecastAdapter(MprisAdapter):
     artist = adapters.Artist(name)
 
     album = adapters.Album(
-      name=self.cc.media_controller.status.album_name,
+      name=self.cc.media_status.album_name,
       artists=(artist,),
       art_url=art_url,
     )
@@ -176,7 +181,7 @@ class ChromecastAdapter(MprisAdapter):
     track = adapters.Track(
       track_id=f'/tracks/1',
       name=self.get_stream_title(),
-      track_no=self.cc.media_controller.status.track,
+      track_no=self.cc.media_status.track,
       length=int(duration),
       uri=content_id,
       artists=(artist,),

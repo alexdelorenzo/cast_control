@@ -1,18 +1,27 @@
-from typing import Optional
+from typing import Optional, Any, Union
 from enum import auto
 
+from pychromecast.controllers.media import MediaStatus
+from pychromecast.socket_client import CastStatus
+from pychromecast import Chromecast
 import pychromecast
 
 from mpris_server.base import AutoName
 
+
 RC_NO_CHROMECAST = 1
 NO_DURATION = 0
 NO_DELTA = 0
+NO_CHROMECAST_NAME = "NO_NAME"
+FIRST_CHROMECAST = 0
 
 DESKTOP_FILE = "chromecast_mpris.desktop"
 DEFAULT_THUMB = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
 
 YOUTUBE = "YouTube"
+
+
+Status = Union[MediaStatus, CastStatus]
 
 
 class ChromecastMediaType(AutoName):
@@ -23,11 +32,37 @@ class ChromecastMediaType(AutoName):
   TVSHOW = auto()
 
 
-def get_chromecast(name: str) -> Optional[pychromecast.Chromecast]:
+class ChromecastWrapper:
+  """
+  A wrapper to make it easier to switch out implementations.
+
+  Holds common logic for dealing with underlying Chromecast API.
+  """
+  def __init__(self, cc: Chromecast):
+    self.cc = cc
+  
+  def __getattr__(self, name: str) -> Any:
+    return getattr(self.cc, name)
+  
+  @property
+  def cast_status(self) -> Optional[CastStatus]:
+    return self.cc.status
+  
+  @property
+  def media_status(self) -> Optional[MediaStatus]:
+    return self.cc.media_controller.status
+
+
+def get_chromecast(name: Optional[str] = None) -> Optional[Chromecast]:
   chromecasts = pychromecast.get_chromecasts()
 
-  if not name:
-    return chromecasts[0] if chromecasts else None
+  if not name and not chromecasts:
+    return
+  
+  elif not name:
+    chromecast = chromecasts[FIRST_CHROMECAST]
+    chromecast.wait()
+    return chromecast
 
   name = name.lower()
 
@@ -35,3 +70,4 @@ def get_chromecast(name: str) -> Optional[pychromecast.Chromecast]:
     if chromecast.name.lower() == name:
       chromecast.wait()
       return chromecast
+

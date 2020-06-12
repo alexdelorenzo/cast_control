@@ -9,8 +9,13 @@ from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-def create_adapters_and_server(chromecast_name: str) -> Optional[Server]:
-  chromecast = get_chromecast(chromecast_name)
+def create_adapters_and_server(chromecast_name: Optional[str]) -> Optional[Server]:
+  # breakpoint()
+  if chromecast_name:
+    chromecast = get_chromecast(chromecast_name)
+  
+  else:
+    chromecast = get_chromecast()
 
   if not chromecast:
     return
@@ -24,7 +29,7 @@ def create_adapters_and_server(chromecast_name: str) -> Optional[Server]:
   return mpris
 
 
-def main(name: str, log_level: int = logging.INFO):
+def main(name: Optional[str], log_level: int = logging.INFO):
   logging.basicConfig(level=log_level)
   mpris = create_adapters_and_server(name)
 
@@ -36,7 +41,4 @@ def main(name: str, log_level: int = logging.INFO):
 
 
 if __name__ == "__main__":
-  # from dbus.mainloop.glib import DBusGMainLoop
-  # DBusGMainLoop(set_as_default=True)
-
   main(sys.argv[1])
