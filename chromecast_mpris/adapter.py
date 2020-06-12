@@ -1,22 +1,19 @@
-from pathlib import Path
-from typing import List, Callable, Iterable, Any, Optional
 from mimetypes import guess_type
-from functools import wraps
-from enum import Enum, auto
-
-from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE, \
-  AutoName
-from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
-  TimeInMicroseconds, VolumeAsDecimal, RateAsDecimal
-from mpris_server import adapters
+from pathlib import Path
+from typing import List, Dict
 
 import pychromecast
+from gi.overrides.GLib import Variant
 
-from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB, YOUTUBE, NO_DURATION, \
-    NO_DELTA, DESKTOP_FILE
-
+from mpris_server import adapters
+from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
+  Microseconds, VolumeDecimal, RateDecimal
+from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE
+from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB,\
+  NO_DURATION, NO_DELTA, DESKTOP_FILE
 
 US_IN_SEC = 1_000_000  # seconds to microseconds
+DEFAULT_TRACK = "/track/1"
 
 
 class ChromecastAdapter(MprisAdapter):
@@ -36,7 +33,7 @@ class ChromecastAdapter(MprisAdapter):
   def quit(self):
     self.cc.quit_app()
   
-  def get_current_position(self) -> TimeInMicroseconds:
+  def get_current_position(self) -> Microseconds:
     position_secs = self.cc.media_status.adjusted_current_time
 
     if position_secs:
@@ -45,9 +42,6 @@ class ChromecastAdapter(MprisAdapter):
     return BEGINNING
 
   def next(self):
-    #if self.cc.cast_status.display_name == YOUTUBE:
-      #self.cc.media_controller.skip()
-
     self.cc.media_controller.queue_next()
 
   def previous(self):
@@ -74,7 +68,7 @@ class ChromecastAdapter(MprisAdapter):
 
     return PlayState.STOPPED
 
-  def seek(self, time: TimeInMicroseconds):
+  def seek(self, time: Microseconds):
     seconds = int(time / US_IN_SEC)
     self.cc.media_controller.seek(seconds)
 
@@ -94,10 +88,10 @@ class ChromecastAdapter(MprisAdapter):
   def set_loop_status(self, val: str):
     pass
 
-  def get_rate(self) -> RateAsDecimal:
+  def get_rate(self) -> RateDecimal:
     return DEFAULT_RATE
 
-  def set_rate(self, val: RateAsDecimal):
+  def set_rate(self, val: RateDecimal):
     pass
 
   def get_shuffle(self) -> bool:
@@ -110,10 +104,10 @@ class ChromecastAdapter(MprisAdapter):
     thumb = self.cc.media_controller.thumbnail
     return thumb if thumb else DEFAULT_THUMB
 
-  def get_volume(self) -> VolumeAsDecimal:
+  def get_volume(self) -> VolumeDecimal:
     return self.cc.cast_status.volume_level
 
-  def set_volume(self, val: VolumeAsDecimal):
+  def set_volume(self, val: VolumeDecimal):
     curr = self.get_volume()
     diff = val - curr
 
@@ -158,10 +152,13 @@ class ChromecastAdapter(MprisAdapter):
 
     return title
 
-  def get_current_track(self) -> adapters.Track:
-    art_url = self.get_art_url()
-    content_id = self.cc.media_status.content_id
-    name = self.cc.media_status.artist
+  def get_previous_track(self) -> adapters.Track:
+    pass
+
+  def get_next_track(self) -> adapters.Track:
+    pass
+
+  def _get_duration(self) -> Microseconds:
     duration = self.cc.media_status.duration
 
     if duration:
@@ -170,6 +167,32 @@ class ChromecastAdapter(MprisAdapter):
     else:
       duration = NO_DURATION
 
+    return duration
+
+  def metadata(self) -> Metadata:
+    artist = self.cc.media_status.artist
+
+    metadata = {
+      "mpris:trackid": DEFAULT_TRACK,
+      "mpris:length": self._get_duration(),
+      "mpris:artUrl": self.get_art_url(),
+      "xesam:url": self.cc.media_status.content_id,
+      "xesam:title": self.get_stream_title(),
+      "xesam:artist": [artist],
+      "xesam:album": self.cc.media_status.album_name,
+      "xesam:albumArtist": [artist],
+      "xesam:discNumber": 1,
+      "xesam:trackNumber": self.cc.media_status.track,
+      "xesam:comment": ["comment"],
+    }
+
+    return metadata
+
+  def get_current_track(self) -> adapters.Track:
+    art_url = self.get_art_url()
+    content_id = self.cc.media_status.content_id
+    name = self.cc.media_status.artist
+    duration = self._get_duration()
     artist = adapters.Artist(name)
 
     album = adapters.Album(
@@ -179,7 +202,7 @@ class ChromecastAdapter(MprisAdapter):
     )
 
     track = adapters.Track(
-      track_id=f'/tracks/1',
+      track_id=DEFAULT_TRACK,
       name=self.get_stream_title(),
       track_no=self.cc.media_status.track,
       length=int(duration),
@@ -193,20 +216,11 @@ class ChromecastAdapter(MprisAdapter):
 
     return track
 
-  def get_previous_track(self) -> adapters.Track:
-    pass
-
-  def get_next_track(self) -> adapters.Track:
-    pass
-
-  def metadata(self) -> Metadata:
-    pass
-
   def get_desktop_entry(self) -> str:
     return str(Path(DESKTOP_FILE).absolute())
 
 
-def get_media_type(cc: pychromecast.Chromecast) -> ChromecastMediaType:
+def get_media_type(cc: ChromecastWrapper) -> ChromecastMediaType:
   if cc.media_controller.status.media_is_movie:
     return ChromecastMediaType.MOVIE
 
@@ -221,3 +235,5 @@ def get_media_type(cc: pychromecast.Chromecast) -> ChromecastMediaType:
 
   elif cc.media_controller.status.media_is_generic:
     return ChromecastMediaType.GENERIC
+
+
