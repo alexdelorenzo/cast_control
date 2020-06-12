@@ -60,7 +60,7 @@ It also helps to know the names of the devices in advance.
 #### Help
 ```bash
 $ chromecast_mpris --help
-Usage: command.py [OPTIONS]
+Usage: chromecast_mpris [OPTIONS]
 
   Control Chromecasts through MPRIS media controls.
 
