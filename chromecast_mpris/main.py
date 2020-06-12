@@ -10,7 +10,6 @@ from .listeners import register_mpris_adapter
 
 
 def create_adapters_and_server(chromecast_name: Optional[str]) -> Optional[Server]:
-  # breakpoint()
   if chromecast_name:
     chromecast = get_chromecast(chromecast_name)
   

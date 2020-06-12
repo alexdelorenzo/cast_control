@@ -34,7 +34,7 @@ class ChromecastMediaType(AutoName):
 
 class ChromecastWrapper:
   """
-  A wrapper to make it easier to switch out implementations.
+  A wrapper to make it easier to switch out backend implementations.
 
   Holds common logic for dealing with underlying Chromecast API.
   """
@@ -43,6 +43,9 @@ class ChromecastWrapper:
   
   def __getattr__(self, name: str) -> Any:
     return getattr(self.cc, name)
+
+  def __repr__(self) -> str:
+    return f"<{self.__name__} for {self.cc}>"
   
   @property
   def cast_status(self) -> Optional[CastStatus]:
