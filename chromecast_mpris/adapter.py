@@ -8,9 +8,11 @@ from gi.overrides.GLib import Variant
 from mpris_server import adapters
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   Microseconds, VolumeDecimal, RateDecimal
-from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE
-from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB,\
+from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE, DbusObj
+
+from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB, \
   NO_DURATION, NO_DELTA, DESKTOP_FILE
+from mpris_server.compat import get_dbus_name
 
 US_IN_SEC = 1_000_000  # seconds to microseconds
 DEFAULT_TRACK = "/track/1"
@@ -170,20 +172,25 @@ class ChromecastAdapter(MprisAdapter):
     return duration
 
   def metadata(self) -> Metadata:
-    artist = self.cc.media_status.artist
+    title: str = self.get_stream_title()
+    dbus_name: DbusObj = f"/track/{get_dbus_name(title)}"
+
+    artist: str = self.cc.media_status.artist
+    artists: List[str] = [artist] if artist else []
+    comments: List[str] = []
 
     metadata = {
-      "mpris:trackid": DEFAULT_TRACK,
+      "mpris:trackid": dbus_name,
       "mpris:length": self._get_duration(),
       "mpris:artUrl": self.get_art_url(),
       "xesam:url": self.cc.media_status.content_id,
-      "xesam:title": self.get_stream_title(),
-      "xesam:artist": [artist],
+      "xesam:title": title,
+      "xesam:artist": artists,
       "xesam:album": self.cc.media_status.album_name,
-      "xesam:albumArtist": [artist],
+      "xesam:albumArtist": artists,
       "xesam:discNumber": 1,
       "xesam:trackNumber": self.cc.media_status.track,
-      "xesam:comment": ["comment"],
+      "xesam:comment": comments,
     }
 
     return metadata

@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 NAME = "chromecast_mpris"
-VERSION = "0.2.3"
+VERSION = "0.2.4"
 LICENSE = "AGPL-3.0"
 
 requirements = \
