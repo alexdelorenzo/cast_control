@@ -1,5 +1,8 @@
-PyChromecast>=7.1.1
+# foreign
+PyChromecast==7.1.1
 PyGObject>=3.34.0
 pydbus>=0.6.0
-mpris_server>=0.2.4
 click>=7.0
+
+# local
+mpris_server>=0.2.4
