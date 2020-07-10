@@ -57,7 +57,7 @@ class ChromecastWrapper:
 
 
 def get_chromecast(name: Optional[str] = None) -> Optional[Chromecast]:
-  chromecasts = pychromecast.get_chromecasts()
+  chromecasts, service_browser = pychromecast.get_chromecasts()
 
   if not name and not chromecasts:
     return

@@ -1,4 +1,4 @@
-PyChromecast>=5.0.0
+PyChromecast>=7.1.1
 PyGObject>=3.34.0
 pydbus>=0.6.0
 mpris_server>=0.2.4
