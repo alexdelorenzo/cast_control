@@ -10,6 +10,7 @@ from pychromecast import Chromecast
 
 from .base import Status
 
+
 class ChromecastEventListener(ABC):
   """
   Event listeners that conform to pychromecast's API
