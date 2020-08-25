@@ -4,13 +4,14 @@ from pathlib import Path
 
 
 NAME = "chromecast_mpris"
-VERSION = "0.2.4"
+VERSION = "0.2.6"
 LICENSE = "AGPL-3.0"
 
 requirements = \
   Path('requirements.txt') \
     .read_text() \
     .split('\n')
+
 readme = Path('README.md').read_text()
 
 setup(
