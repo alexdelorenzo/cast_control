@@ -72,7 +72,7 @@ Options:
 ```
 
 #### Connecting to a Device
-Connect to Chromecast named "My Chromecast" and run the adapter in the background.
+Connect to a Chromecast named "My Chromecast" and run the adapter in the background.
 ```bash
 $ chromecast_mpris -n "My Chromecast" &
 [1] 1234
