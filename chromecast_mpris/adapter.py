@@ -9,10 +9,10 @@ from mpris_server import adapters
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   Microseconds, VolumeDecimal, RateDecimal
 from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE, DbusObj
+from mpris_server.compat import get_dbus_name
 
 from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB, \
   NO_DURATION, NO_DELTA, DESKTOP_FILE
-from mpris_server.compat import get_dbus_name
 
 US_IN_SEC = 1_000_000  # seconds to microseconds
 DEFAULT_TRACK = "/track/1"
