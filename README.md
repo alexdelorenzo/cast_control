@@ -30,7 +30,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 ## Installation
 ### Requirements
  - Linux / *BSD / [macOS](https://github.com/zbentley/dbus-osx-examples)
- - DBus
+ - D-Bus
  - Python >= 3.6
  - [PyGObject](https://pypi.org/project/PyGObject/)
  - `requirements.txt`
