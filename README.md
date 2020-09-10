@@ -46,7 +46,7 @@ Use `pip` to install `PyGObject>=3.34.0` if there are no installation candidates
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
 
-### Github
+### GitHub
 Clone the repo, run `pip3 install -r requirements.txt`, followed by `python3 setup.py install`. 
 
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
