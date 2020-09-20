@@ -71,12 +71,30 @@ Options:
   --help                   Show this message and exit.
 ```
 
-#### Connecting to a Device
+#### Connecting to a Chromecast
 Connect to a Chromecast named "My Chromecast" and run `chromecast_mpris` in the background.
 ```bash
 $ chromecast_mpris -n "My Chromecast" &
 [1] 1234
 ```
+
+After launching `chromecast_mpris`, you can use any MPRIS client to interact with it. MPRIS support is built in directly to Plasma Desktop and GNOME 3, and you can use `playerctl` on the command-line. 
+
+#### Opening a URI on a Chromecast
+ Get the D-Bus name for your Chromecast using `playerctl`.
+```bash
+$ playerctl -l
+My_Chromecast
+```
+
+Use the D-Bus name to issue commands to it.
+
+```bash
+$ export URL="http://ccmixter.org/content/gmz/gmz_-_Parametaphoriquement.mp3"
+$ playerctl -p My_Chromecast open "$URL"
+```
+
+This will play a song on the Chromecast.
 
 ## License
 See `LICENSE`. Message me if you'd like to use this project with a different license.
