@@ -41,13 +41,15 @@ On Debian-derived distributions like Ubuntu, install `python3-gi` with `apt`. On
 Use `pip` to install `PyGObject>=3.34.0` if there are no installation candidates available in your vendor's package repositories.
 
 ### PyPI
-`pip3 install chromecast_mpris`
+```bash
+python3 -m pip install chromecast_mpris
+```
 
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
 
 ### GitHub
-Clone the repo, run `pip3 install -r requirements.txt`, followed by `python3 setup.py install`. 
+Clone the repo, run `python3 -m pip install -r requirements.txt`, followed by `python3 setup.py install`. 
 
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
