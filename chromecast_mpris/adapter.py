@@ -2,12 +2,11 @@ from mimetypes import guess_type
 from pathlib import Path
 from typing import List, Dict
 
-import pychromecast
+from pychromecast import Chromecast
 from gi.overrides.GLib import Variant
 
-from mpris_server import adapters
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
-  Microseconds, VolumeDecimal, RateDecimal
+  Microseconds, VolumeDecimal, RateDecimal, Track, Album, Artist
 from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE, DbusObj
 from mpris_server.compat import get_dbus_name
 
@@ -19,7 +18,7 @@ DEFAULT_TRACK = "/track/1"
 
 
 class ChromecastAdapter(MprisAdapter):
-  def __init__(self, chromecast: pychromecast.Chromecast):
+  def __init__(self, chromecast: Chromecast):
     self.cc = ChromecastWrapper(chromecast)
     super().__init__(chromecast.name)
 
@@ -34,7 +33,7 @@ class ChromecastAdapter(MprisAdapter):
 
   def quit(self):
     self.cc.quit_app()
-  
+
   def get_current_position(self) -> Microseconds:
     position_secs = self.cc.media_status.adjusted_current_time
 
@@ -154,10 +153,10 @@ class ChromecastAdapter(MprisAdapter):
 
     return title
 
-  def get_previous_track(self) -> adapters.Track:
+  def get_previous_track(self) -> Track:
     pass
 
-  def get_next_track(self) -> adapters.Track:
+  def get_next_track(self) -> Track:
     pass
 
   def _get_duration(self) -> Microseconds:
@@ -195,20 +194,20 @@ class ChromecastAdapter(MprisAdapter):
 
     return metadata
 
-  def get_current_track(self) -> adapters.Track:
+  def get_current_track(self) -> Track:
     art_url = self.get_art_url()
     content_id = self.cc.media_status.content_id
     name = self.cc.media_status.artist
     duration = self._get_duration()
-    artist = adapters.Artist(name)
+    artist = Artist(name)
 
-    album = adapters.Album(
+    album = Album(
       name=self.cc.media_status.album_name,
       artists=(artist,),
       art_url=art_url,
     )
 
-    track = adapters.Track(
+    track = Track(
       track_id=DEFAULT_TRACK,
       name=self.get_stream_title(),
       track_no=self.cc.media_status.track,

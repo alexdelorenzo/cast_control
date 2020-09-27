@@ -12,7 +12,7 @@ from .listeners import register_mpris_adapter
 def create_adapters_and_server(chromecast_name: Optional[str]) -> Optional[Server]:
   if chromecast_name:
     chromecast = get_chromecast(chromecast_name)
-
+  
   else:
     chromecast = get_chromecast()
 
@@ -28,7 +28,7 @@ def create_adapters_and_server(chromecast_name: Optional[str]) -> Optional[Serve
   return mpris
 
 
-def main(name: Optional[str], log_level: int = logging.DEBUG):
+def main(name: Optional[str], log_level: int = logging.INFO):
   logging.basicConfig(level=log_level)
   mpris = create_adapters_and_server(name)
 

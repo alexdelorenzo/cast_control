@@ -3,8 +3,7 @@ from enum import auto
 
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.socket_client import CastStatus
-from pychromecast import Chromecast
-import pychromecast
+from pychromecast import Chromecast, get_chromecasts
 
 from mpris_server.base import AutoName
 
@@ -57,11 +56,11 @@ class ChromecastWrapper:
 
 
 def get_chromecast(name: Optional[str] = None) -> Optional[Chromecast]:
-  chromecasts, service_browser = pychromecast.get_chromecasts()
+  chromecasts, service_browser = get_chromecasts()
 
   if not name and not chromecasts:
     return
-  
+
   elif not name:
     chromecast = chromecasts[FIRST_CHROMECAST]
     chromecast.wait()
