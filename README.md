@@ -66,8 +66,7 @@ You'll need to make sure that your computer is on the same network as your Chrom
 
 It also helps to know the names of the devices in advance.
 
-### Example
-#### Help
+### Help
 ```bash
 $ chromecast_mpris --help
 Usage: chromecast_mpris [OPTIONS]
@@ -81,7 +80,7 @@ Options:
   --help                   Show this message and exit.
 ```
 
-#### Connecting to a Chromecast
+### Connecting to a Chromecast
 Connect to a Chromecast named "My Chromecast" and run `chromecast_mpris` in the background.
 ```bash
 $ chromecast_mpris -n "My Chromecast" &
@@ -90,7 +89,7 @@ $ chromecast_mpris -n "My Chromecast" &
 
 After launching `chromecast_mpris`, you can use any MPRIS client to interact with it. MPRIS support is built in directly to Plasma Desktop and GNOME 3, and you can use `playerctl` on the command-line. 
 
-#### Opening a URI on a Chromecast
+### Opening a URI on a Chromecast
  Get the D-Bus name for your Chromecast using `playerctl`.
 ```bash
 $ playerctl -l
