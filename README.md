@@ -53,6 +53,14 @@ Clone the repo, run `python3 -m pip install -r requirements.txt`, followed by `p
 
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
+### Upgrading
+
+Stable releases are uploaded to PyPI. You can upgrade your `chromecast_mpris` installation like so:
+
+```bash
+python3 -m pip --upgrade chromecast_mpris
+```
+
 ## Usage
 You'll need to make sure that your computer is on the same network as your Chromecasts, and that you're able to make connections to them. 
 
