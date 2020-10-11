@@ -20,7 +20,12 @@ DEFAULT_THUMB = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chrom
 YOUTUBE = "YouTube"
 
 
+Seconds = int
 Status = Union[MediaStatus, CastStatus]
+
+
+class NoChromecastFoundException(Exception):
+  pass
 
 
 class ChromecastMediaType(AutoName):

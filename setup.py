@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 NAME = "chromecast_mpris"
-VERSION = "0.2.12"
+VERSION = "0.3.0"
 LICENSE = "AGPL-3.0"
 
 requirements = \
@@ -17,7 +17,7 @@ readme = Path('README.md').read_text()
 setup(
       name=NAME,
       version=VERSION,
-      description="Control Chromecasts via MPRIS.",
+      description="📺 Control Chromecasts from Linux and D-Bus",
       long_description=readme,
       long_description_content_type="text/markdown",
       url="https://alexdelorenzo.dev",
