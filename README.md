@@ -109,5 +109,16 @@ $ playerctl -p My_Chromecast open "$URL"
 
 This will play a song on the Chromecast.
 
+### Waiting until a Chromecast is found
+You can use the `-w/--wait` flag to specify a waiting period in seconds before `chromecast_mpris` will try find a Chromecast again if one is not found initially.
+
+For example, if you want to wait 60 seconds between scans for Chromecasts, you can run the following:
+```bash
+$ export SECONDS=60
+$ chromecast_mpris -w $SECONDS
+```
+
+This is useful if you'd like to start `chromecast_mpris` at login, and there is a chance that your Chromecast isn't on, or you're on a different network. 
+
 ## License
 See `LICENSE`. Message me if you'd like to use this project with a different license.
