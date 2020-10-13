@@ -109,7 +109,7 @@ $ playerctl -p My_Chromecast open "$URL"
 
 This will play a song on the Chromecast.
 
-### Waiting until a Chromecast is found
+### Retrying until a Chromecast is found
 You can use the `-w/--wait` flag to specify a waiting period in seconds before `chromecast_mpris` will try find a Chromecast again if one is not found initially.
 
 For example, if you want to wait 60 seconds between scans for Chromecasts, you can run the following:
