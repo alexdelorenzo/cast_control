@@ -74,9 +74,13 @@ Usage: chromecast_mpris [OPTIONS]
   Control Chromecasts through MPRIS media controls.
 
 Options:
-  -n, --name TEXT          Specify Chromecast, otherwise control first
-                           Chromecast found.
+  -n, --name TEXT          Specify a Chromecast name, otherwise control the
+                           first Chromecast found.
+
   -l, --log-level INTEGER  Debugging log level.  [default: 20]
+  -w, --wait INTEGER       Retry after specified amount of seconds if a
+                           Chromecast isn't found.
+
   --help                   Show this message and exit.
 ```
 
