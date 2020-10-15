@@ -61,6 +61,8 @@ Stable releases are uploaded to PyPI. You can upgrade your `chromecast_mpris` in
 python3 -m pip --upgrade chromecast_mpris
 ```
 
+See the [releases page](https://github.com/alexdelorenzo/chromecast_mpris/releases) on GitHub.
+
 ## Usage
 You'll need to make sure that your computer is on the same network as your Chromecasts, and that you're able to make connections to them. 
 
