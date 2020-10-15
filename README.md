@@ -79,10 +79,10 @@ Options:
   -n, --name TEXT          Specify a Chromecast name, otherwise control the
                            first Chromecast found.
 
-  -l, --log-level INTEGER  Debugging log level.  [default: 20]
   -w, --wait INTEGER       Retry after specified amount of seconds if a
                            Chromecast isn't found.
 
+  -l, --log-level INTEGER  Debugging log level.  [default: 20]
   --help                   Show this message and exit.
 ```
 
