@@ -4,29 +4,34 @@ from pathlib import Path
 
 
 NAME = "chromecast_mpris"
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 LICENSE = "AGPL-3.0"
 
-requirements = \
+ENTRY_POINTS = {
+  "console_scripts": [
+    f"{NAME} = {NAME}.command:cmd"
+  ]
+}
+
+REQS = \
   Path('requirements.txt') \
     .read_text() \
     .split('\n')
 
-readme = Path('README.md').read_text()
+README = Path('README.md').read_text()
 
 setup(
       name=NAME,
       version=VERSION,
       description="📺 Control Chromecasts from Linux and D-Bus",
-      long_description=readme,
+      long_description=README,
       long_description_content_type="text/markdown",
       url="https://alexdelorenzo.dev",
       author=__author__,
       license=LICENSE,
       packages=[NAME],
       zip_safe=True,
-      install_requires=requirements,
-      entry_points={"console_scripts":
-                      [f"{NAME} = {NAME}.command:cmd"]},
+      install_requires=REQS,
+      entry_points=ENTRY_POINTS,
       python_requires='>=3.6',
 )
