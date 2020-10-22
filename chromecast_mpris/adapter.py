@@ -218,7 +218,7 @@ class ChromecastAdapter(MprisAdapter):
       artists=(artist,),
       album=album,
       art_url=art_url,
-      disc_no=1,
+      disc_no=DEFAULT_DISC_NO,
       type=get_media_type(self.cc)
     )
 

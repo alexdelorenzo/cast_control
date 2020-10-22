@@ -47,16 +47,16 @@ class Wrapper(ABC):
   def media_status(self) -> Optional[MediaStatus]:
     pass
 
-  def can_play_next() -> bool:
+  def can_play_next(self) -> bool:
     pass
 
-  def can_play_prev() -> bool:
+  def can_play_prev(self) -> bool:
     pass
 
-  def play_next():
+  def play_next(self):
     pass
 
-  def play_prev():
+  def play_prev(self):
     pass
 
 
@@ -66,6 +66,7 @@ class ChromecastWrapper(Wrapper):
 
   Holds common logic for dealing with underlying Chromecast API.
   """
+
   def __init__(self, cc: Chromecast):
     self.cc = cc
     self.yt_ctl = YouTubeController()
@@ -85,16 +86,16 @@ class ChromecastWrapper(Wrapper):
   def media_status(self) -> Optional[MediaStatus]:
     return self.cc.media_controller.status
 
-  def can_play_next() -> bool:
-    return self.cc.media_status.supports_queue_next
+  def can_play_next(self) -> bool:
+    return self.media_status.supports_queue_next
 
-  def can_play_prev() -> bool:
-    return self.cc.media_status.supports_queue_next
+  def can_play_prev(self) -> bool:
+    return self.media_status.supports_queue_next
 
-  def play_next():
+  def play_next(self):
     self.cc.media_controller.queue_next()
 
-  def play_prev():
+  def play_prev(self):
     self.cc.media_controller.queue_prev()
 
 
