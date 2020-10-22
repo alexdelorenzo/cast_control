@@ -31,6 +31,24 @@ class ChromecastAdapter(MprisAdapter):
   def can_quit(self) -> bool:
     return True
 
+  def can_go_next(self) -> bool:
+    return self.cc.can_play_next()
+
+  def can_go_previous(self) -> bool:
+    return self.cc.can_play_prev()
+
+  def can_play(self) -> bool:
+    return True
+
+  def can_pause(self) -> bool:
+    return self.cc.media_status.supports_pause
+
+  def can_seek(self) -> bool:
+    return self.cc.media_status.supports_seek
+
+  def can_control(self) -> bool:
+    return True
+
   def quit(self):
     self.cc.quit_app()
 
@@ -43,10 +61,10 @@ class ChromecastAdapter(MprisAdapter):
     return BEGINNING
 
   def next(self):
-    self.cc.media_controller.queue_next()
+    self.cc.play_next()
 
   def previous(self):
-    self.cc.media_controller.queue_prev()
+    self.cc.play_previous()
 
   def pause(self):
     self.cc.media_controller.pause()
@@ -70,7 +88,7 @@ class ChromecastAdapter(MprisAdapter):
     return PlayState.STOPPED
 
   def seek(self, time: Microseconds):
-    seconds = int(time / US_IN_SEC)
+    seconds = int(round(time / US_IN_SEC))
     self.cc.media_controller.seek(seconds)
 
   def open_uri(self, uri: str):
@@ -125,24 +143,6 @@ class ChromecastAdapter(MprisAdapter):
 
   def set_mute(self, val: bool):
     self.cc.set_volume_muted(val)
-
-  def can_go_next(self) -> bool:
-    return self.cc.media_status.supports_queue_next
-
-  def can_go_previous(self) -> bool:
-    return self.cc.media_status.supports_queue_prev
-
-  def can_play(self) -> bool:
-    return True
-
-  def can_pause(self) -> bool:
-    return self.cc.media_status.supports_pause
-
-  def can_seek(self) -> bool:
-    return self.cc.media_status.supports_seek
-
-  def can_control(self) -> bool:
-    return True
 
   def get_stream_title(self) -> str:
     title = self.cc.media_controller.title

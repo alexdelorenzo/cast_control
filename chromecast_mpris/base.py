@@ -1,7 +1,9 @@
+from abc import ABC
 from typing import Optional, Any, Union
 from enum import auto
 
 from pychromecast.controllers.media import MediaStatus
+from pychromecast.controllers.youtube import YouTubeController
 from pychromecast.socket_client import CastStatus
 from pychromecast import Chromecast, get_chromecasts
 
@@ -36,7 +38,29 @@ class ChromecastMediaType(AutoName):
   TVSHOW = auto()
 
 
-class ChromecastWrapper:
+class Wrapper(ABC):
+  @property
+  def cast_status(self) -> Optional[CastStatus]:
+    pass
+
+  @property
+  def media_status(self) -> Optional[MediaStatus]:
+    pass
+
+  def can_play_next() -> bool:
+    pass
+
+  def can_play_prev() -> bool:
+    pass
+
+  def play_next():
+    pass
+
+  def play_prev():
+    pass
+
+
+class ChromecastWrapper(Wrapper):
   """
   A wrapper to make it easier to switch out backend implementations.
 
@@ -44,20 +68,34 @@ class ChromecastWrapper:
   """
   def __init__(self, cc: Chromecast):
     self.cc = cc
-  
+    self.yt_ctl = YouTubeController()
+    self.cc.register_handler(self.yt_ctl)
+
   def __getattr__(self, name: str) -> Any:
     return getattr(self.cc, name)
 
   def __repr__(self) -> str:
     return f"<{self.__name__} for {self.cc}>"
-  
+
   @property
   def cast_status(self) -> Optional[CastStatus]:
     return self.cc.status
-  
+
   @property
   def media_status(self) -> Optional[MediaStatus]:
     return self.cc.media_controller.status
+
+  def can_play_next() -> bool:
+    return self.cc.media_status.supports_queue_next
+
+  def can_play_prev() -> bool:
+    return self.cc.media_status.supports_queue_next
+
+  def play_next():
+    self.cc.media_controller.queue_next()
+
+  def play_prev():
+    self.cc.media_controller.queue_prev()
 
 
 def get_chromecast(name: Optional[str] = None) -> Optional[Chromecast]:

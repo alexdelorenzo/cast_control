@@ -1,5 +1,6 @@
+from typing import Union, Optional
 from abc import ABC
-from typing import Union
+import logging
 
 from mpris_server.adapters import EventAdapter, MprisAdapter
 from mpris_server.server import Server
@@ -11,14 +12,21 @@ from pychromecast import Chromecast
 from .base import Status
 
 
+DEBUG_FN = 'chromecast_mpris.txt'
+
+#logging.basicConfig(filename=DEBUG_FN)
+
+
 class ChromecastEventListener(ABC):
   """
   Event listeners that conform to pychromecast's API
   """
   def new_media_status(self, status: MediaStatus):
+    # logging.info(repr(status))
     pass
 
   def new_cast_status(self, status: CastStatus):
+    # logging.info(repr(status))
     pass
 
 
@@ -47,11 +55,13 @@ class ChromecastEventHandler(ChromecastEventAdapter,
       self.on_volume()
 
   def new_media_status(self, status: MediaStatus):
+    super().new_media_status(status)
     self.check_volume(status)
     self.on_playback()
     self.on_options()
 
   def new_cast_status(self, status: CastStatus):
+    super().new_cast_status(status)
     self.check_volume(status)
 
 
