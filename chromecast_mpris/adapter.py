@@ -13,8 +13,10 @@ from mpris_server.compat import get_dbus_name
 from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB, \
   NO_DURATION, NO_DELTA, DESKTOP_FILE
 
+
 US_IN_SEC = 1_000_000  # seconds to microseconds
 DEFAULT_TRACK = "/track/1"
+DEFAULT_DISC_NO = 1
 
 
 class ChromecastAdapter(MprisAdapter):
@@ -187,7 +189,7 @@ class ChromecastAdapter(MprisAdapter):
       "xesam:artist": artists,
       "xesam:album": self.cc.media_status.album_name,
       "xesam:albumArtist": artists,
-      "xesam:discNumber": 1,
+      "xesam:discNumber": DEFAULT_DISC_NO,
       "xesam:trackNumber": self.cc.media_status.track,
       "xesam:comment": comments,
     }
