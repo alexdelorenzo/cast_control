@@ -38,7 +38,9 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
  - `requirements.txt`
  
 #### Installing PyGObject
-On Debian-derived distributions like Ubuntu, install `python3-gi` with `apt`. On Arch, you'll want to install `python-gobject`. On macOS, install [`pygobject3`](https://formulae.brew.sh/formula/pygobject3) via `brew`.
+On Debian-derived distributions like Ubuntu, install `python3-gi` with `apt`. 
+On Arch, you'll want to install `python-gobject`, or install `chromecast_mpris` [directly from the AUR](https://aur.archlinux.org/packages/chromecast_mpris/).
+On macOS, install [`pygobject3`](https://formulae.brew.sh/formula/pygobject3) via `brew`.
 
 Use `pip` to install `PyGObject>=3.34.0` if there are no installation candidates available in your vendor's package repositories.
 
@@ -49,11 +51,18 @@ python3 -m pip install chromecast_mpris
 
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
-
 ### GitHub
 Clone the repo, run `python3 -m pip install -r requirements.txt`, followed by `python3 setup.py install`. 
 
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
+
+### AUR
+
+If you're on Arch, you can install `chromecast_mpris` [directly from the AUR](https://aur.archlinux.org/packages/chromecast_mpris/).
+
+```bash
+yay -S chromecast_mpris
+```
 
 ### Upgrading
 
