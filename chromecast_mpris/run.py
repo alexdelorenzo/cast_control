@@ -57,7 +57,7 @@ def retry_until_found(
 def run_server(
   name: Optional[str],
   wait: Optional[Seconds] = DEFAULT_WAIT,
-  log_level: int = logging.DEBUG,
+  log_level: int = logging.WARN,
 ):
   logging.basicConfig(level=log_level)
   mpris = retry_until_found(name, log_level, wait)
