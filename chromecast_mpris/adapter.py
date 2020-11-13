@@ -6,9 +6,9 @@ from pychromecast import Chromecast
 from gi.overrides.GLib import Variant
 
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
-  Microseconds, VolumeDecimal, RateDecimal, Track, Album, Artist
+  Microseconds, VolumeDecimal, RateDecimal, Track, Album, Artist, 
 from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE, DbusObj
-from mpris_server.compat import get_dbus_name
+from mpris_server.compat import get_dbus_name, DBUS_NAME_MAX
 
 from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB, \
   NO_DURATION, NO_DELTA, DESKTOP_FILE
@@ -174,7 +174,7 @@ class ChromecastAdapter(MprisAdapter):
 
   def metadata(self) -> Metadata:
     title: str = self.get_stream_title()
-    dbus_name: DbusObj = f"/track/{get_dbus_name(title)}"
+    dbus_name: DbusObj = get_track_id(title)
 
     artist: str = self.cc.media_status.artist
     artists: List[str] = [artist] if artist else []
@@ -201,6 +201,7 @@ class ChromecastAdapter(MprisAdapter):
     content_id = self.cc.media_status.content_id
     name = self.cc.media_status.artist
     duration = self._get_duration()
+    title = self.get_stream_title()
     artist = Artist(name)
 
     album = Album(
@@ -210,8 +211,8 @@ class ChromecastAdapter(MprisAdapter):
     )
 
     track = Track(
-      track_id=DEFAULT_TRACK,
-      name=self.get_stream_title(),
+      track_id=get_track_id(title),
+      name=title,
       track_no=self.cc.media_status.track,
       length=int(duration),
       uri=content_id,
@@ -245,3 +246,8 @@ def get_media_type(cc: ChromecastWrapper) -> ChromecastMediaType:
     return ChromecastMediaType.GENERIC
 
 
+def get_track_id(name: str) -> DbusObj:
+  track_id = f"/track/{get_dbus_name(name)}"
+
+  return track_id[:DBUS_NAME_MAX]
+  
