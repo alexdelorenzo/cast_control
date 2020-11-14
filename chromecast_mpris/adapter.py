@@ -6,7 +6,7 @@ from pychromecast import Chromecast
 from gi.overrides.GLib import Variant
 
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
-  Microseconds, VolumeDecimal, RateDecimal, Track, Album, Artist, 
+  Microseconds, VolumeDecimal, RateDecimal, Track, Album, Artist
 from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE, DbusObj
 from mpris_server.compat import get_dbus_name, DBUS_NAME_MAX
 
