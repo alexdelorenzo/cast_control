@@ -1,9 +1,8 @@
 from mimetypes import guess_type
 from pathlib import Path
-from typing import List, Dict
+from typing import List
 
 from pychromecast import Chromecast
-from gi.overrides.GLib import Variant
 
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   Microseconds, VolumeDecimal, RateDecimal, Track, Album, Artist
@@ -250,4 +249,4 @@ def get_track_id(name: str) -> DbusObj:
   track_id = f"/track/{get_dbus_name(name)}"
 
   return track_id[:DBUS_NAME_MAX]
-  
+

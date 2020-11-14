@@ -15,7 +15,7 @@ from .run import run_server
               help="Hostname or IP address of streaming device.")
 @click.option('--wait', '-w', default=None, show_default=True, type=click.INT,
               help="Retry after specified amount of seconds if a Chromecast isn't found.")
-@click.option('--log-level', '-l', default=logging.INFO, show_default=True, type=click.INT,
+@click.option('--log-level', '-l', default=logging.WARNING, show_default=True, type=click.INT,
               help='Debugging log level.')
 def cmd(
   name: str,
@@ -24,7 +24,7 @@ def cmd(
   log_level: int
 ):
   try:
-    run_server(name, wait, log_level)
+    run_server(name, host, wait, log_level)
 
   except NoChromecastFoundException as e:
     logging.warning(f"{e} not found")
