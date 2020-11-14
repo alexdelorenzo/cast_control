@@ -1,11 +1,13 @@
 from abc import ABC
-from typing import Optional, Any, Union
+from typing import Optional, Any, Union, NamedTuple
+from pathlib import Path
 from enum import auto
 
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.youtube import YouTubeController
 from pychromecast.socket_client import CastStatus
-from pychromecast import Chromecast, get_chromecasts
+from pychromecast import Chromecast, get_chromecasts, \
+  get_chromecast_from_host
 
 from mpris_server.base import AutoName
 
@@ -16,10 +18,13 @@ NO_DELTA = 0
 NO_CHROMECAST_NAME = "NO_NAME"
 FIRST_CHROMECAST = 0
 
-DESKTOP_FILE = "chromecast_mpris.desktop"
+DESKTOP_FILE = Path(__file__).parent / "chromecast_mpris.desktop"
 DEFAULT_THUMB = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
 
 YOUTUBE = "YouTube"
+
+NO_STR = ''
+NO_PORT = None
 
 
 Seconds = int
@@ -97,6 +102,25 @@ class ChromecastWrapper(Wrapper):
 
   def play_prev(self):
     self.cc.media_controller.queue_prev()
+
+
+class Host(NamedTuple):
+  host: str
+  port: Optional[int] = NO_PORT
+  uuid: str = NO_STR
+  model_name: str = NO_STR
+  friendly_name: str = NO_STR
+
+
+def get_chromecast_via_host(host: str) -> Optional[Chromecast]:
+  info = Host(host)
+  chromecast = get_chromecast_from_host(info)
+
+  if chromecast:
+    chromecast.wait()
+    return chromecast
+
+  return None  # be explicit
 
 
 def get_chromecast(name: Optional[str] = None) -> Optional[Chromecast]:

@@ -5,7 +5,7 @@ import sys
 
 from mpris_server.server import Server
 
-from .base import get_chromecast, Seconds, \
+from .base import get_chromecast, Seconds, get_chromecast_via_host, \
   NoChromecastFoundException, RC_NO_CHROMECAST
 from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
@@ -14,8 +14,14 @@ from .listeners import register_mpris_adapter
 DEFAULT_WAIT: Seconds = 30
 
 
-def create_adapters_and_server(chromecast_name: Optional[str]) -> Optional[Server]:
-  if chromecast_name:
+def create_adapters_and_server(
+  chromecast_name: Optional[str],
+  host: Optional[str],
+) -> Optional[Server]:
+  if host:
+    chromecast = get_chromecast_via_host(host)
+
+  elif chromecast_name:
     chromecast = get_chromecast(chromecast_name)
 
   else:
@@ -35,6 +41,7 @@ def create_adapters_and_server(chromecast_name: Optional[str]) -> Optional[Serve
 
 def retry_until_found(
   name: Optional[str],
+  host: Optional[str],
   log_level: int = logging.DEBUG,
   wait: Optional[Seconds] = DEFAULT_WAIT
 ) -> Optional[Server]:
@@ -45,7 +52,7 @@ def retry_until_found(
   """
 
   while True:
-    mpris = create_adapters_and_server(name)
+    mpris = create_adapters_and_server(name, host)
 
     if mpris or wait is None:
       return mpris
@@ -56,11 +63,12 @@ def retry_until_found(
 
 def run_server(
   name: Optional[str],
+  host: Optional[str],
   wait: Optional[Seconds] = DEFAULT_WAIT,
   log_level: int = logging.WARN,
 ):
   logging.basicConfig(level=log_level)
-  mpris = retry_until_found(name, log_level, wait)
+  mpris = retry_until_found(name, host, log_level, wait)
 
   if not mpris:
     raise NoChromecastFoundException(name)
