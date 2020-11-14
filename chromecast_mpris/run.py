@@ -67,7 +67,6 @@ def run_server(
   wait: Optional[Seconds] = DEFAULT_WAIT,
   log_level: int = logging.WARN,
 ):
-  print(log_level)
   logging.basicConfig(level=log_level)
   mpris = retry_until_found(name, host, wait, log_level)
 
@@ -76,6 +75,3 @@ def run_server(
 
   mpris.loop()
 
-
-if __name__ == "__main__":
-  run_server(sys.argv[1])
