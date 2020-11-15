@@ -18,7 +18,7 @@ from .run import run_server
 @click.option('--log-level', '-l', default=logging.WARNING, show_default=True, type=click.INT,
               help='Debugging log level.')
 def cmd(
-  name: str,
+  name: Optional[str],
   host: Optional[str],
   wait: Optional[Seconds],
   log_level: int
