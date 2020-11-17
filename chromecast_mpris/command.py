@@ -15,7 +15,7 @@ from .run import run_server
               help="Hostname or IP address of streaming device.")
 @click.option('--wait', '-w', default=None, show_default=True, type=click.INT,
               help="Retry after specified amount of seconds if a Chromecast isn't found.")
-@click.option('--log-level', '-l', default=logging.WARNING, show_default=True, type=click.INT,
+@click.option('--log-level', '-l', default=logging.DEBUG, show_default=True, type=click.INT,
               help='Debugging log level.')
 def cmd(
   name: str,
