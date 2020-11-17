@@ -7,7 +7,7 @@ from pychromecast import Chromecast
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   Microseconds, VolumeDecimal, RateDecimal, Track, Album, Artist
 from mpris_server.base import URI, MIME_TYPES, BEGINNING, DEFAULT_RATE, DbusObj
-from mpris_server.compat import get_dbus_name, DBUS_NAME_MAX
+from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
 from .base import ChromecastMediaType, ChromecastWrapper, DEFAULT_THUMB, \
   NO_DURATION, NO_DELTA, DESKTOP_FILE
@@ -245,8 +245,6 @@ def get_media_type(cc: ChromecastWrapper) -> ChromecastMediaType:
     return ChromecastMediaType.GENERIC
 
 
+@enforce_dbus_length
 def get_track_id(name: str) -> DbusObj:
-  track_id = f"/track/{get_dbus_name(name)}"
-
-  return track_id[:DBUS_NAME_MAX]
-
+  return f"/track/{get_dbus_name(name)}"
