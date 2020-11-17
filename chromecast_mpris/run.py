@@ -42,7 +42,6 @@ def retry_until_found(
   name: Optional[str],
   host: Optional[str],
   wait: Optional[Seconds] = DEFAULT_WAIT,
-  log_level: str = LOG_LEVEL,
 ) -> Optional[Server]:
   """
     If the Chromecast isn't found, keep trying to find it.
@@ -66,8 +65,8 @@ def run_server(
   wait: Optional[Seconds] = DEFAULT_WAIT,
   log_level: str = LOG_LEVEL
 ):
-  logging.basicConfig(level=log_level)
-  mpris = retry_until_found(name, host, wait, log_level)
+  logging.basicConfig(level=log_level.upper())
+  mpris = retry_until_found(name, host, wait)
 
   if not mpris:
     raise NoChromecastFoundException(name)
