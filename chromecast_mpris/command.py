@@ -10,13 +10,13 @@ from .run import run_server
 
 @click.command(help="Control Chromecasts through MPRIS media controls.")
 @click.option('--name', '-n', default=None, show_default=True, type=click.STRING,
-              help="Specify a Chromecast name, otherwise control the first Chromecast found.")
+  help="Specify a Chromecast name, otherwise control the first Chromecast found.")
 @click.option('--host', '-h', default=None, show_default=True, type=click.STRING,
-              help="Hostname or IP address of streaming device.")
+  help="Hostname or IP address of streaming device.")
 @click.option('--wait', '-w', default=None, show_default=True, type=click.INT,
-              help="Retry after specified amount of seconds if a Chromecast isn't found.")
+  help="Retry after specified amount of seconds if a Chromecast isn't found.")
 @click.option('--log-level', '-l', default=logging.DEBUG, show_default=True, type=click.INT,
-              help='Debugging log level.')
+  help='Debugging log level.')
 def cmd(
   name: Optional[str],
   host: Optional[str],
