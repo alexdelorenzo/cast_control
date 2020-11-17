@@ -4,7 +4,8 @@ import sys
 
 import click
 
-from .base import Seconds, NoChromecastFoundException, RC_NO_CHROMECAST
+from .base import Seconds, NoChromecastFoundException, \
+  RC_NO_CHROMECAST, LOG_LEVEL
 from .run import run_server
 
 
@@ -15,13 +16,13 @@ from .run import run_server
   help="Hostname or IP address of streaming device.")
 @click.option('--wait', '-w', default=None, show_default=True, type=click.INT,
   help="Retry after specified amount of seconds if a Chromecast isn't found.")
-@click.option('--log-level', '-l', default=logging.DEBUG, show_default=True, type=click.INT,
+@click.option('--log-level', '-l', default=LOG_LEVEL, show_default=True, type=click.STRING,
   help='Debugging log level.')
 def cmd(
   name: Optional[str],
   host: Optional[str],
   wait: Optional[Seconds],
-  log_level: int
+  log_level: str
 ):
   try:
     run_server(name, host, wait, log_level)

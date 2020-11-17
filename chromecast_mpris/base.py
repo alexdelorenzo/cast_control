@@ -26,6 +26,8 @@ YOUTUBE = "YouTube"
 NO_STR = ''
 NO_PORT = None
 
+LOG_LEVEL: str = 'WARN'
+
 
 Seconds = int
 Status = Union[MediaStatus, CastStatus]
