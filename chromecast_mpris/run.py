@@ -1,7 +1,6 @@
 from typing import Optional
 from time import sleep
 import logging
-import sys
 
 from mpris_server.server import Server
 
@@ -65,7 +64,7 @@ def run_server(
   name: Optional[str],
   host: Optional[str],
   wait: Optional[Seconds] = DEFAULT_WAIT,
-  log_level: int = logging.WARN,
+  log_level: int = logging.DEBUG,
 ):
   logging.basicConfig(level=log_level)
   mpris = retry_until_found(name, host, wait, log_level)
