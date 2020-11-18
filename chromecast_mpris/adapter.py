@@ -11,7 +11,7 @@ from .wrapper import ChromecastWrapper
 
 class ChromecastAdapter(MprisAdapter):
   def __init__(self, chromecast: Chromecast):
-    self.cc = ChromecastWrapper(chromecast)
+    self.adapter = ChromecastWrapper(chromecast)
     super().__init__(chromecast.name)
 
   def get_uri_schemes(self) -> List[str]:
@@ -24,61 +24,61 @@ class ChromecastAdapter(MprisAdapter):
     return True
 
   def can_go_next(self) -> bool:
-    return self.cc.can_play_next()
+    return self.adapter.can_play_next()
 
   def can_go_previous(self) -> bool:
-    return self.cc.can_play_prev()
+    return self.adapter.can_play_prev()
 
   def can_play(self) -> bool:
     return True
 
   def can_pause(self) -> bool:
-    return self.cc.can_pause()
+    return self.adapter.can_pause()
 
   def can_seek(self) -> bool:
-    return self.cc.can_seek()
+    return self.adapter.can_seek()
 
   def can_control(self) -> bool:
     return True
 
   def quit(self):
-    self.cc.quit()
+    self.adapter.quit()
 
   def get_current_position(self) -> Microseconds:
-    return self.cc.get_current_position()
+    return self.adapter.get_current_position()
 
   def next(self):
-    self.cc.next()
+    self.adapter.next()
 
   def previous(self):
-    self.cc.previous()
+    self.adapter.previous()
 
   def pause(self):
-    self.cc.pause()
+    self.adapter.pause()
 
   def resume(self):
     self.play()
 
   def stop(self):
-    self.cc.stop()
+    self.adapter.stop()
 
   def play(self):
-    self.cc.play()
+    self.adapter.play()
 
   def get_playstate(self) -> PlayState:
-    return self.cc.get_playstate()
+    return self.adapter.get_playstate()
 
   def seek(self, time: Microseconds):
-    self.cc.seek()
+    self.adapter.seek()
 
   def open_uri(self, uri: str):
-    self.cc.open_uri(uri)
+    self.adapter.open_uri(uri)
 
   def is_repeating(self) -> bool:
-    return self.cc.is_repeating()
+    return self.adapter.is_repeating()
 
   def is_playlist(self) -> bool:
-    return self.cc.is_playlist()
+    return self.adapter.is_playlist()
 
   def set_repeating(self, val: bool):
     pass
@@ -99,22 +99,22 @@ class ChromecastAdapter(MprisAdapter):
     return False
 
   def get_art_url(self, track: int = None) -> str:
-    return self.cc.get_art_url(track)
+    return self.adapter.get_art_url(track)
 
   def get_volume(self) -> VolumeDecimal:
-    return self.cc.get_volume()
+    return self.adapter.get_volume()
 
   def set_volume(self, val: VolumeDecimal):
-    self.cc.set_volume(val)
+    self.adapter.set_volume(val)
 
   def is_mute(self) -> bool:
-    return self.cc.is_mute()
+    return self.adapter.is_mute()
 
   def set_mute(self, val: bool):
-    self.cc.set_mute(val)
+    self.adapter.set_mute(val)
 
   def get_stream_title(self) -> str:
-    return self.cc.get_stream_title()
+    return self.adapter.get_stream_title()
 
   def get_previous_track(self) -> Track:
     pass
@@ -123,13 +123,13 @@ class ChromecastAdapter(MprisAdapter):
     pass
 
   def get_duration(self) -> Microseconds:
-    return self.cc.get_duration()
+    return self.adapter.get_duration()
 
   def metadata(self) -> Metadata:
-    return self.cc.metadata()
+    return self.adapter.metadata()
 
   def get_current_track(self) -> Track:
-    return self.cc.get_current_track()
+    return self.adapter.get_current_track()
 
   def get_desktop_entry(self) -> str:
-    return self.cc.get_desktop_entry()
+    return self.adapter.get_desktop_entry()
