@@ -69,7 +69,7 @@ class ChromecastAdapter(MprisAdapter):
     return self.adapter.get_playstate()
 
   def seek(self, time: Microseconds):
-    self.adapter.seek()
+    self.adapter.seek(time)
 
   def open_uri(self, uri: str):
     self.adapter.open_uri(uri)
