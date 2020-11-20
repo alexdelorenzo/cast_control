@@ -31,6 +31,8 @@ US_IN_SEC = 1_000_000  # seconds to microseconds
 DEFAULT_TRACK = "/track/1"
 DEFAULT_DISC_NO = 1
 
+DEFAULT_RETRY_WAIT: float = 5.0
+
 
 Seconds = int
 Status = Union[MediaStatus, CastStatus]
@@ -56,9 +58,12 @@ class Host(NamedTuple):
   friendly_name: str = NO_STR
 
 
-def get_chromecast_via_host(host: str) -> Optional[Chromecast]:
+def get_chromecast_via_host(
+  host: str,
+  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
+) -> Optional[Chromecast]:
   info = Host(host)
-  chromecast = get_chromecast_from_host(info)
+  chromecast = get_chromecast_from_host(info, retry_wait=retry_wait)
 
   if chromecast:
     chromecast.wait()
@@ -67,8 +72,11 @@ def get_chromecast_via_host(host: str) -> Optional[Chromecast]:
   return None  # be explicit
 
 
-def get_chromecast(name: Optional[str] = None) -> Optional[Chromecast]:
-  chromecasts, service_browser = get_chromecasts()
+def get_chromecast(
+  name: Optional[str] = None,
+  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
+) -> Optional[Chromecast]:
+  chromecasts, service_browser = get_chromecasts(retry_wait=retry_wait)
 
   if not name and not chromecasts:
     return

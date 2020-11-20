@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 NAME = "chromecast_mpris"
-VERSION = "0.4.1"
+VERSION = "0.5.0"
 LICENSE = "AGPL-3.0"
 
 # potential new name
