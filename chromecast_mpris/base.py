@@ -69,7 +69,7 @@ def get_chromecast_via_host(
     chromecast.wait()
     return chromecast
 
-  return None  # be explicit
+  return None  # explicit
 
 
 def get_chromecast(
@@ -79,7 +79,7 @@ def get_chromecast(
   chromecasts, service_browser = get_chromecasts(retry_wait=retry_wait)
 
   if not name and not chromecasts:
-    return
+    return None
 
   elif not name:
     chromecast = chromecasts[FIRST_CHROMECAST]

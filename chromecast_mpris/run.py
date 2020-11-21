@@ -5,7 +5,7 @@ import logging
 from mpris_server.server import Server
 
 from .base import get_chromecast, Seconds, get_chromecast_via_host, \
-  NoChromecastFoundException, RC_NO_CHROMECAST, LOG_LEVEL, \
+  NoChromecastFoundException, LOG_LEVEL, \
   DEFAULT_RETRY_WAIT
 from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
@@ -29,7 +29,7 @@ def create_adapters_and_server(
     chromecast = get_chromecast()
 
   if not chromecast:
-    return
+    return None
 
   chromecast_adapter = ChromecastAdapter(chromecast)
   mpris = Server(name=chromecast.name, adapter=chromecast_adapter)

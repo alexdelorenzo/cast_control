@@ -4,7 +4,7 @@ from pychromecast import Chromecast
 
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   Microseconds, VolumeDecimal, RateDecimal, Track
-from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE
+from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj
 
 from .wrapper import ChromecastWrapper
 
@@ -133,3 +133,14 @@ class ChromecastAdapter(MprisAdapter):
 
   def get_desktop_entry(self) -> str:
     return self.adapter.get_desktop_entry()
+
+  def add_track(
+    self,
+    uri: str,
+    after_track: DbusObj,
+    set_as_current: bool
+  ):
+    self.adapter.add_track(uri, after_track, set_as_current)
+
+  def can_edit_track(self):
+    return True

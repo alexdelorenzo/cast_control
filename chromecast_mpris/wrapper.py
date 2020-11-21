@@ -26,10 +26,10 @@ class Wrapper(ABC):
   def media_status(self) -> Optional[MediaStatus]:
     pass
 
-  def can_play_next(self) -> bool:
+  def can_play_next(self) -> Optional[bool]:
     pass
 
-  def can_play_prev(self) -> bool:
+  def can_play_prev(self) -> Optional[bool]:
     pass
 
   def play_next(self):
@@ -81,13 +81,13 @@ class ChromecastWrapper(Wrapper):
 
     return ReturnsNone()
 
-  def can_play_next(self) -> bool:
+  def can_play_next(self) -> Optional[bool]:
     if self.media_status:
       return self.media_status.supports_queue_next
 
     return False
 
-  def can_play_prev(self) -> bool:
+  def can_play_prev(self) -> Optional[bool]:
     if self.media_status:
       return self.media_status.supports_queue_prev
 
@@ -99,10 +99,10 @@ class ChromecastWrapper(Wrapper):
   def play_prev(self):
     self.cc.media_controller.queue_prev()
 
-  def can_pause(self) -> bool:
+  def can_pause(self) -> Optional[bool]:
     return self.media_status.supports_pause
 
-  def can_seek(self) -> bool:
+  def can_seek(self) -> Optional[bool]:
     return self.media_status.supports_seek
 
   def quit(self):
@@ -148,13 +148,7 @@ class ChromecastWrapper(Wrapper):
     self.cc.media_controller.seek(seconds)
 
   def open_uri(self, uri: str):
-    video_id: Optional[str] = None
-
-    if 'youtube.com/' in uri:
-      _, video_id = uri.split('=')
-
-    elif 'youtu.be/' in uri:
-      *_, video_id = uri.split('/')
+    video_id = get_video_id(uri)
 
     if video_id:
       self.play_youtube(video_id)
@@ -205,7 +199,7 @@ class ChromecastWrapper(Wrapper):
     elif diff < NO_DELTA:
       self.cc.volume_down(abs(diff))
 
-  def is_mute(self) -> bool:
+  def is_mute(self) -> Optional[bool]:
     if self.cast_status:
       return self.cast_status.volume_muted
 
@@ -218,7 +212,7 @@ class ChromecastWrapper(Wrapper):
     title = self.cc.media_controller.title
     metadata = self.media_status.media_metadata
 
-    if 'subtitle' in metadata:
+    if metadata and 'subtitle' in metadata:
       title = ' - '.join((title, metadata['subtitle']))
 
     return title
@@ -238,7 +232,7 @@ class ChromecastWrapper(Wrapper):
     title: str = self.get_stream_title()
     dbus_name: DbusObj = get_track_id(title)
 
-    artist: str = self.media_status.artist
+    artist: Optional[str] = self.media_status.artist
     artists: List[str] = [artist] if artist else []
     comments: List[str] = []
 
@@ -299,6 +293,17 @@ class ChromecastWrapper(Wrapper):
 
     self.yt_ctl.play_video(video_id)
 
+  def add_track(
+    self,
+    uri: str,
+    after_track: DbusObj,
+    set_as_current: bool
+  ):
+    video_id = get_video_id(uri)
+
+    if video_id:
+      self.yt_ctl.add_to_queue()
+
 
 @enforce_dbus_length
 def get_track_id(name: str) -> DbusObj:
@@ -322,3 +327,15 @@ def get_media_type(cc: ChromecastWrapper) -> Optional[ChromecastMediaType]:
     return ChromecastMediaType.GENERIC
 
   return None
+
+
+def get_video_id(uri: str) -> Optional[str]:
+  video_id: Optional[str] = None
+
+  if 'youtube.com/' in uri:
+    *_, video_id = uri.split('=')
+
+  elif 'youtu.be/' in uri:
+    *_, video_id = uri.split('/')
+
+  return video_id
