@@ -148,6 +148,18 @@ class ChromecastWrapper(Wrapper):
     self.cc.media_controller.seek(seconds)
 
   def open_uri(self, uri: str):
+    video_id: Optional[str] = None
+
+    if 'youtube.com/' in uri:
+      _, video_id = uri.split('=')
+
+    elif 'youtu.be/' in uri:
+      *_, video_id = uri.split('/')
+
+    if video_id:
+      self.play_youtube(video_id)
+      return
+
     mimetype, _ = guess_type(uri)
     self.cc.media_controller.play_media(uri, mimetype)
 
@@ -277,6 +289,15 @@ class ChromecastWrapper(Wrapper):
 
   def get_desktop_entry(self) -> str:
     return str(Path(DESKTOP_FILE).absolute())
+
+  def launch_youtube(self):
+    self.yt_ctl.launch()
+
+  def play_youtube(self, video_id: str):
+    if not self.yt_ctl.is_active:
+      self.launch_youtube()
+
+    self.yt_ctl.play_video(video_id)
 
 
 @enforce_dbus_length
