@@ -92,3 +92,5 @@ def get_chromecast(
     if chromecast.name.lower() == name:
       chromecast.wait()
       return chromecast
+
+  return None
