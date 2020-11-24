@@ -12,6 +12,7 @@ from .listeners import register_mpris_adapter
 
 
 DEFAULT_WAIT: Seconds = 30
+NO_DEVICE = 'Device'
 
 
 def create_adapters_and_server(
@@ -57,8 +58,8 @@ def retry_until_found(
 
     if mpris or wait is None:
       return mpris
-
-    logging.info(f"{name} not found. Waiting {wait} seconds before retrying.")
+      
+    logging.info(f"{name or NO_DEVICE} not found. Waiting {wait} seconds before retrying.")
     sleep(wait)
 
 
