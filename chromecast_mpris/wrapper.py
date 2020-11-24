@@ -40,7 +40,7 @@ class Wrapper(ABC):
 
 
 class ReturnsNone:
-  """ Keeps everything from crashing if no status is found """
+  """ Returns None if attribute doesn't exist """
 
   def __getattr__(self, name: str) -> None:
     return None
@@ -256,7 +256,7 @@ class ChromecastWrapper(Wrapper):
     art_url = self.get_art_url()
     content_id = self.media_status.content_id
     name = self.media_status.artist
-    duration = self._get_duration()
+    duration = int(self._get_duration())
     title = self.get_stream_title()
     artist = Artist(name)
 
@@ -270,7 +270,7 @@ class ChromecastWrapper(Wrapper):
       track_id=get_track_id(title),
       name=title,
       track_no=self.media_status.track,
-      length=int(duration),
+      length=duration,
       uri=content_id,
       artists=(artist,),
       album=album,
@@ -311,19 +311,24 @@ def get_track_id(name: str) -> DbusObj:
 
 
 def get_media_type(cc: ChromecastWrapper) -> Optional[ChromecastMediaType]:
-  if cc.media_controller.status.media_is_movie:
+  media_status = cc.media_status
+
+  if not media_status:
+    return None
+
+  if media_status.media_is_movie:
     return ChromecastMediaType.MOVIE
 
-  elif cc.media_controller.status.media_is_tvshow:
+  elif media_status.media_is_tvshow:
     return ChromecastMediaType.TVSHOW
 
-  elif cc.media_controller.status.media_is_photo:
+  elif media_status.media_is_photo:
     return ChromecastMediaType.PHOTO
 
-  elif cc.media_controller.status.media_is_musictrack:
+  elif media_status.media_is_musictrack:
     return ChromecastMediaType.MUSICTRACK
 
-  elif cc.media_controller.status.media_is_generic:
+  elif media_status.media_is_generic:
     return ChromecastMediaType.GENERIC
 
   return None
@@ -337,5 +342,8 @@ def get_video_id(uri: str) -> Optional[str]:
 
   elif 'youtu.be/' in uri:
     *_, video_id = uri.split('/')
+
+  if video_id and '&' in video_id:
+    video_id, *_ = video_id.split('&')
 
   return video_id
