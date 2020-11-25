@@ -338,7 +338,7 @@ def get_video_id(uri: str) -> Optional[str]:
   video_id: Optional[str] = None
 
   if 'youtube.com/' in uri:
-    *_, video_id = uri.split('=')
+    *_, video_id = uri.split('v=')
 
   elif 'youtu.be/' in uri:
     *_, video_id = uri.split('/')
