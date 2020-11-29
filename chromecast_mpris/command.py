@@ -11,16 +11,16 @@ from .run import run_server
 
 @click.command(help="Control casting devices through MPRIS media controls.")
 @click.option('--name', '-n', default=None, show_default=True, type=click.STRING,
-  help="Specify a device name, otherwise control the first device found.")
+  help="Specify a device name, otherwise control the first device found.\n")
 @click.option('--host', '-h', default=None, show_default=True, type=click.STRING,
-  help="Hostname or IP address of streaming device.")
+  help="Hostname or IP address of streaming device.\n")
 @click.option('--uuid', '-u', default=None, show_default=True, type=click.STRING,
-  help="Streaming device's UUID.")
+  help="Streaming device's UUID.\n")
 @click.option('--wait', '-w', default=None, show_default=True, type=click.INT,
   help="Retry after specified amount of seconds if a device isn't found.")
 @click.option('--retry-wait', '-r',
   default=DEFAULT_RETRY_WAIT, show_default=True, type=click.FLOAT,
-  help="Seconds to wait between retries to reconnect after a device connection is interrupted.")
+  help="Seconds to wait between reconnection attempts if the connection is interrupted.")
 @click.option('--log-level', '-l', default=LOG_LEVEL, show_default=True, type=click.STRING,
   help='Debugging log level.')
 def cmd(
