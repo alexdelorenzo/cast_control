@@ -1,5 +1,6 @@
 from typing import Optional, Union, NamedTuple
 from pathlib import Path
+from uuid import UUID
 from enum import auto
 
 from pychromecast.controllers.media import MediaStatus
@@ -70,6 +71,30 @@ def get_chromecast_via_host(
     return chromecast
 
   return None  # explicit
+
+
+def get_chromecast_via_uuid(
+  uuid: Optional[str] = None,
+  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
+) -> Optional[Chromecast]:
+  chromecasts, service_browser = get_chromecasts(retry_wait=retry_wait)
+
+  if not uuid and not chromecasts:
+    return None
+
+  elif not uuid:
+    chromecast = chromecasts[FIRST_CHROMECAST]
+    chromecast.wait()
+    return chromecast
+
+  uuid = UUID(uuid)
+
+  for chromecast in chromecasts:
+    if chromecast.uuid == uuid:
+      chromecast.wait()
+      return chromecast
+
+  return None
 
 
 def get_chromecast(
