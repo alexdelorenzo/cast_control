@@ -16,7 +16,7 @@ NO_DEVICE = 'Device'
 
 
 def create_adapters_and_server(
-  chromecast_name: Optional[str],
+  name: Optional[str],
   host: Optional[str],
   uuid: Optional[str],
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
@@ -25,7 +25,7 @@ def create_adapters_and_server(
     chromecast = get_chromecast_via_host(host, retry_wait)
 
   elif chromecast_name:
-    chromecast = get_chromecast(chromecast_name, retry_wait)
+    chromecast = get_chromecast(name, retry_wait)
 
   elif uuid:
     chromecast = get_chromecast_via_uuid(uuid, retry_wait)

@@ -83,15 +83,17 @@ def get_chromecast_via_uuid(
     return None
 
   elif not uuid:
-    chromecast = chromecasts[FIRST_CHROMECAST]
-    chromecast.wait()
-    return chromecast
+    first, *_ = chromecasts
+    first.wait()
+
+    return first
 
   uuid = UUID(uuid)
 
   for chromecast in chromecasts:
     if chromecast.uuid == uuid:
       chromecast.wait()
+
       return chromecast
 
   return None
@@ -107,15 +109,17 @@ def get_chromecast(
     return None
 
   elif not name:
-    chromecast = chromecasts[FIRST_CHROMECAST]
-    chromecast.wait()
-    return chromecast
+    first, *_ = chromecasts
+    first.wait()
+
+    return first
 
   name = name.lower()
 
   for chromecast in chromecasts:
     if chromecast.name.lower() == name:
       chromecast.wait()
+
       return chromecast
 
   return None

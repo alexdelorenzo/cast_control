@@ -53,7 +53,11 @@ python3 -m pip install chromecast_mpris
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
 ### GitHub
-Clone the repo, run `python3 -m pip install -r requirements.txt`, followed by `python3 setup.py install`. 
+Check out [the releases page on GitHub](https://github.com/alexdelorenzo/chromecast_mpris/releases) for stable releases.
+
+If you'd like to use the development branch, clone the repository.
+
+Once you have a source copy, run `python3 -m pip install -r requirements.txt`, followed by `python3 setup.py install`. 
 
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
@@ -85,17 +89,22 @@ It also helps to know the names of the devices in advance.
 $ chromecast_mpris --help
 Usage: chromecast_mpris [OPTIONS]
 
-  Control Chromecasts through MPRIS media controls.
+  Control casting devices through MPRIS media controls.
 
 Options:
-  -n, --name TEXT          Specify a Chromecast name, otherwise control the
-                           first Chromecast found.
+  -n, --name TEXT         Specify a device name, otherwise control the first
+                          device found.
 
-  -w, --wait INTEGER       Retry after specified amount of seconds if a
-                           Chromecast isn't found.
+  -h, --host TEXT         Hostname or IP address of streaming device.
+  -u, --uuid TEXT         Streaming device's UUID.
+  -w, --wait INTEGER      Retry after specified amount of seconds if a device
+                          isn't found.
 
-  -l, --log-level INTEGER  Debugging log level.  [default: 20]
-  --help                   Show this message and exit.
+  -r, --retry-wait FLOAT  Seconds to wait between retries to reconnect after a
+                          device connection is interrupted.  [default: 5.0]
+
+  -l, --log-level TEXT    Debugging log level.  [default: WARN]
+  --help                  Show this message and exit.
 ```
 
 ### Connecting to a Chromecast
