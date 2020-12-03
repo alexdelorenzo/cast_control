@@ -16,7 +16,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 
 
 ## Features
-  * [x] Control generic music and video playback
+  * [x] Control music and video playback
   * [x] Control app playback
   * [x] View playback information in real-time
   * [x] Display thumbnail and title
