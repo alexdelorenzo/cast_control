@@ -9,8 +9,9 @@ from pychromecast.socket_client import CastStatus
 from pychromecast import Chromecast
 
 from mpris_server.adapters import Metadata, PlayState, \
-  Microseconds, VolumeDecimal, RateDecimal, Track, Album, Artist
-from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
+  Microseconds, VolumeDecimal, RateDecimal
+from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, \
+  Track, Album, Artist
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
 from .base import DEFAULT_THUMB, NO_DURATION, NO_DELTA, DESKTOP_FILE, \

@@ -3,8 +3,9 @@ from typing import List
 from pychromecast import Chromecast
 
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
-  Microseconds, VolumeDecimal, RateDecimal, Track
-from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj
+  Microseconds, VolumeDecimal, RateDecimal
+from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
+  Track
 
 from .wrapper import ChromecastWrapper
 
