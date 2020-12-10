@@ -24,7 +24,7 @@ def create_adapters_and_server(
   if host:
     chromecast = get_chromecast_via_host(host, retry_wait)
 
-  elif chromecast_name:
+  elif name:
     chromecast = get_chromecast(name, retry_wait)
 
   elif uuid:
