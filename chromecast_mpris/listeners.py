@@ -2,7 +2,8 @@ from typing import Union, Optional
 from abc import ABC
 import logging
 
-from mpris_server.adapters import EventAdapter, MprisAdapter
+from mpris_server.adapters import MprisAdapter
+from mpris_server.events import EventAdapter
 from mpris_server.server import Server
 
 from pychromecast.controllers.media import MediaStatus
