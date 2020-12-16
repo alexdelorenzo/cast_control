@@ -89,9 +89,10 @@ Installing the package via PyPI, GitHub or the AUR will add `chromecast_mpris` t
 ```bash
 $ which chromecast_mpris 
 ~/.local/bin/chromecast_mpris
+```
 
 If you have your `pip` executables path added to your shell's `$PATH`, you can launch `chromecast_mpris` like so:
-```
+```bash
 $ chromecast_mpris
 ```
 
