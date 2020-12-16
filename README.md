@@ -1,8 +1,8 @@
 # 📺 Control Chromecasts from Linux
-Control your Chromecast via [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
+Control your Chromecast and casting devices via [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
 
 MPRIS is the standard media player interface on Linux desktops.
-`chromecast_mpris` allows you to control media playback on Chromecasts, and provides an interface for playback information.
+`chromecast_mpris` allows you to control media playback on casting devices, and provides an interface for playback information.
 
 MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspace/tree/master/applets/mediacontroller) in Plasma Desktop, and, along with GNOME's volume control widget, [there are widgets for GNOME](https://extensions.gnome.org/extension/1379/mpris-indicator-button/), too. [`playerctl` provides a CLI](https://github.com/altdesktop/playerctl) for controlling media players through MPRIS.
 
@@ -25,7 +25,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
   * [x] Play, pause, and stop playback
   * [x] Volume up and down
   * [x] Play next and previous
-  * [x] Quit current Chromecast app
+  * [x] Quit casted app
   * [x] Open media from D-Bus
   * [x] Play YouTube videos
   * [ ] Playlist integration
@@ -80,9 +80,25 @@ python3 -m pip --upgrade chromecast_mpris
 See the [releases page](https://github.com/alexdelorenzo/chromecast_mpris/releases) on GitHub.
 
 ## Usage
-You'll need to make sure that your computer is on the same network as your Chromecasts, and that you're able to make connections to them. 
+You'll need to make sure that your computer is on the same network as your devices, and that you're able to make connections to them. 
 
 It also helps to know the names of the devices in advance.
+
+### Launching 
+Installing the package via PyPI, GitHub or the AUR will add `chromecast_mpris` to your `pip` executables path:
+```bash
+$ which chromecast_mpris 
+~/.local/bin/chromecast_mpris
+
+If you have your `pip` executables path added to your shell's `$PATH`, you can launch `chromecast_mpris` like so:
+```
+$ chromecast_mpris
+```
+
+You can also launch `chromecast_mpris` via its Python module. This can be useful if your `$PATH` doesn't point your `pip` executables.
+```bash
+$ python3 -m chromecast_mpris
+```
 
 ### Help
 ```bash
@@ -107,31 +123,31 @@ Options:
   --help                  Show this message and exit.
 ```
 
-### Connecting to a Chromecast
-Connect to a Chromecast named "My Chromecast" and run `chromecast_mpris` in the background.
+### Connecting to a device
+Connect to a device named "My Device" and run `chromecast_mpris` in the background.
 ```bash
-$ chromecast_mpris -n "My Chromecast" &
+$ chromecast_mpris -n "My Device" &
 [1] 1234
 ```
 
 After launching `chromecast_mpris`, you can use any MPRIS client to interact with it. MPRIS support is built in directly to Plasma Desktop and GNOME 3, and you can use `playerctl` on the command-line. 
 
 ### Retrying until a Chromecast is found
-You can use the `-w/--wait` flag to specify a waiting period in seconds before `chromecast_mpris` will try find a Chromecast again if one is not found initially.
+You can use the `-w/--wait` flag to specify a waiting period in seconds before `chromecast_mpris` will try find a casting device again if one is not found initially.
 
-For example, if you want to wait 60 seconds between scans for Chromecasts, you can run the following:
+For example, if you want to wait 60 seconds between scans for devices, you can run the following:
 ```bash
 $ export SECONDS=60
 $ chromecast_mpris -w $SECONDS
 ```
 
-This is useful if you'd like to start `chromecast_mpris` at login, and there is a chance that your Chromecast isn't on, or you're on a different network. 
+This is useful if you'd like to start `chromecast_mpris` at login, and there is a chance that your device isn't on, or you're on a different network. 
 
 ### Opening a URI on a Chromecast
- Get the D-Bus name for your Chromecast using `playerctl`.
+ Get the D-Bus name for your device using `playerctl`.
 ```bash
 $ playerctl -l
-My_Chromecast
+My_Device
 ```
 
 Use the D-Bus name to issue commands to it.
@@ -141,7 +157,7 @@ $ export URL="http://ccmixter.org/content/gmz/gmz_-_Parametaphoriquement.mp3"
 $ playerctl -p My_Chromecast open "$URL"
 ```
 
-This will play a song on the Chromecast.
+This will play a song on your device.
 
 ## License
 See `LICENSE`. Message me if you'd like to use this project with a different license.
