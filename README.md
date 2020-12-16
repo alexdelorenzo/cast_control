@@ -127,7 +127,7 @@ Options:
 ### Connecting to a device
 Connect to a device named "My Device" and run `chromecast_mpris` in the background.
 ```bash
-$ chromecast_mpris -n "My Device" &
+$ chromecast_mpris --name "My Device" &
 [1] 1234
 ```
 
@@ -139,7 +139,7 @@ You can use the `-w/--wait` flag to specify a waiting period in seconds before `
 For example, if you want to wait 60 seconds between scans for devices, you can run the following:
 ```bash
 $ export SECONDS=60
-$ chromecast_mpris -w $SECONDS
+$ chromecast_mpris --wait $SECONDS
 ```
 
 This is useful if you'd like to start `chromecast_mpris` at login, and there is a chance that your device isn't on, or you're on a different network. 
@@ -147,14 +147,14 @@ This is useful if you'd like to start `chromecast_mpris` at login, and there is 
 ### Opening a URI on a Chromecast
  Get the D-Bus name for your device using `playerctl`.
 ```bash
-$ playerctl -l
+$ playerctl --list-all
 My_Device
 ```
 
 Use the D-Bus name to issue commands to it.
 ```bash
 $ export URL="http://ccmixter.org/content/gmz/gmz_-_Parametaphoriquement.mp3"
-$ playerctl -p My_Device open "$URL"
+$ playerctl --player My_Device open "$URL"
 ```
 
 This will play a song on your device.
@@ -163,7 +163,7 @@ This will play a song on your device.
 You can cast YouTube videos the same way you can cast a generic URI.
 ```bash
 $ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
-$ playerctl -p My_Device open "$VIDEO"
+$ playerctl --player My_Device open "$VIDEO"
 ```
 
 ## License
