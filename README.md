@@ -152,13 +152,19 @@ My_Device
 ```
 
 Use the D-Bus name to issue commands to it.
-
 ```bash
 $ export URL="http://ccmixter.org/content/gmz/gmz_-_Parametaphoriquement.mp3"
-$ playerctl -p My_Chromecast open "$URL"
+$ playerctl -p My_Device open "$URL"
 ```
 
 This will play a song on your device.
+
+### Opening a YouTube video
+You can cast YouTube videos the same way you can cast a generic URI.
+```bash
+$ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
+$ playerctl -p My_Device open "$VIDEO"
+```
 
 ## License
 See `LICENSE`. Message me if you'd like to use this project with a different license.
