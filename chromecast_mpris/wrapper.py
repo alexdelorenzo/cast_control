@@ -18,6 +18,9 @@ from .base import DEFAULT_THUMB, NO_DURATION, NO_DELTA, DESKTOP_FILE, \
   US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType
 
 
+DEFAULT_NAME = "Chromecast MPRIS"
+
+
 class Wrapper(ABC):
   @property
   def cast_status(self) -> Optional[CastStatus]:
@@ -67,6 +70,10 @@ class ChromecastWrapper(Wrapper):
 
   def __repr__(self) -> str:
     return f"<{self.__name__} for {self.cc}>"
+
+  @property
+  def name(self) -> str:
+    return self.cc.name or DEFAULT_NAME
 
   @property
   def cast_status(self) -> Union[CastStatus, ReturnsNone]:

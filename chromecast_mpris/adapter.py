@@ -13,7 +13,7 @@ from .wrapper import ChromecastWrapper
 class ChromecastAdapter(MprisAdapter):
   def __init__(self, chromecast: Chromecast):
     self.adapter = ChromecastWrapper(chromecast)
-    super().__init__(chromecast.name)
+    super().__init__(self.adapter.name)
 
   def get_uri_schemes(self) -> List[str]:
     return URI
