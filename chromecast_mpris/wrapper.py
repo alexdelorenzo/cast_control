@@ -125,10 +125,10 @@ class ChromecastWrapper(Wrapper):
     return BEGINNING
 
   def next(self):
-    self.cc.play_next()
+    self.play_next()
 
   def previous(self):
-    self.cc.play_previous()
+    self.play_previous()
 
   def pause(self):
     self.cc.media_controller.pause()
