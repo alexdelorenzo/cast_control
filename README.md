@@ -96,7 +96,7 @@ If you have your `pip` executables path added to your shell's `$PATH`, you can l
 $ chromecast_mpris
 ```
 
-You can also launch `chromecast_mpris` via its Python module. This can be useful if your `$PATH` doesn't point your `pip` executables.
+You can also launch `chromecast_mpris` via its Python module. This can be useful if your `$PATH` doesn't point to your `pip` executables.
 ```bash
 $ python3 -m chromecast_mpris
 ```
