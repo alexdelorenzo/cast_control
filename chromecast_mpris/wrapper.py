@@ -310,7 +310,7 @@ class ChromecastWrapper(Wrapper):
     video_id = get_video_id(uri)
 
     if video_id:
-      self.yt_ctl.add_to_queue()
+      self.yt_ctl.add_to_queue(video_id)
 
 
 @enforce_dbus_length
