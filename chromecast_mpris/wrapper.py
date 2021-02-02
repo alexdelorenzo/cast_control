@@ -223,7 +223,7 @@ class ChromecastWrapper(Wrapper):
     if metadata and 'subtitle' in metadata:
       title = ' - '.join((title, metadata['subtitle']))
 
-    return title
+    return title or self.cc.app_display_name
 
   def get_duration(self) -> Microseconds:
     duration = self.media_status.duration
