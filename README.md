@@ -47,7 +47,7 @@ Use `pip` to install `PyGObject>=3.34.0` if there are no installation candidates
 
 ### PyPI
 ```bash
-python3 -m pip install chromecast_mpris
+$ python3 -m pip install chromecast_mpris
 ```
 
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
@@ -66,7 +66,7 @@ You'll get a `chromecast_mpris` executable added to your `$PATH`.
 If you're on Arch, you can install `chromecast_mpris` [directly from the AUR](https://aur.archlinux.org/packages/chromecast_mpris/).
 
 ```bash
-yay -S chromecast_mpris
+$ yay -S chromecast_mpris
 ```
 
 ### Upgrading
@@ -74,7 +74,7 @@ yay -S chromecast_mpris
 Stable releases are uploaded to PyPI. You can upgrade your `chromecast_mpris` installation like so:
 
 ```bash
-python3 -m pip --upgrade chromecast_mpris
+$ python3 -m pip --upgrade chromecast_mpris
 ```
 
 See the [releases page](https://github.com/alexdelorenzo/chromecast_mpris/releases) on GitHub.
