@@ -18,7 +18,9 @@ from .base import DEFAULT_THUMB, NO_DURATION, NO_DELTA, DESKTOP_FILE, \
   US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType
 
 
-DEFAULT_NAME = "Chromecast MPRIS"
+DEFAULT_NAME: str = "Chromecast MPRIS"
+NO_ARTIST: str = ''
+TITLE_SEP: str = ' - '
 
 
 class Wrapper(ABC):
@@ -69,7 +71,10 @@ class ChromecastWrapper(Wrapper):
     return getattr(self.cc, name)
 
   def __repr__(self) -> str:
-    return f"<{self.__name__} for {self.cc}>"
+    cls = type(self)
+    cls_name = cls.__name__
+
+    return f"<{cls_name} for {self.cc}>"
 
   @property
   def name(self) -> str:
@@ -221,7 +226,7 @@ class ChromecastWrapper(Wrapper):
     metadata = self.media_status.media_metadata
 
     if metadata and 'subtitle' in metadata:
-      title = ' - '.join((title, metadata['subtitle']))
+      title = TITLE_SEP.join((title, metadata['subtitle']))
 
     return title or self.cc.app_display_name
 
@@ -236,12 +241,26 @@ class ChromecastWrapper(Wrapper):
 
     return duration
 
+  def get_artist(self, title: Optional[str]) -> str:
+    if title is None:
+      title = self.get_stream_title()
+
+    artist: Optional[str] = self.media_status.artist
+    app_name: Optional[str] = self.cc.app_display_name
+
+    if artist:
+      return artist
+
+    elif app_name and app_name not in title:
+      return app_name
+
+    return NO_ARTIST
+
   def metadata(self) -> Metadata:
     title: str = self.get_stream_title()
     dbus_name: DbusObj = get_track_id(title)
+    artists = [self.get_artist(title)]
 
-    artist: Optional[str] = self.media_status.artist
-    artists: List[str] = [artist] if artist else []
     comments: List[str] = []
 
     metadata = {
@@ -261,12 +280,11 @@ class ChromecastWrapper(Wrapper):
     return metadata
 
   def get_current_track(self) -> Track:
+    title = self.get_stream_title()
+    artist = Artist(self.get_artist(title))
     art_url = self.get_art_url()
     content_id = self.media_status.content_id
-    name = self.media_status.artist
     duration = int(self._get_duration())
-    title = self.get_stream_title()
-    artist = Artist(name)
 
     album = Album(
       name=self.media_status.album_name,
@@ -311,6 +329,9 @@ class ChromecastWrapper(Wrapper):
 
     if video_id:
       self.yt_ctl.add_to_queue(video_id)
+
+      if set_as_current:
+        pass
 
 
 @enforce_dbus_length
