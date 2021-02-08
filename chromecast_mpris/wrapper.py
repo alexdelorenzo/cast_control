@@ -165,6 +165,7 @@ class ChromecastWrapper(Wrapper):
 
     if video_id:
       self.play_youtube(video_id)
+
       return
 
     mimetype, _ = guess_type(uri)
@@ -330,8 +331,11 @@ class ChromecastWrapper(Wrapper):
     if video_id:
       self.yt_ctl.add_to_queue(video_id)
 
-      if set_as_current:
-        pass
+    if video_id and set_as_current:
+      self.yt_ctl.play_video(video_id)
+
+    elif set_as_current:
+      self.open_uri(uri)
 
 
 @enforce_dbus_length
