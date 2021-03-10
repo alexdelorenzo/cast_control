@@ -1,11 +1,16 @@
 from abc import ABC
-from typing import Optional, Any, List, Union
+from typing import Optional, Any, List, Union, Tuple, \
+  NamedTuple
 from pathlib import Path
 from mimetypes import guess_type
 
-from pychromecast.controllers.media import MediaStatus
+from pychromecast.controllers.receiver import CastStatus
+from pychromecast.controllers.media import MediaStatus, BaseController
 from pychromecast.controllers.youtube import YouTubeController
-from pychromecast.socket_client import CastStatus
+from pychromecast.controllers.spotify import SpotifyController
+from pychromecast.controllers.dashcast import DashCastController
+# from pychromecast.controllers.homeassistant import HomeAssistantController
+# from pychromecast.controllers.plex import PlexApiController, PlexController
 from pychromecast import Chromecast
 
 from mpris_server.adapters import Metadata, PlayState, \
@@ -14,7 +19,7 @@ from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, \
   Track, Album, Artist
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
-from .base import DEFAULT_THUMB, NO_DURATION, NO_DELTA, DESKTOP_FILE, \
+from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, DESKTOP_FILE, \
   US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType
 
 
@@ -23,13 +28,26 @@ NO_ARTIST: str = ''
 TITLE_SEP: str = ' - '
 
 
+class ReturnsNone:
+  """ Returns None if attribute or method doesn't exist"""
+
+  def __getattr__(self, name: str) -> None:
+    return None
+
+  def __bool__(self) -> bool:
+    return False
+
+
 class Wrapper(ABC):
+  cc: Chromecast
+  light_icon: bool = False
+
   @property
-  def cast_status(self) -> Optional[CastStatus]:
+  def cast_status(self) -> Union[CastStatus, ReturnsNone]:
     pass
 
   @property
-  def media_status(self) -> Optional[MediaStatus]:
+  def media_status(self) -> Union[MediaStatus, ReturnsNone]:
     pass
 
   def can_play_next(self) -> Optional[bool]:
@@ -44,41 +62,24 @@ class Wrapper(ABC):
   def play_prev(self):
     pass
 
+  def open_uri(self, uri: str):
+    pass
 
-class ReturnsNone:
-  """ Returns None if attribute doesn't exist """
+  def add_track(
+    self,
+    uri: str,
+    after_track: DbusObj,
+    set_as_current: bool
+  ):
+    pass
 
-  def __getattr__(self, name: str) -> None:
-    return None
-
-  def __bool__(self) -> bool:
-    return False
+  def set_icon(self, lighter: bool = False):
+    self.light_icon = lighter
 
 
-class ChromecastWrapper(Wrapper):
-  """
-  A wrapper to make it easier to switch out backend implementations.
-
-  Holds common logic for dealing with underlying Chromecast API.
-  """
-
-  def __init__(self, cc: Chromecast):
-    self.cc = cc
-    self.yt_ctl = YouTubeController()
-    self.cc.register_handler(self.yt_ctl)
-
+class StatusAttrsMixin(Wrapper):
   def __getattr__(self, name: str) -> Any:
     return getattr(self.cc, name)
-
-  def __repr__(self) -> str:
-    cls = type(self)
-    cls_name = cls.__name__
-
-    return f"<{cls_name} for {self.cc}>"
-
-  @property
-  def name(self) -> str:
-    return self.cc.name or DEFAULT_NAME
 
   @property
   def cast_status(self) -> Union[CastStatus, ReturnsNone]:
@@ -93,6 +94,146 @@ class ChromecastWrapper(Wrapper):
       return self.cc.media_controller.status
 
     return ReturnsNone()
+
+
+class ControllersMixin(Wrapper):
+  def __init__(self):
+    self.yt_ctl, self.spotify_ctl, self.dash_ctl = ctls = [
+      YouTubeController(),
+      SpotifyController(),
+      DashCastController(),
+    ]
+
+    for ctl in ctls:
+      self._register(ctl)
+
+  def _register(self, controller: BaseController):
+    self.cc.register_handler(controller)
+
+  def _launch_youtube(self):
+    self.yt_ctl.launch()
+
+  def _play_youtube(self, video_id: str):
+    if not self.yt_ctl.is_active:
+      self._launch_youtube()
+
+    self.yt_ctl.play_video(video_id)
+
+  def open_uri(self, uri: str):
+    video_id = get_video_id(uri)
+
+    if video_id:
+      self._play_youtube(video_id)
+      return
+
+    mimetype, _ = guess_type(uri)
+    self.cc.media_controller.play_media(uri, mimetype)
+
+  def add_track(
+    self,
+    uri: str,
+    after_track: DbusObj,
+    set_as_current: bool
+  ):
+    video_id = get_video_id(uri)
+
+    if video_id:
+      self.yt_ctl.add_to_queue(video_id)
+
+    if video_id and set_as_current:
+      self.yt_ctl.play_video(video_id)
+
+    elif set_as_current:
+      self.open_uri(uri)
+
+
+class TitlesMixin(Wrapper):
+  def get_stream_title(self) -> Optional[str]:
+    title = self.cc.media_controller.title
+    app_name = self.cc.app_display_name
+    subtitle = self.get_subtitle()
+
+    return title or app_name or subtitle
+
+  def get_subtitle(self) -> Optional[str]:
+    metadata = self.media_status.media_metadata
+
+    if metadata and 'subtitle' in metadata:
+      return metadata['subtitle']
+
+    return None
+
+  def get_artist(self, title: Optional[str] = None) -> Optional[str]:
+    if not title:
+      title = self.get_stream_title()
+
+    subtitle = self.get_subtitle()
+    artist: Optional[str] = self.media_status.artist
+    app_name: Optional[str] = self.cc.app_display_name
+
+    if artist:
+      return artist
+
+    elif subtitle:
+      return subtitle
+
+    elif app_name and app_name != title:
+      return app_name
+
+    return None
+
+  def get_album(
+    self,
+    title: Optional[str] = None,
+    artist: Optional[str] = None
+  ) -> Optional[str]:
+    if not title:
+      title = self.get_stream_title()
+
+    if not artist:
+      artist = self.get_artist()
+
+    album: Optional[str] = self.media_status.album_name
+    app_name = self.cc.app_display_name
+    subtitle = self.get_subtitle()
+    titles = {artist, title}
+
+    if album:
+      return album
+
+    elif subtitle and subtitle not in titles:
+      return subtitle
+
+    elif app_name and app_name not in titles:
+      return app_name
+
+    return None
+
+
+class ChromecastWrapper(
+  StatusAttrsMixin,
+  TitlesMixin,
+  ControllersMixin
+):
+  """
+  A wrapper to make it easier to switch out backend implementations.
+
+  Holds common logic for dealing with underlying Chromecast API.
+  """
+
+  def __init__(self, cc: Chromecast):
+    self.cc = cc
+    super().__init__()
+
+  def __repr__(self) -> str:
+    cls = type(self)
+    cls_name = cls.__name__
+
+    return f"<{cls_name} for {self.cc}>"
+
+  @property
+  def name(self) -> str:
+    return self.cc.name or DEFAULT_NAME
 
   def can_play_next(self) -> Optional[bool]:
     if self.media_status:
@@ -160,17 +301,6 @@ class ChromecastWrapper(Wrapper):
     seconds = int(round(time / US_IN_SEC))
     self.cc.media_controller.seek(seconds)
 
-  def open_uri(self, uri: str):
-    video_id = get_video_id(uri)
-
-    if video_id:
-      self.play_youtube(video_id)
-
-      return
-
-    mimetype, _ = guess_type(uri)
-    self.cc.media_controller.play_media(uri, mimetype)
-
   def is_repeating(self) -> bool:
     return False
 
@@ -195,9 +325,20 @@ class ChromecastWrapper(Wrapper):
   def set_shuffle(self, val: bool):
     return False
 
-  def get_art_url(self, track: int = None) -> str:
+  def get_art_url(self, track: Optional[int] = None) -> str:
     thumb = self.media_controller.thumbnail
-    return thumb if thumb else DEFAULT_THUMB
+    icon = self.cast_status.icon_url
+
+    if thumb:
+      return thumb
+
+    elif icon:
+      return icon
+
+    elif self.light_icon:
+      return LIGHT_THUMB
+
+    return DEFAULT_THUMB
 
   def get_volume(self) -> VolumeDecimal:
     return self.cast_status.volume_level
@@ -222,15 +363,6 @@ class ChromecastWrapper(Wrapper):
   def set_mute(self, val: bool):
     self.cc.set_volume_muted(val)
 
-  def get_stream_title(self) -> str:
-    title = self.cc.media_controller.title
-    metadata = self.media_status.media_metadata
-
-    if metadata and 'subtitle' in metadata:
-      title = TITLE_SEP.join((title, metadata['subtitle']))
-
-    return title or self.cc.app_display_name
-
   def get_duration(self) -> Microseconds:
     duration = self.media_status.duration
 
@@ -242,26 +374,11 @@ class ChromecastWrapper(Wrapper):
 
     return duration
 
-  def get_artist(self, title: Optional[str]) -> str:
-    if title is None:
-      title = self.get_stream_title()
-
-    artist: Optional[str] = self.media_status.artist
-    app_name: Optional[str] = self.cc.app_display_name
-
-    if artist:
-      return artist
-
-    elif app_name and app_name not in title:
-      return app_name
-
-    return NO_ARTIST
-
   def metadata(self) -> Metadata:
-    title: str = self.get_stream_title()
+    title: Optional[str] = self.get_stream_title()
+    artist = self.get_artist()
+    artists = [artist] if artist else []
     dbus_name: DbusObj = get_track_id(title)
-    artists = [self.get_artist(title)]
-
     comments: List[str] = []
 
     metadata = {
@@ -271,7 +388,7 @@ class ChromecastWrapper(Wrapper):
       "xesam:url": self.media_status.content_id,
       "xesam:title": title,
       "xesam:artist": artists,
-      "xesam:album": self.media_status.album_name,
+      "xesam:album": self.get_album(title, artist),
       "xesam:albumArtist": artists,
       "xesam:discNumber": DEFAULT_DISC_NO,
       "xesam:trackNumber": self.media_status.track,
@@ -282,13 +399,14 @@ class ChromecastWrapper(Wrapper):
 
   def get_current_track(self) -> Track:
     title = self.get_stream_title()
-    artist = Artist(self.get_artist(title))
+    artist_name = self.get_artist()
+    artist = Artist(artist_name)
     art_url = self.get_art_url()
     content_id = self.media_status.content_id
-    duration = int(self._get_duration())
+    duration = int(self.get_duration())
 
     album = Album(
-      name=self.media_status.album_name,
+      name=self.get_album(title, artist_name),
       artists=(artist,),
       art_url=art_url,
     )
@@ -303,39 +421,13 @@ class ChromecastWrapper(Wrapper):
       album=album,
       art_url=art_url,
       disc_no=DEFAULT_DISC_NO,
-      type=get_media_type(self.cc)
+      type=get_media_type(self)
     )
 
     return track
 
   def get_desktop_entry(self) -> str:
     return str(Path(DESKTOP_FILE).absolute())
-
-  def launch_youtube(self):
-    self.yt_ctl.launch()
-
-  def play_youtube(self, video_id: str):
-    if not self.yt_ctl.is_active:
-      self.launch_youtube()
-
-    self.yt_ctl.play_video(video_id)
-
-  def add_track(
-    self,
-    uri: str,
-    after_track: DbusObj,
-    set_as_current: bool
-  ):
-    video_id = get_video_id(uri)
-
-    if video_id:
-      self.yt_ctl.add_to_queue(video_id)
-
-    if video_id and set_as_current:
-      self.yt_ctl.play_video(video_id)
-
-    elif set_as_current:
-      self.open_uri(uri)
 
 
 @enforce_dbus_length

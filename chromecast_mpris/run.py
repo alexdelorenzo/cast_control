@@ -72,12 +72,16 @@ def run_server(
   name: Optional[str],
   host: Optional[str],
   uuid: Optional[str],
-  wait: Optional[Seconds] = DEFAULT_WAIT,
+  wait: Optional[float] = DEFAULT_WAIT,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
+  icon: bool = False,
   log_level: str = LOG_LEVEL
 ):
   logging.basicConfig(level=log_level.upper())
   mpris = retry_until_found(name, host, uuid, wait, retry_wait)
+
+  if mpris and icon:
+    mpris.adapter.wrapper.set_icon(True)
 
   if not mpris:
     raise NoChromecastFoundException(name)

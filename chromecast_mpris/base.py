@@ -4,7 +4,7 @@ from uuid import UUID
 from enum import auto
 
 from pychromecast.controllers.media import MediaStatus
-from pychromecast.socket_client import CastStatus
+from pychromecast.controllers.receiver import CastStatus
 from pychromecast import Chromecast, get_chromecasts, \
   get_chromecast_from_host
 
@@ -20,6 +20,8 @@ FIRST_CHROMECAST = 0
 DESKTOP_FILE = Path(__file__).parent / "chromecast_mpris.desktop"
 DEFAULT_THUMB = \
   'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
+LIGHT_THUMB = \
+  'https://alexdelorenzo.dev/assets/imgs/projects/chromecast_mpris/cc-white.png'
 
 YOUTUBE = "YouTube"
 
