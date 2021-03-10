@@ -70,8 +70,7 @@ If you're on Arch, you can install `chromecast_mpris` [directly from the AUR](ht
 $ yay -S chromecast_mpris
 ```
 
-### Upgrading
-
+### Upgrades
 Stable releases are uploaded to PyPI. You can upgrade your `chromecast_mpris` installation like so:
 
 ```bash
@@ -85,7 +84,7 @@ You'll need to make sure that your computer is on the same network as your devic
 
 It also helps to know the names of the devices in advance.
 
-### Launching 
+### Launch
 Installing the package via PyPI, GitHub or the AUR will add `chromecast_mpris` to your `pip` executables path:
 ```bash
 $ which chromecast_mpris 
@@ -107,25 +106,37 @@ $ python3 -m chromecast_mpris
 $ chromecast_mpris --help
 Usage: chromecast_mpris [OPTIONS]
 
-  Control casting devices through MPRIS media controls.
+  Control casting devices via Linux media controls and desktops.
+
+  This daemon connects your casting device directly to the D-Bus media
+  player interface.
 
 Options:
-  -n, --name TEXT         Specify a device name, otherwise control the first
-                          device found.
+  -n, --name TEXT         Connect to a device via its name, otherwise control
+                          the first device found.
 
-  -h, --host TEXT         Hostname or IP address of streaming device.
-  -u, --uuid TEXT         Streaming device's UUID.
-  -w, --wait INTEGER      Retry after specified amount of seconds if a device
-                          isn't found.
+  -h, --host TEXT         Connect to a device via its hostname or IP address,
+                          otherwise control the first device found.
 
-  -r, --retry-wait FLOAT  Seconds to wait between retries to reconnect after a
-                          device connection is interrupted.  [default: 5.0]
+  -u, --uuid TEXT         Connect to a device via its UUID, otherwise control
+                          the first device found
 
-  -l, --log-level TEXT    Debugging log level.  [default: WARN]
+  -w, --wait FLOAT        Seconds to wait between trying to make initial
+                          successful connections to a device.
+
+  -r, --retry-wait FLOAT  Seconds to wait between reconnection attempts if a
+                          successful connection is interrupted.  [default:
+                          5.0]
+
+  -i, --icon              Use a lighter icon instead of the dark icon. The
+                          lighter icon goes well with dark themes.  [default:
+                          False]
+
+  -l, --log-level TEXT    Set the debugging log level.  [default: WARN]
   --help                  Show this message and exit.
 ```
 
-### Connecting to a device
+### Connect to a device
 Connect to a device named "My Device" and run `chromecast_mpris` in the background.
 ```bash
 $ chromecast_mpris --name "My Device" &
@@ -134,7 +145,7 @@ $ chromecast_mpris --name "My Device" &
 
 After launching `chromecast_mpris`, you can use any MPRIS client to interact with it. MPRIS support is built in directly to Plasma Desktop and GNOME 3, and you can use `playerctl` on the command-line. 
 
-### Retrying until a Chromecast is found
+### Retry until a Chromecast is found
 You can use the `-w/--wait` flag to specify a waiting period in seconds before `chromecast_mpris` will try to find a casting device again if one is not found initially.
 
 For example, if you want to wait 60 seconds between scans for devices, you can run the following:
@@ -145,7 +156,7 @@ $ chromecast_mpris --wait $SECONDS
 
 This is useful if you'd like to start `chromecast_mpris` at login, and there is a chance that your device isn't on, or you're on a different network. 
 
-### Opening a URI on a Chromecast
+### Open a URI on a Chromecast
  Get the D-Bus name for your device using `playerctl`.
 ```bash
 $ playerctl --list-all
@@ -160,14 +171,14 @@ $ playerctl --player My_Device open "$URL"
 
 This will play a song on your device.
 
-### Opening a YouTube video
+### Open a YouTube video
 You can cast YouTube videos the same way you can cast a generic URI.
 ```bash
 $ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
 $ playerctl --player My_Device open "$VIDEO"
 ```
 
-# Support
+## Support
 Want to support this project and [other open-source projects](https://github.com/alexdelorenzo) like it?
 
 <a href="https://www.buymeacoffee.com/alexdelorenzo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" height="60px" style="height: 60px !important;width: 217px !important;max-width:25%" ></a>
