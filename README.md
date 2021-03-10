@@ -1,5 +1,5 @@
 # 📺 Control Chromecasts from Linux
-`chromecast_mpris` allows you to control media playback on casting devices and view their playback information from the Linux desktop.
+`chromecast_mpris` allows you to control and view media playback on casting devices from the Linux desktop.
 
 ### Integrations
 `chromecast_mpris` controls Chromecasts and casting devices via [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
