@@ -2,14 +2,14 @@
 Control your Chromecast and casting devices via [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
 
 MPRIS is the standard media player interface on Linux desktops.
-`chromecast_mpris` allows you to control media playback on casting devices, and it provides an interface for playback information.
+`chromecast_mpris` allows you to control media playback on casting devices, and to view details about the media that's playing.
 
+#### Integrations
 MPRIS integration is [enabled by default](https://github.com/KDE/plasma-workspace/tree/master/applets/mediacontroller) in Plasma Desktop, and, along with GNOME's volume control widget, [there are widgets for GNOME](https://extensions.gnome.org/extension/1379/mpris-indicator-button/), too. [`playerctl` provides a CLI](https://github.com/altdesktop/playerctl) for controlling media players through MPRIS.
 
 Check out [▶️mpris_server](https://github.com/alexdelorenzo/mpris_server) if you want to integrate MPRIS support into your media player.
 
 ## Screenshots
-
 Controlling a Chromecast via Plasma Desktop's Media Player widget:
 
 <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/assets/peg.png" height="225" /> <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/assets/mpris_plasma.png" height="225" />
@@ -165,6 +165,11 @@ You can cast YouTube videos the same way you can cast a generic URI.
 $ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
 $ playerctl --player My_Device open "$VIDEO"
 ```
+
+# Support
+Want to support this project and [other open-source projects](https://github.com/alexdelorenzo) like it?
+
+<a href="https://www.buymeacoffee.com/alexdelorenzo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" height="60px" style="height: 60px !important;width: 217px !important;max-width:25%" ></a>
 
 ## License
 See `LICENSE`. Message me if you'd like to use this project with a different license.
