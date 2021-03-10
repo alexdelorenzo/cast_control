@@ -134,7 +134,7 @@ $ chromecast_mpris --name "My Device" &
 After launching `chromecast_mpris`, you can use any MPRIS client to interact with it. MPRIS support is built in directly to Plasma Desktop and GNOME 3, and you can use `playerctl` on the command-line. 
 
 ### Retrying until a Chromecast is found
-You can use the `-w/--wait` flag to specify a waiting period in seconds before `chromecast_mpris` will try find a casting device again if one is not found initially.
+You can use the `-w/--wait` flag to specify a waiting period in seconds before `chromecast_mpris` will try to find a casting device again if one is not found initially.
 
 For example, if you want to wait 60 seconds between scans for devices, you can run the following:
 ```bash
