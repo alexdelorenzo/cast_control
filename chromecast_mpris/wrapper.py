@@ -27,6 +27,8 @@ DEFAULT_NAME: str = "Chromecast MPRIS"
 NO_ARTIST: str = ''
 TITLE_SEP: str = ' - '
 
+YT_VID_URL: str = "https://youtube.com/watch?v="
+
 
 class ReturnsNone:
   """ Returns None if attribute or method doesn't exist"""
@@ -118,6 +120,14 @@ class ControllersMixin(Wrapper):
       self._launch_youtube()
 
     self.yt_ctl.play_video(video_id)
+
+  def _get_url(self) -> Optional[str]:
+    content_id = self.media_status.content_id
+
+    if content_id and 'http' not in content_id and self.yt_ctl.is_active:
+      return f"{YT_VID_URL}{content_id}"
+
+    return content_id
 
   def open_uri(self, uri: str):
     video_id = get_video_id(uri)
@@ -385,7 +395,7 @@ class ChromecastWrapper(
       "mpris:trackid": dbus_name,
       "mpris:length": self.get_duration(),
       "mpris:artUrl": self.get_art_url(),
-      "xesam:url": self.media_status.content_id,
+      "xesam:url": self._get_url(),
       "xesam:title": title,
       "xesam:artist": artists,
       "xesam:album": self.get_album(title, artist),
@@ -402,7 +412,7 @@ class ChromecastWrapper(
     artist_name = self.get_artist()
     artist = Artist(artist_name)
     art_url = self.get_art_url()
-    content_id = self.media_status.content_id
+    content_id = self._get_url()
     duration = int(self.get_duration())
 
     album = Album(

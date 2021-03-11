@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 NAME = "chromecast_mpris"
-VERSION = "0.7.1"
+VERSION = "0.7.2"
 LICENSE = "AGPL-3.0"
 
 # potential new name
@@ -30,7 +30,7 @@ setup(
   description="📺 Control Chromecasts from Linux and D-Bus",
   long_description=README,
   long_description_content_type="text/markdown",
-  url="https://alexdelorenzo.dev",
+  url="https://github.com/alexdelorenzo/chromecast_mpris",
   author=__author__,
   license=LICENSE,
   packages=[NAME],
