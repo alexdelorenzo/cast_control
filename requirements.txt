@@ -5,4 +5,4 @@ pydbus>=0.6.0
 click>=7.0
 
 # local
-mpris_server==0.2.16
+mpris_server==0.2.17
