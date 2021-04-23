@@ -1,0 +1,17 @@
+[tool]
+[tool.poetry]
+name = "chromecast_mpris"
+version = "0.7.7"
+description = "📺 Control Chromecasts from Linux and D-Bus"
+license = "AGPL-3.0"
+homepage = "https://github.com/alexdelorenzo/chromecast_mpris"
+authors = ["Alex DeLorenzo"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+click = ">=7.0"
+mpris-server = "==0.2.18"
+pychromecast = "==9.1.2"
+pydbus = ">=0.6.0"
+pygobject = ">=3.34.0"
