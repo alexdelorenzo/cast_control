@@ -1,8 +1,10 @@
 # 📺 Control Chromecasts from Linux
-`chromecast_mpris` allows you to view and control media playback on casting devices from the Linux desktop.
+`chromecast_mpris` allows you to control media playback on casting devices from the Linux desktop. 
+
+`chromecast_mpris` also publishes metadata about the media that's currently playing, or the app that's currently open, on your device.
 
 ### Integrations
-`chromecast_mpris` controls Chromecasts and casting devices via [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
+`chromecast_mpris` controls Chromecasts and casting devices via D-Bus and [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
 
 MPRIS is the standard media player interface on Linux desktops. 
 
@@ -14,7 +16,6 @@ Check out [▶️mpris_server](https://github.com/alexdelorenzo/mpris_server) if
 Controlling a Chromecast via Plasma Desktop's Media Player widget:
 
 <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/assets/mpris_widget.png" height="225" /> <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/assets/mpris_plasma.png" height="225" />
-
 
 ## Features
   * [x] Control music and video playback
@@ -63,7 +64,6 @@ Once you have a source copy, run `python3 -m pip install -r requirements.txt`, f
 You'll get a `chromecast_mpris` executable added to your `$PATH`.
 
 ### AUR
-
 If you're on Arch, you can install `chromecast_mpris` [directly from the AUR](https://aur.archlinux.org/packages/chromecast_mpris/).
 
 ```bash
