@@ -29,8 +29,8 @@ ASSETS_DIR = SRC_DIR / "assets"
 DESKTOP_FILE_LOCAL = ASSETS_DIR / f"{NAME}{DESKTOP_SUFFIX}"
 
 ICON_DIR = ASSETS_DIR / 'icon'
-LIGHT_ICON = ICON_DIR / 'cc-white.png'
-DARK_ICON = ICON_DIR / 'cc-black.png'
+LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
+DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
 
 APP_DIRS = AppDirs(NAME)
 DATA_DIR = Path(APP_DIRS.user_data_dir)
@@ -69,13 +69,15 @@ try:
 except Exception as e:
   logging.exception(e)
   logging.warn(f"Couldn't create {DATA_DIR} or {DESKTOP_FILE_DATA}.")
+
   DESKTOP_FILE_LIGHT = DESKTOP_FILE_DARK = Path()
 
 
-DEFAULT_THUMB = \
-  'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
-LIGHT_THUMB = \
-  'https://alexdelorenzo.dev/assets/imgs/projects/chromecast_mpris/cc-white.png'
+#DEFAULT_THUMB = \
+  #'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
+#LIGHT_THUMB = \
+  #'https://alexdelorenzo.dev/assets/imgs/projects/chromecast_mpris/cc-white.png'
+
 
 YOUTUBE = "YouTube"
 
