@@ -19,8 +19,9 @@ from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, \
   Track, Album, Artist
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
-from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, DESKTOP_FILE, \
-  US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType
+from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
+  US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType, DESKTOP_FILE_DARK, \
+  DESKTOP_FILE_LIGHT
 
 
 DEFAULT_NAME: str = "Chromecast MPRIS"
@@ -437,8 +438,12 @@ class ChromecastWrapper(
     return track
 
   def get_desktop_entry(self) -> str:
-    path = Path(DESKTOP_FILE).absolute().with_suffix('')
-    print(path)
+    path = \
+      DESKTOP_FILE_LIGHT if self.light_icon else DESKTOP_FILE_DARK
+
+    # mpris requires stripped of suffix
+    path = path.with_suffix('')
+
     return str(path)
 
 

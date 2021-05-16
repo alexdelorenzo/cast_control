@@ -2,6 +2,7 @@ from typing import Optional, Union, NamedTuple
 from pathlib import Path
 from uuid import UUID
 from enum import auto
+import logging
 
 from appdirs import AppDirs
 
@@ -13,33 +14,63 @@ from pychromecast import Chromecast, get_chromecasts, \
 from mpris_server.base import AutoName
 
 
+NAME = 'chromecast_mpris'
+
 RC_NO_CHROMECAST = 1
 NO_DURATION = 0
 NO_DELTA = 0
 NO_CHROMECAST_NAME = "NO_NAME"
 FIRST_CHROMECAST = 0
 
+DESKTOP_SUFFIX = '.desktop'
+
 SRC_DIR = Path(__file__).parent
 ASSETS_DIR = SRC_DIR / "assets"
-DESKTOP_FILE = ASSETS_DIR / "chromecast_mpris.desktop"
-LIGHT_ICON = ASSETS_DIR / 'icon' / 'cc-white.png'
+DESKTOP_FILE_LOCAL = ASSETS_DIR / f"{NAME}{DESKTOP_SUFFIX}"
 
-DIRS = AppDirs('chromecast_mpris')
-DATA_DIR = Path(DIRS.user_data_dir)
-DESKTOP_FILE_DATA = DATA_DIR / DESKTOP_FILE.name
+ICON_DIR = ASSETS_DIR / 'icon'
+LIGHT_ICON = ICON_DIR / 'cc-white.png'
+DARK_ICON = ICON_DIR / 'cc-black.png'
 
-if not DATA_DIR.exists():
-  DATA_DIR.mkdir()
+APP_DIRS = AppDirs(NAME)
+DATA_DIR = Path(APP_DIRS.user_data_dir)
+DESKTOP_FILE_DATA = DATA_DIR / DESKTOP_FILE_LOCAL.name
 
-if not DESKTOP_FILE_DATA.exists():
-  *lines, last = DESKTOP_FILE.read_text().splitlines()
-  last += str(LIGHT_ICON.absolute())
-  lines = (*lines, last)
-  data = '\n'.join(lines)
-  DESKTOP_FILE_DATA.write_text(data)
 
-DESKTOP_FILE = DESKTOP_FILE_DATA
-  
+def create_desktop_file(light_icon: bool = True) -> Path:
+  if not DATA_DIR.exists():
+    DATA_DIR.mkdir()
+
+  if light_icon:
+    icon = str(LIGHT_ICON.absolute())
+    file = DATA_DIR / f'{NAME}-light{DESKTOP_SUFFIX}'
+
+  else:
+    icon = str(DARK_ICON.absolute())
+    file = DATA_DIR / f'{NAME}-dark{DESKTOP_SUFFIX}'
+
+  if not file.exists():
+    *lines, last = DESKTOP_FILE_LOCAL \
+      .read_text() \
+      .splitlines()
+
+    last += icon
+    lines = (*lines, last)
+    data = '\n'.join(lines)
+    file.write_text(data)
+
+  return file
+
+
+try:
+  DESKTOP_FILE_LIGHT = create_desktop_file(light_icon=True)
+  DESKTOP_FILE_DARK = create_desktop_file(light_icon=False)
+
+except Exception as e:
+  logging.exception(e)
+  logging.warn(f"Couldn't create {DATA_DIR} or {DESKTOP_FILE_DATA}.")
+  DESKTOP_FILE = Path()
+
 
 DEFAULT_THUMB = \
   'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'

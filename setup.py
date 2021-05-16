@@ -23,6 +23,11 @@ REQS = Path('requirements.txt') \
 
 README = Path('README.md').read_text()
 
+ASSET_DIRS = [
+  'assets/*',
+  'assets/icon/*'
+]
+
 
 setup(
   name=NAME,
@@ -38,4 +43,5 @@ setup(
   install_requires=REQS,
   entry_points=ENTRY_POINTS,
   python_requires='>=3.6',
+  package_data={NAME: ASSET_DIRS},
 )
