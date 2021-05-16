@@ -15,7 +15,7 @@ Check out [▶️mpris_server](https://github.com/alexdelorenzo/mpris_server) if
 ## Screenshots
 Controlling a Chromecast via Plasma Desktop's Media Player widget:
 
-<img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/assets/mpris_widget.png" height="225" /> <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/assets/mpris_plasma.png" height="225" />
+<img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/chromecast_mpris/assets/mpris_widget.png" height="225" /> <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/chromecast_mpris/assets/mpris_plasma.png" height="225" />
 
 ## Features
   * [x] Control music and video playback
