@@ -1,1 +1,1 @@
-include README.md requirements.txt LICENSE chromecast_mpris.desktop assets
+include README.md requirements.txt LICENSE chromecast_mpris/assets
