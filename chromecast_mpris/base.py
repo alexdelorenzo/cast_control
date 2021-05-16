@@ -69,7 +69,7 @@ try:
 except Exception as e:
   logging.exception(e)
   logging.warn(f"Couldn't create {DATA_DIR} or {DESKTOP_FILE_DATA}.")
-  DESKTOP_FILE = Path()
+  DESKTOP_FILE_LIGHT = DESKTOP_FILE_DARK = Path()
 
 
 DEFAULT_THUMB = \
