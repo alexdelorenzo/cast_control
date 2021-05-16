@@ -441,7 +441,7 @@ class ChromecastWrapper(
     path = \
       DESKTOP_FILE_LIGHT if self.light_icon else DESKTOP_FILE_DARK
 
-    # mpris requires stripped of suffix
+    # mpris requires stripped suffix
     path = path.with_suffix('')
 
     return str(path)
