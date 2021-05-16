@@ -3,6 +3,8 @@ from pathlib import Path
 from uuid import UUID
 from enum import auto
 
+from appdirs import AppDirs
+
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast import Chromecast, get_chromecasts, \
@@ -17,7 +19,28 @@ NO_DELTA = 0
 NO_CHROMECAST_NAME = "NO_NAME"
 FIRST_CHROMECAST = 0
 
-DESKTOP_FILE = Path(__file__).parent / "chromecast_mpris.desktop"
+SRC_DIR = Path(__file__).parent
+ASSETS_DIR = SRC_DIR / "assets"
+DESKTOP_FILE = ASSETS_DIR / "chromecast_mpris.desktop"
+LIGHT_ICON = ASSETS_DIR / 'icon' / 'cc-white.png'
+
+DIRS = AppDirs('chromecast_mpris')
+DATA_DIR = Path(DIRS.user_data_dir)
+DESKTOP_FILE_DATA = DATA_DIR / DESKTOP_FILE.name
+
+if not DATA_DIR.exists():
+  DATA_DIR.mkdir()
+
+if not DESKTOP_FILE_DATA.exists():
+  *lines, last = DESKTOP_FILE.read_text().splitlines()
+  last += str(LIGHT_ICON.absolute())
+  lines = (*lines, last)
+  data = '\n'.join(lines)
+  DESKTOP_FILE_DATA.write_text(data)
+
+DESKTOP_FILE = DESKTOP_FILE_DATA
+  
+
 DEFAULT_THUMB = \
   'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
 LIGHT_THUMB = \

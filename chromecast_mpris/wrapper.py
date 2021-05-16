@@ -437,7 +437,9 @@ class ChromecastWrapper(
     return track
 
   def get_desktop_entry(self) -> str:
-    return str(Path(DESKTOP_FILE).absolute())
+    path = Path(DESKTOP_FILE).absolute().with_suffix('')
+    print(path)
+    return str(path)
 
 
 @enforce_dbus_length

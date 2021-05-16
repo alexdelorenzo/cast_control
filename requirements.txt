@@ -1,8 +1,9 @@
 # foreign
-PyChromecast==9.1.2
-PyGObject>=3.34.0
-pydbus>=0.6.0
+appdirs==1.4.4
 click>=7.0
+PyChromecast==9.1.2
+pydbus>=0.6.0
+PyGObject>=3.34.0
 
 # local
 mpris_server==0.2.18
