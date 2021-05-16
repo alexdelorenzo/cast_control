@@ -15,6 +15,7 @@ from mpris_server.base import AutoName
 
 
 NAME = 'chromecast_mpris'
+DESKTOP_NAME = "Cast Control"
 
 RC_NO_CHROMECAST = 1
 NO_DURATION = 0
@@ -22,7 +23,8 @@ NO_DELTA = 0
 NO_CHROMECAST_NAME = "NO_NAME"
 FIRST_CHROMECAST = 0
 
-DESKTOP_SUFFIX = '.desktop'
+DESKTOP_SUFFIX: str = '.desktop'
+NO_DESKTOP_FILE: str = ''
 
 SRC_DIR = Path(__file__).parent
 ASSETS_DIR = SRC_DIR / "assets"
@@ -42,25 +44,29 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     DATA_DIR.mkdir()
 
   if light_icon:
-    icon = str(LIGHT_ICON.absolute())
+    icon_path = str(LIGHT_ICON.absolute())
     file = DATA_DIR / f'{NAME}-light{DESKTOP_SUFFIX}'
 
   else:
-    icon = str(DARK_ICON.absolute())
+    icon_path = str(DARK_ICON.absolute())
     file = DATA_DIR / f'{NAME}-dark{DESKTOP_SUFFIX}'
 
   if not file.exists():
-    *lines, last = DESKTOP_FILE_LOCAL \
+    *lines, name, icon = DESKTOP_FILE_LOCAL \
       .read_text() \
       .splitlines()
 
-    last += icon
-    lines = (*lines, last)
+    name += DESKTOP_NAME
+    icon += icon_path
+    lines = (*lines, name, icon)
     data = '\n'.join(lines)
+
     file.write_text(data)
 
   return file
 
+DESKTOP_FILE_LIGHT: Optional[Path] = None
+DESKTOP_FILE_DARK: Optional[Path] = None
 
 try:
   DESKTOP_FILE_LIGHT = create_desktop_file(light_icon=True)
@@ -69,15 +75,6 @@ try:
 except Exception as e:
   logging.exception(e)
   logging.warn(f"Couldn't create {DATA_DIR} or {DESKTOP_FILE_DATA}.")
-
-  DESKTOP_FILE_LIGHT = DESKTOP_FILE_DARK = Path()
-
-
-#DEFAULT_THUMB = \
-  #'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Chromecast_cast_button_icon.svg/500px-Chromecast_cast_button_icon.svg.png'
-#LIGHT_THUMB = \
-  #'https://alexdelorenzo.dev/assets/imgs/projects/chromecast_mpris/cc-white.png'
-
 
 YOUTUBE = "YouTube"
 

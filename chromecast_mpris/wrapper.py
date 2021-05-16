@@ -21,7 +21,7 @@ from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType, DESKTOP_FILE_DARK, \
-  DESKTOP_FILE_LIGHT
+  DESKTOP_FILE_LIGHT, NO_DESKTOP_FILE
 
 
 DEFAULT_NAME: str = "Chromecast MPRIS"
@@ -440,6 +440,9 @@ class ChromecastWrapper(
   def get_desktop_entry(self) -> str:
     path = \
       DESKTOP_FILE_LIGHT if self.light_icon else DESKTOP_FILE_DARK
+
+    if not path:
+      return NO_DESKTOP_FILE
 
     # mpris requires stripped suffix
     path = path.with_suffix('')
