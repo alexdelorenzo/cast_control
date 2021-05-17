@@ -83,18 +83,18 @@ class StatusAttrsMixin(Wrapper):
     return getattr(self.cc, name)
 
   @property
-  def cast_status(self) -> Union[CastStatus, _ReturnsNone]:
+  def cast_status(self) -> Optional[CastStatus]:
     if self.cc.status:
       return self.cc.status
 
-    return _ReturnsNone()
+    return None
 
   @property
-  def media_status(self) -> Union[MediaStatus, _ReturnsNone]:
+  def media_status(self) -> Optional[MediaStatus]:
     if self.cc.media_controller.status:
       return self.cc.media_controller.status
 
-    return _ReturnsNone()
+    return None
 
 
 class ControllersMixin(Wrapper):
