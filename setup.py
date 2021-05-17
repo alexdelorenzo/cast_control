@@ -24,8 +24,8 @@ REQS = Path('requirements.txt') \
 README = Path('README.md').read_text()
 
 ASSET_DIRS = [
-  'assets/*',
-  'assets/icon/*'
+  'assets/chromecast_mpris.desktop',
+  'assets/icon/cc-*.png'
 ]
 
 
