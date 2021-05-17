@@ -60,6 +60,8 @@ class ChromecastEventHandler(
     self.on_playback()
     self.on_options()
 
+    self.adapter.wrapper.on_new_status()
+
   def new_cast_status(self, status: CastStatus):
     self.check_volume(status)
 

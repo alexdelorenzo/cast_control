@@ -14,11 +14,11 @@ from pychromecast import Chromecast, get_chromecasts, \
 from mpris_server.base import AutoName
 
 
-NAME = 'chromecast_mpris'
-DESKTOP_NAME = "Cast Control"
+NAME: str = 'chromecast_mpris'
+DESKTOP_NAME: str = "Cast Control"
 
 RC_NO_CHROMECAST = 1
-NO_DURATION = 0
+NO_DURATION: float = 0.0
 NO_DELTA = 0
 NO_CHROMECAST_NAME = "NO_NAME"
 FIRST_CHROMECAST = 0
@@ -64,6 +64,7 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     file.write_text(data)
 
   return file
+
 
 DESKTOP_FILE_LIGHT: Optional[Path] = None
 DESKTOP_FILE_DARK: Optional[Path] = None

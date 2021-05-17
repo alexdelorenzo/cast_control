@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import Optional, Any, List, Union, Tuple, \
-  NamedTuple
+  NamedTuple, Callable, Set
 from pathlib import Path
 from mimetypes import guess_type
 
@@ -21,24 +21,22 @@ from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType, DESKTOP_FILE_DARK, \
-  DESKTOP_FILE_LIGHT, NO_DESKTOP_FILE
+  DESKTOP_FILE_LIGHT, NO_DESKTOP_FILE, NAME
 
 
-DEFAULT_NAME: str = "Chromecast MPRIS"
+DEFAULT_NAME: str = NAME
 NO_ARTIST: str = ''
 TITLE_SEP: str = ' - '
 
-YT_VID_URL: str = "https://youtube.com/watch?v="
+YOUTUBE_URLS: Set[str] = {
+  'youtube.com/',
+  'youtu.be/'
+}
+YT_LONG, YT_SHORT = YOUTUBE_URLS
+YT_VID_URL: str = f'https://{YT_LONG}watch?v='
 
 
-class ReturnsNone:
-  """ Returns None if attribute or method doesn't exist"""
-
-  def __getattr__(self, name: str) -> None:
-    return None
-
-  def __bool__(self) -> bool:
-    return False
+RESOLUTION: int = 1
 
 
 class Wrapper(ABC):
@@ -46,11 +44,11 @@ class Wrapper(ABC):
   light_icon: bool = False
 
   @property
-  def cast_status(self) -> Union[CastStatus, ReturnsNone]:
+  def cast_status(self) -> Optional[CastStatus]:
     pass
 
   @property
-  def media_status(self) -> Union[MediaStatus, ReturnsNone]:
+  def media_status(self) -> Optional[MediaStatus]:
     pass
 
   def can_play_next(self) -> Optional[bool]:
@@ -85,18 +83,18 @@ class StatusAttrsMixin(Wrapper):
     return getattr(self.cc, name)
 
   @property
-  def cast_status(self) -> Union[CastStatus, ReturnsNone]:
+  def cast_status(self) -> Union[CastStatus, _ReturnsNone]:
     if self.cc.status:
       return self.cc.status
 
-    return ReturnsNone()
+    return _ReturnsNone()
 
   @property
-  def media_status(self) -> Union[MediaStatus, ReturnsNone]:
+  def media_status(self) -> Union[MediaStatus, _ReturnsNone]:
     if self.cc.media_controller.status:
       return self.cc.media_controller.status
 
-    return ReturnsNone()
+    return _ReturnsNone()
 
 
 class ControllersMixin(Wrapper):
@@ -109,6 +107,8 @@ class ControllersMixin(Wrapper):
 
     for ctl in ctls:
       self._register(ctl)
+
+    super().__init__()
 
   def _register(self, controller: BaseController):
     self.cc.register_handler(controller)
@@ -123,7 +123,10 @@ class ControllersMixin(Wrapper):
     self.yt_ctl.play_video(video_id)
 
   def _get_url(self) -> Optional[str]:
-    content_id = self.media_status.content_id
+    content_id = None
+
+    if self.media_status:
+      content_id = self.media_status.content_id
 
     if content_id and 'http' not in content_id and self.yt_ctl.is_active:
       return f"{YT_VID_URL}{content_id}"
@@ -167,6 +170,9 @@ class TitlesMixin(Wrapper):
     return title or app_name or subtitle
 
   def get_subtitle(self) -> Optional[str]:
+    if not self.media_status:
+      return None
+
     metadata = self.media_status.media_metadata
 
     if metadata and 'subtitle' in metadata:
@@ -179,7 +185,12 @@ class TitlesMixin(Wrapper):
       title = self.get_stream_title()
 
     subtitle = self.get_subtitle()
-    artist: Optional[str] = self.media_status.artist
+
+    artist: Optional[str] = None
+
+    if not self.media_status:
+      artist = self.media_status.artist
+
     app_name: Optional[str] = self.cc.app_display_name
 
     if artist:
@@ -204,7 +215,11 @@ class TitlesMixin(Wrapper):
     if not artist:
       artist = self.get_artist()
 
-    album: Optional[str] = self.media_status.album_name
+    album: Optional[str] = None
+
+    if not self.media_status:
+      album = self.media_status.album_name
+
     app_name = self.cc.app_display_name
     subtitle = self.get_subtitle()
     titles = {artist, title}
@@ -221,10 +236,80 @@ class TitlesMixin(Wrapper):
     return None
 
 
+class TimeMixin(Wrapper):
+  def __init__(self,):
+    self._longest_duration: float = NO_DURATION
+    super().__init__()
+
+  def get_duration(self) -> Microseconds:
+    duration = None
+
+    if self.media_status:
+      duration = self.media_status.duration
+
+    current = self.get_current_position()
+    longest = self._longest_duration
+
+    if duration:
+      return duration * US_IN_SEC
+
+    elif longest and longest > current:
+        return longest
+
+    elif current:
+      self._longest_duration = current
+      return current
+
+    return NO_DURATION
+
+  def get_current_position(self) -> Microseconds:
+    status = self.media_status
+
+    if not status:
+      return BEGINNING
+
+    position_secs = status.adjusted_current_time
+
+    if position_secs:
+      return int(position_secs * US_IN_SEC)
+
+    return BEGINNING
+
+  def on_new_status(self, *args, **kwargs):
+    # super().on_new_status(*args, **kwargs)
+    status = self.media_status
+
+    if not status:
+      return
+
+    if not status.current_time or \
+        round(status.current_time, RESOLUTION) <= NO_DURATION:
+      self._longest_duration = NO_DURATION
+
+  def seek(self, time: Microseconds):
+    seconds = int(round(time / US_IN_SEC))
+    self.cc.media_controller.seek(seconds)
+
+  def get_rate(self) -> RateDecimal:
+    if not self.media_status:
+      return DEFAULT_RATE
+
+    rate = self.media_status.playback_rate
+
+    if rate:
+      return rate
+
+    return DEFAULT_RATE
+
+  def set_rate(self, val: RateDecimal):
+    pass
+
+
 class ChromecastWrapper(
   StatusAttrsMixin,
   TitlesMixin,
-  ControllersMixin
+  ControllersMixin,
+  TimeMixin,
 ):
   """
   A wrapper to make it easier to switch out backend implementations.
@@ -273,14 +358,6 @@ class ChromecastWrapper(
   def quit(self):
     self.cc.quit_app()
 
-  def get_current_position(self) -> Microseconds:
-    position_secs = self.media_status.adjusted_current_time
-
-    if position_secs:
-      return int(position_secs * US_IN_SEC)
-
-    return BEGINNING
-
   def next(self):
     self.play_next()
 
@@ -308,10 +385,6 @@ class ChromecastWrapper(
 
     return PlayState.STOPPED
 
-  def seek(self, time: Microseconds):
-    seconds = int(round(time / US_IN_SEC))
-    self.cc.media_controller.seek(seconds)
-
   def is_repeating(self) -> bool:
     return False
 
@@ -324,12 +397,6 @@ class ChromecastWrapper(
   def set_loop_status(self, val: str):
     pass
 
-  def get_rate(self) -> RateDecimal:
-    return DEFAULT_RATE
-
-  def set_rate(self, val: RateDecimal):
-    pass
-
   def get_shuffle(self) -> bool:
     return False
 
@@ -338,7 +405,11 @@ class ChromecastWrapper(
 
   def get_art_url(self, track: Optional[int] = None) -> str:
     thumb = self.media_controller.thumbnail
-    icon = self.cast_status.icon_url
+
+    icon = None
+
+    if self.cast_status:
+      icon = self.cast_status.icon_url
 
     if thumb:
       return thumb
@@ -352,6 +423,9 @@ class ChromecastWrapper(
     return DEFAULT_THUMB
 
   def get_volume(self) -> VolumeDecimal:
+    if not self.cast_status:
+      return None
+
     return self.cast_status.volume_level
 
   def set_volume(self, val: VolumeDecimal):
@@ -373,17 +447,6 @@ class ChromecastWrapper(
 
   def set_mute(self, val: bool):
     self.cc.set_volume_muted(val)
-
-  def get_duration(self) -> Microseconds:
-    duration = self.media_status.duration
-
-    if duration:
-      duration *= US_IN_SEC
-
-    else:
-      duration = NO_DURATION
-
-    return duration
 
   def metadata(self) -> Metadata:
     title: Optional[str] = self.get_stream_title()
@@ -456,36 +519,41 @@ def get_track_id(name: str) -> DbusObj:
 
 
 def get_media_type(cc: ChromecastWrapper) -> Optional[ChromecastMediaType]:
-  media_status = cc.media_status
+  status = cc.media_status
 
-  if not media_status:
+  if not status:
     return None
 
-  if media_status.media_is_movie:
+  if status.media_is_movie:
     return ChromecastMediaType.MOVIE
 
-  elif media_status.media_is_tvshow:
+  elif status.media_is_tvshow:
     return ChromecastMediaType.TVSHOW
 
-  elif media_status.media_is_photo:
+  elif status.media_is_photo:
     return ChromecastMediaType.PHOTO
 
-  elif media_status.media_is_musictrack:
+  elif status.media_is_musictrack:
     return ChromecastMediaType.MUSICTRACK
 
-  elif media_status.media_is_generic:
+  elif status.media_is_generic:
     return ChromecastMediaType.GENERIC
 
   return None
 
 
+def is_youtube(uri: str) -> bool:
+  uri = uri.lower()
+  return any(yt in uri for yt in YOUTUBE_URLS)
+
+
 def get_video_id(uri: str) -> Optional[str]:
   video_id: Optional[str] = None
 
-  if 'youtube.com/' in uri:
+  if YT_LONG in uri:
     *_, video_id = uri.split('v=')
 
-  elif 'youtu.be/' in uri:
+  elif YT_SHORT in uri:
     *_, video_id = uri.split('/')
 
   if video_id and '&' in video_id:
