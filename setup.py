@@ -1,47 +1,53 @@
-__author__ = "Alex DeLorenzo"
+__author__ = 'Alex DeLorenzo'
+from typing import Dict, List
 from setuptools import setup
 from pathlib import Path
 
 
-NAME = "chromecast_mpris"
-VERSION = "0.8.3"
-LICENSE = "AGPL-3.0"
+NAME: str = 'chromecast_mpris'
+VERSION: str = '0.8.3'
+LICENSE: str = 'AGPL-3.0'
+PY_VERSION: str = '>=3.6'
 
-# potential new name
-NEW_NAME = "cast_control"
+# decided new name
+NEW_NAME: str = 'cast_control'
 
-ENTRY_POINTS = {
-  "console_scripts": [
-    f"{NAME} = {NAME}.command:cmd",
-    f"{NEW_NAME} = {NAME}.command:cmd"
+ENTRY_POINTS: Dict[str, List[str]] = {
+  'console_scripts': [
+    f'{NAME} = {NAME}.command:cmd',
+    f'{NEW_NAME} = {NAME}.command:cmd'
   ]
 }
 
-REQS = Path('requirements.txt') \
+REQS: List[str] = Path('requirements.txt') \
   .read_text() \
   .split('\n')
 
-README = Path('README.md').read_text()
+README: str = Path('README.md').read_text()
 
-ASSET_DIRS = [
+ASSET_DIRS: List[str] = [
   'assets/chromecast_mpris.desktop',
   'assets/icon/cc-*.png'
 ]
+
+PKG_DATA: Dict[str, List[str]] = {
+  NAME: ASSET_DIRS
+}
 
 
 setup(
   name=NAME,
   version=VERSION,
-  description="📺 Control Chromecasts from Linux and D-Bus",
+  description='📺 Control Chromecasts from Linux and D-Bus',
   long_description=README,
-  long_description_content_type="text/markdown",
-  url="https://github.com/alexdelorenzo/chromecast_mpris",
+  long_description_content_type='text/markdown',
+  url='https://github.com/alexdelorenzo/chromecast_mpris',
   author=__author__,
   license=LICENSE,
   packages=[NAME],
   zip_safe=True,
   install_requires=REQS,
   entry_points=ENTRY_POINTS,
-  python_requires='>=3.6',
-  package_data={NAME: ASSET_DIRS},
+  python_requires=PY_VERSION,
+  package_data=PKG_DATA,
 )
