@@ -74,9 +74,6 @@ class Wrapper(ABC):
   ):
     pass
 
-  def set_icon(self, lighter: bool = False):
-    self.light_icon = lighter
-
 
 class StatusAttrsMixin(Wrapper):
   def __getattr__(self, name: str) -> Any:
@@ -305,11 +302,47 @@ class TimeMixin(Wrapper):
     pass
 
 
+class IconsMixin(Wrapper):
+  def get_art_url(self, track: Optional[int] = None) -> str:
+    thumb = self.media_controller.thumbnail
+    icon = None
+
+    if self.cast_status:
+      icon = self.cast_status.icon_url
+
+    if thumb:
+      return thumb
+
+    elif icon:
+      return icon
+
+    elif self.light_icon:
+      return str(LIGHT_THUMB)
+
+    return str(DEFAULT_THUMB)
+
+  def get_desktop_entry(self) -> str:
+    path = \
+      DESKTOP_FILE_LIGHT if self.light_icon else DESKTOP_FILE_DARK
+
+    if not path:
+      return NO_DESKTOP_FILE
+
+    # mpris requires stripped suffix
+    path = path.with_suffix('')
+
+    return str(path)
+
+  def set_icon(self, lighter: bool = False):
+    self.light_icon = lighter
+
+
 class ChromecastWrapper(
   StatusAttrsMixin,
   TitlesMixin,
   ControllersMixin,
   TimeMixin,
+  IconsMixin,
 ):
   """
   A wrapper to make it easier to switch out backend implementations.
@@ -403,25 +436,6 @@ class ChromecastWrapper(
   def set_shuffle(self, val: bool):
     return False
 
-  def get_art_url(self, track: Optional[int] = None) -> str:
-    thumb = self.media_controller.thumbnail
-
-    icon = None
-
-    if self.cast_status:
-      icon = self.cast_status.icon_url
-
-    if thumb:
-      return thumb
-
-    elif icon:
-      return icon
-
-    elif self.light_icon:
-      return LIGHT_THUMB
-
-    return DEFAULT_THUMB
-
   def get_volume(self) -> VolumeDecimal:
     if not self.cast_status:
       return None
@@ -499,18 +513,6 @@ class ChromecastWrapper(
     )
 
     return track
-
-  def get_desktop_entry(self) -> str:
-    path = \
-      DESKTOP_FILE_LIGHT if self.light_icon else DESKTOP_FILE_DARK
-
-    if not path:
-      return NO_DESKTOP_FILE
-
-    # mpris requires stripped suffix
-    path = path.with_suffix('')
-
-    return str(path)
 
 
 @enforce_dbus_length
