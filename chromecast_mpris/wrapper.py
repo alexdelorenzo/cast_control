@@ -396,6 +396,14 @@ class MetadataMixin(Wrapper):
 
 
 class PlaybackMixin(Wrapper):
+  def get_playstate(self) -> PlayState:
+    if self.cc.media_controller.is_paused:
+      return PlayState.PAUSED
+
+    elif self.cc.media_controller.is_playing:
+      return PlayState.PLAYING
+
+    return PlayState.STOPPED
 
   def can_play_next(self) -> Optional[bool]:
     if self.media_status:
@@ -441,15 +449,6 @@ class PlaybackMixin(Wrapper):
 
   def play(self):
     self.cc.media_controller.play()
-
-  def get_playstate(self) -> PlayState:
-    if self.cc.media_controller.is_paused:
-      return PlayState.PAUSED
-
-    elif self.cc.media_controller.is_playing:
-      return PlayState.PLAYING
-
-    return PlayState.STOPPED
 
   def is_repeating(self) -> bool:
     return False
