@@ -75,7 +75,7 @@ try:
 
 except Exception as e:
   logging.exception(e)
-  logging.warn(f"Couldn't create {DATA_DIR} or {DESKTOP_FILE_DATA}.")
+  logging.warn(f"Couldn't create {DESKTOP_SUFFIX} files in {DATA_DIR}.")
 
 YOUTUBE = "YouTube"
 

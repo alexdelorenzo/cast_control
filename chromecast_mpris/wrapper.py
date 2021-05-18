@@ -35,8 +35,8 @@ YOUTUBE_URLS: Set[str] = {
 YT_LONG, YT_SHORT = YOUTUBE_URLS
 YT_VID_URL: str = f'https://{YT_LONG}watch?v='
 
-
 RESOLUTION: int = 1
+NO_SUFFIX: str = ''
 
 
 class Wrapper(ABC):
@@ -126,7 +126,7 @@ class ControllersMixin(Wrapper):
       content_id = self.media_status.content_id
 
     if content_id and 'http' not in content_id and self.yt_ctl.is_active:
-      return f"{YT_VID_URL}{content_id}"
+      return f'{YT_VID_URL}{content_id}'
 
     return content_id
 
@@ -204,7 +204,7 @@ class TitlesMixin(Wrapper):
   def get_album(
     self,
     title: Optional[str] = None,
-    artist: Optional[str] = None
+    artist: Optional[str] = None,
   ) -> Optional[str]:
     if not title:
       title = self.get_stream_title()
@@ -239,7 +239,7 @@ class TimeMixin(Wrapper):
     super().__init__()
 
   def get_duration(self) -> Microseconds:
-    duration = None
+    duration: Optional[float] = None
 
     if self.media_status:
       duration = self.media_status.duration
@@ -307,6 +307,9 @@ class TimeMixin(Wrapper):
 
 
 class IconsMixin(Wrapper):
+  def set_icon(self, lighter: bool = False):
+    self.light_icon: bool = lighter
+
   def get_art_url(self, track: Optional[int] = None) -> str:
     thumb = self.media_controller.thumbnail
     icon: Optional[str] = None
@@ -333,12 +336,9 @@ class IconsMixin(Wrapper):
       return NO_DESKTOP_FILE
 
     # mpris requires stripped suffix
-    path = path.with_suffix('')
+    path = path.with_suffix(NO_SUFFIX)
 
     return str(path)
-
-  def set_icon(self, lighter: bool = False):
-    self.light_icon: bool = lighter
 
 
 class MetadataMixin(Wrapper):
@@ -350,17 +350,17 @@ class MetadataMixin(Wrapper):
     comments: List[str] = []
 
     metadata = {
-      "mpris:trackid": dbus_name,
-      "mpris:length": self.get_duration(),
-      "mpris:artUrl": self.get_art_url(),
-      "xesam:url": self._get_url(),
-      "xesam:title": title,
-      "xesam:artist": artists,
-      "xesam:album": self.get_album(title, artist),
-      "xesam:albumArtist": artists,
-      "xesam:discNumber": DEFAULT_DISC_NO,
-      "xesam:trackNumber": self.media_status.track,
-      "xesam:comment": comments,
+      'mpris:trackid': dbus_name,
+      'mpris:length': self.get_duration(),
+      'mpris:artUrl': self.get_art_url(),
+      'xesam:url': self._get_url(),
+      'xesam:title': title,
+      'xesam:artist': artists,
+      'xesam:album': self.get_album(title, artist),
+      'xesam:albumArtist': artists,
+      'xesam:discNumber': DEFAULT_DISC_NO,
+      'xesam:trackNumber': self.media_status.track,
+      'xesam:comment': comments,
     }
 
     return metadata
@@ -522,11 +522,11 @@ class ChromecastWrapper(
   VolumeMixin,
   AbilitiesMixin,
 ):
-  """
+  '''
   A wrapper to make it easier to switch out backend implementations.
 
   Holds common logic for dealing with underlying Chromecast API.
-  """
+  '''
 
   def __init__(self, cc: Chromecast):
     self.cc = cc
@@ -536,7 +536,7 @@ class ChromecastWrapper(
     cls = type(self)
     cls_name = cls.__name__
 
-    return f"<{cls_name} for {self.cc}>"
+    return f'<{cls_name} for {self.cc}>'
 
   @property
   def name(self) -> str:
@@ -545,7 +545,7 @@ class ChromecastWrapper(
 
 @enforce_dbus_length
 def get_track_id(name: str) -> DbusObj:
-  return f"/track/{get_dbus_name(name)}"
+  return f'/track/{get_dbus_name(name)}'
 
 
 def get_media_type(cc: ChromecastWrapper) -> Optional[ChromecastMediaType]:
