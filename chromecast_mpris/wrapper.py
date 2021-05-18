@@ -75,7 +75,7 @@ class Wrapper(ABC):
     pass
 
 
-class StatusAttrsMixin(Wrapper):
+class StatusMixin(Wrapper):
   def __getattr__(self, name: str) -> Any:
     return getattr(self.cc, name)
 
@@ -251,7 +251,7 @@ class TimeMixin(Wrapper):
       return duration * US_IN_SEC
 
     elif longest and longest > current:
-        return longest
+      return longest
 
     elif current:
       self._longest_duration = current
@@ -274,14 +274,18 @@ class TimeMixin(Wrapper):
 
   def on_new_status(self, *args, **kwargs):
     # super().on_new_status(*args, **kwargs)
+    if not self.has_current_time():
+      self._longest_duration = NO_DURATION
+
+  def has_current_time(self) -> bool:
     status = self.media_status
 
-    if not status:
-      return
+    if not status or not status.current_time:
+      return False
 
-    if not status.current_time or \
-        round(status.current_time, RESOLUTION) <= NO_DURATION:
-      self._longest_duration = NO_DURATION
+    rounded = round(status.current_time, RESOLUTION)
+
+    return rounded > NO_DURATION
 
   def seek(self, time: Microseconds):
     seconds = int(round(time / US_IN_SEC))
@@ -305,7 +309,7 @@ class TimeMixin(Wrapper):
 class IconsMixin(Wrapper):
   def get_art_url(self, track: Optional[int] = None) -> str:
     thumb = self.media_controller.thumbnail
-    icon = None
+    icon: Optional[str] = None
 
     if self.cast_status:
       icon = self.cast_status.icon_url
@@ -334,134 +338,10 @@ class IconsMixin(Wrapper):
     return str(path)
 
   def set_icon(self, lighter: bool = False):
-    self.light_icon = lighter
+    self.light_icon: bool = lighter
 
 
-class ChromecastWrapper(
-  StatusAttrsMixin,
-  TitlesMixin,
-  ControllersMixin,
-  TimeMixin,
-  IconsMixin,
-):
-  """
-  A wrapper to make it easier to switch out backend implementations.
-
-  Holds common logic for dealing with underlying Chromecast API.
-  """
-
-  def __init__(self, cc: Chromecast):
-    self.cc = cc
-    super().__init__()
-
-  def __repr__(self) -> str:
-    cls = type(self)
-    cls_name = cls.__name__
-
-    return f"<{cls_name} for {self.cc}>"
-
-  @property
-  def name(self) -> str:
-    return self.cc.name or DEFAULT_NAME
-
-  def can_play_next(self) -> Optional[bool]:
-    if self.media_status:
-      return self.media_status.supports_queue_next
-
-    return False
-
-  def can_play_prev(self) -> Optional[bool]:
-    if self.media_status:
-      return self.media_status.supports_queue_prev
-
-    return False
-
-  def play_next(self):
-    self.cc.media_controller.queue_next()
-
-  def play_prev(self):
-    self.cc.media_controller.queue_prev()
-
-  def can_pause(self) -> Optional[bool]:
-    return self.media_status.supports_pause
-
-  def can_seek(self) -> Optional[bool]:
-    return self.media_status.supports_seek
-
-  def quit(self):
-    self.cc.quit_app()
-
-  def next(self):
-    self.play_next()
-
-  def previous(self):
-    self.play_prev()
-
-  def pause(self):
-    self.cc.media_controller.pause()
-
-  def resume(self):
-    self.play()
-
-  def stop(self):
-    self.cc.media_controller.stop()
-
-  def play(self):
-    self.cc.media_controller.play()
-
-  def get_playstate(self) -> PlayState:
-    if self.cc.media_controller.is_paused:
-      return PlayState.PAUSED
-
-    elif self.cc.media_controller.is_playing:
-      return PlayState.PLAYING
-
-    return PlayState.STOPPED
-
-  def is_repeating(self) -> bool:
-    return False
-
-  def is_playlist(self) -> bool:
-    return self.can_go_next() or self.can_go_previous()
-
-  def set_repeating(self, val: bool):
-    pass
-
-  def set_loop_status(self, val: str):
-    pass
-
-  def get_shuffle(self) -> bool:
-    return False
-
-  def set_shuffle(self, val: bool):
-    return False
-
-  def get_volume(self) -> VolumeDecimal:
-    if not self.cast_status:
-      return None
-
-    return self.cast_status.volume_level
-
-  def set_volume(self, val: VolumeDecimal):
-    curr = self.get_volume()
-    diff = val - curr
-
-    # can't adjust vol by 0
-    if diff > NO_DELTA:  # vol up
-      self.cc.volume_up(diff)
-
-    elif diff < NO_DELTA:
-      self.cc.volume_down(abs(diff))
-
-  def is_mute(self) -> Optional[bool]:
-    if self.cast_status:
-      return self.cast_status.volume_muted
-
-    return False
-
-  def set_mute(self, val: bool):
-    self.cc.set_volume_muted(val)
-
+class MetadataMixin(Wrapper):
   def metadata(self) -> Metadata:
     title: Optional[str] = self.get_stream_title()
     artist = self.get_artist()
@@ -513,6 +393,140 @@ class ChromecastWrapper(
     )
 
     return track
+
+
+class PlaybackMixin(Wrapper):
+
+  def can_play_next(self) -> Optional[bool]:
+    if self.media_status:
+      return self.media_status.supports_queue_next
+
+    return False
+
+  def can_play_prev(self) -> Optional[bool]:
+    if self.media_status:
+      return self.media_status.supports_queue_prev
+
+    return False
+
+  def can_pause(self) -> Optional[bool]:
+    return self.media_status.supports_pause
+
+  def can_seek(self) -> Optional[bool]:
+    return self.media_status.supports_seek
+
+  def play_next(self):
+    self.cc.media_controller.queue_next()
+
+  def play_prev(self):
+    self.cc.media_controller.queue_prev()
+
+  def quit(self):
+    self.cc.quit_app()
+
+  def next(self):
+    self.play_next()
+
+  def previous(self):
+    self.play_prev()
+
+  def pause(self):
+    self.cc.media_controller.pause()
+
+  def resume(self):
+    self.play()
+
+  def stop(self):
+    self.cc.media_controller.stop()
+
+  def play(self):
+    self.cc.media_controller.play()
+
+  def get_playstate(self) -> PlayState:
+    if self.cc.media_controller.is_paused:
+      return PlayState.PAUSED
+
+    elif self.cc.media_controller.is_playing:
+      return PlayState.PLAYING
+
+    return PlayState.STOPPED
+
+  def is_repeating(self) -> bool:
+    return False
+
+  def is_playlist(self) -> bool:
+    return self.can_go_next() or self.can_go_previous()
+
+  def set_repeating(self, val: bool):
+    pass
+
+  def set_loop_status(self, val: str):
+    pass
+
+  def get_shuffle(self) -> bool:
+    return False
+
+  def set_shuffle(self, val: bool):
+    return False
+
+
+class VolumeMixin(Wrapper):
+  def get_volume(self) -> VolumeDecimal:
+    if not self.cast_status:
+      return None
+
+    return self.cast_status.volume_level
+
+  def set_volume(self, val: VolumeDecimal):
+    curr = self.get_volume()
+    diff = val - curr
+
+    # can't adjust vol by 0
+    if diff > NO_DELTA:  # vol up
+      self.cc.volume_up(diff)
+
+    elif diff < NO_DELTA:
+      self.cc.volume_down(abs(diff))
+
+  def is_mute(self) -> Optional[bool]:
+    if self.cast_status:
+      return self.cast_status.volume_muted
+
+    return False
+
+  def set_mute(self, val: bool):
+    self.cc.set_volume_muted(val)
+
+
+class ChromecastWrapper(
+  StatusMixin,
+  TitlesMixin,
+  ControllersMixin,
+  TimeMixin,
+  IconsMixin,
+  MetadataMixin,
+  PlaybackMixin,
+  VolumeMixin,
+):
+  """
+  A wrapper to make it easier to switch out backend implementations.
+
+  Holds common logic for dealing with underlying Chromecast API.
+  """
+
+  def __init__(self, cc: Chromecast):
+    self.cc = cc
+    super().__init__()
+
+  def __repr__(self) -> str:
+    cls = type(self)
+    cls_name = cls.__name__
+
+    return f"<{cls_name} for {self.cc}>"
+
+  @property
+  def name(self) -> str:
+    return self.cc.name or DEFAULT_NAME
 
 
 @enforce_dbus_length
