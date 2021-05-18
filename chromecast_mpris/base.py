@@ -23,6 +23,19 @@ NO_DELTA = 0
 NO_CHROMECAST_NAME = "NO_NAME"
 FIRST_CHROMECAST = 0
 
+YOUTUBE = "YouTube"
+
+NO_STR = ''
+NO_PORT = None
+
+LOG_LEVEL: str = 'WARN'
+
+US_IN_SEC = 1_000_000  # seconds to microseconds
+DEFAULT_TRACK = "/track/1"
+DEFAULT_DISC_NO = 1
+
+DEFAULT_RETRY_WAIT: float = 5.0
+
 DESKTOP_SUFFIX: str = '.desktop'
 NO_DESKTOP_FILE: str = ''
 
@@ -76,19 +89,6 @@ try:
 except Exception as e:
   logging.exception(e)
   logging.warn(f"Couldn't create {DESKTOP_SUFFIX} files in {DATA_DIR}.")
-
-YOUTUBE = "YouTube"
-
-NO_STR = ''
-NO_PORT = None
-
-LOG_LEVEL: str = 'WARN'
-
-US_IN_SEC = 1_000_000  # seconds to microseconds
-DEFAULT_TRACK = "/track/1"
-DEFAULT_DISC_NO = 1
-
-DEFAULT_RETRY_WAIT: float = 5.0
 
 
 Seconds = int
