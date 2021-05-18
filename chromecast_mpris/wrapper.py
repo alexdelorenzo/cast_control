@@ -275,7 +275,7 @@ class TimeMixin(Wrapper):
   def on_new_status(self, *args, **kwargs):
     # super().on_new_status(*args, **kwargs)
     if not self.has_current_time():
-      self._longest_duration = NO_DURATION
+      self._longest_duration = None
 
   def has_current_time(self) -> bool:
     status = self.media_status
@@ -285,7 +285,7 @@ class TimeMixin(Wrapper):
 
     rounded = round(status.current_time, RESOLUTION)
 
-    return rounded > NO_DURATION
+    return rounded > BEGINNING
 
   def seek(self, time: Microseconds):
     seconds = int(round(time / US_IN_SEC))
@@ -497,6 +497,20 @@ class VolumeMixin(Wrapper):
     self.cc.set_volume_muted(val)
 
 
+class AbilitiesMixin(Wrapper):
+  def can_quit(self) -> bool:
+    return True
+
+  def can_play(self) -> bool:
+    return True
+
+  def can_control(self) -> bool:
+    return True
+
+  def can_edit_track(self) -> bool:
+    return False
+
+
 class ChromecastWrapper(
   StatusMixin,
   TitlesMixin,
@@ -506,6 +520,7 @@ class ChromecastWrapper(
   MetadataMixin,
   PlaybackMixin,
   VolumeMixin,
+  AbilitiesMixin,
 ):
   """
   A wrapper to make it easier to switch out backend implementations.

@@ -22,7 +22,7 @@ class ChromecastAdapter(MprisAdapter):
     return MIME_TYPES
 
   def can_quit(self) -> bool:
-    return True
+    return self.wrapper.can_quit()
 
   def can_go_next(self) -> bool:
     return self.wrapper.can_play_next()
@@ -31,7 +31,7 @@ class ChromecastAdapter(MprisAdapter):
     return self.wrapper.can_play_prev()
 
   def can_play(self) -> bool:
-    return True
+    return self.wrapper.can_play()
 
   def can_pause(self) -> bool:
     return self.wrapper.can_pause()
@@ -40,7 +40,7 @@ class ChromecastAdapter(MprisAdapter):
     return self.wrapper.can_seek()
 
   def can_control(self) -> bool:
-    return True
+    return self.wrapper.can_control()
 
   def quit(self):
     self.wrapper.quit()
@@ -88,7 +88,7 @@ class ChromecastAdapter(MprisAdapter):
     pass
 
   def get_rate(self) -> RateDecimal:
-    return DEFAULT_RATE
+    return self.wrapper.get_rate()
 
   def set_rate(self, val: RateDecimal):
     pass
@@ -143,5 +143,5 @@ class ChromecastAdapter(MprisAdapter):
   ):
     self.wrapper.add_track(uri, after_track, set_as_current)
 
-  def can_edit_track(self):
-    return True
+  def can_edit_track(self) -> bool:
+    return self.wrapper.can_edit_track()
