@@ -35,7 +35,7 @@ class MprisDaemon(RunDaemon):
     self.target()
 
 
-def get_daemon(func, *args, pidfile: str = str(PID), **kwargs) -> MprisDaemon:
+def get_daemon(func=None, *args, pidfile: str = str(PID), **kwargs) -> MprisDaemon:
   daemon = MprisDaemon(pidfile=pidfile)
   daemon.set_target(func, *args, **kwargs)
   return daemon
