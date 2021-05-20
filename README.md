@@ -97,12 +97,12 @@ $ which chromecast_mpris
 
 If you have your `pip` executables path added to your shell's `$PATH`, you can launch `chromecast_mpris` like so:
 ```bash
-$ chromecast_mpris
+$ chromecast_mpris --help
 ```
 
 You can also launch `chromecast_mpris` via its Python module. This can be useful if your `$PATH` doesn't point to your `pip` executables.
 ```bash
-$ python3 -m chromecast_mpris
+$ python3 -m chromecast_mpris --help
 ```
 
 ### Help
@@ -112,9 +112,9 @@ To enable Bash completion for `chromecast_mpris`, add the following to your `~/.
 eval "$(_CHROMECAST_MPRIS_COMPLETE=bash_source chromecast_mpris)"
 ```
 
-For the `zsh` and `fish` shells, check out [the documentation here](https://click.palletsprojects.com/en/8.0.x/shell-completion/#enabling-completion)
+For the `zsh` and `fish` shells, check out [the documentation here](https://click.palletsprojects.com/en/8.0.x/shell-completion/#enabling-completion).
 
-#### Help command
+#### Help text
 ```bash
 $ chromecast_mpris --help
 Usage: chromecast_mpris [OPTIONS] COMMAND [ARGS]...
@@ -220,7 +220,9 @@ You can use the `-w/--wait` flag to specify a waiting period in seconds before `
 For example, if you want to wait 60 seconds between scans for devices, you can run the following:
 ```bash
 $ export SECONDS=60
-$ chromecast_mpris --wait $SECONDS
+$ chromecast_mpris run --wait $SECONDS
+# or
+$ chromecast_mpris service run --wait $SECONDS
 ```
 
 This is useful if you'd like to start `chromecast_mpris` at login, and there is a chance that your device isn't on, or you're on a different network. 
