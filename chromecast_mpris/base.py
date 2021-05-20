@@ -17,22 +17,22 @@ from mpris_server.base import AutoName
 NAME: str = 'chromecast_mpris'
 DESKTOP_NAME: str = "Cast Control"
 
-RC_NO_CHROMECAST = 1
+RC_NO_CHROMECAST: int = 1
 NO_DURATION: float = 0.0
-NO_DELTA = 0
-NO_CHROMECAST_NAME = "NO_NAME"
-FIRST_CHROMECAST = 0
+NO_DELTA: int = 0
+NO_CHROMECAST_NAME: str = "NO_NAME"
+FIRST_CHROMECAST: int = 0
 
-YOUTUBE = "YouTube"
+YOUTUBE: str = "YouTube"
 
-NO_STR = ''
-NO_PORT = None
+NO_STR: str = ''
+NO_PORT: Optional[int] = None
 
 LOG_LEVEL: str = 'WARN'
 
-US_IN_SEC = 1_000_000  # seconds to microseconds
-DEFAULT_TRACK = "/track/1"
-DEFAULT_DISC_NO = 1
+US_IN_SEC: int = 1_000_000  # seconds to microseconds
+DEFAULT_TRACK: str = "/track/1"
+DEFAULT_DISC_NO: int = 1
 
 DEFAULT_RETRY_WAIT: float = 5.0
 
@@ -40,16 +40,16 @@ DESKTOP_SUFFIX: str = '.desktop'
 NO_DESKTOP_FILE: str = ''
 
 SRC_DIR = Path(__file__).parent
-ASSETS_DIR = SRC_DIR / "assets"
-DESKTOP_FILE_LOCAL = ASSETS_DIR / f"{NAME}{DESKTOP_SUFFIX}"
+ASSETS_DIR: Path = SRC_DIR / "assets"
+DESKTOP_FILE_LOCAL: Path = ASSETS_DIR / f"{NAME}{DESKTOP_SUFFIX}"
 
-ICON_DIR = ASSETS_DIR / 'icon'
+ICON_DIR: Path = ASSETS_DIR / 'icon'
 LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
 DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
 
 APP_DIRS = AppDirs(NAME)
 DATA_DIR = Path(APP_DIRS.user_data_dir)
-DESKTOP_FILE_DATA = DATA_DIR / DESKTOP_FILE_LOCAL.name
+DESKTOP_FILE_DATA: Path = DATA_DIR / DESKTOP_FILE_LOCAL.name
 
 
 def create_desktop_file(light_icon: bool = True) -> Path:
