@@ -32,6 +32,7 @@ class MprisDaemon(RunDaemon):
 
   def set_target(self, func: FuncMaybe = None, *args, **kwargs):
     if not func:
+      self.target = None
       return
 
     self.target = partial(func, *args, **kwargs)
@@ -84,7 +85,7 @@ def cmd():
 
 
 @cmd.command(
-  help='Run the service locally.'
+  help='Run the service locally.',
 )
 @click.option('--name', '-n',
   default=None, show_default=True, type=click.STRING,
