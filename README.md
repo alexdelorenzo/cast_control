@@ -48,7 +48,9 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
  
 #### Installing PyGObject
 On Debian-derived distributions like Ubuntu, install `python3-gi` with `apt`. 
+
 On Arch, you'll want to install `python-gobject`, or install `chromecast_mpris` [directly from the AUR](https://aur.archlinux.org/packages/chromecast_mpris/).
+
 On macOS, install [`pygobject3`](https://formulae.brew.sh/formula/pygobject3) via `brew`.
 
 Use `pip` to install `PyGObject>=3.34.0` if there are no installation candidates available in your vendor's package repositories.
@@ -86,9 +88,7 @@ $ python3 -m pip --upgrade chromecast_mpris
 See the [releases page](https://github.com/alexdelorenzo/chromecast_mpris/releases) on GitHub.
 
 ## Usage
-You'll need to make sure that your computer is on the same network as your devices, and that you're able to make connections to them. 
-
-It also helps to know the names of the devices in advance.
+You'll need to make sure that your computer can make network connections with your casting devices. It also helps to know the names of the devices in advance.
 
 ### Launch
 Installing the package via PyPI, GitHub or the AUR will add `chromecast_mpris` to your `pip` executables path:
@@ -114,7 +114,7 @@ To enable Bash completion for `chromecast_mpris`, add the following to your `~/.
 eval "$(_CHROMECAST_MPRIS_COMPLETE=bash_source chromecast_mpris)"
 ```
 
-For the `zsh` and `fish` shells, check out [the documentation here](https://click.palletsprojects.com/en/8.0.x/shell-completion/#enabling-completion)
+For the `zsh` and `fish` shells, check out [the documentation here](https://click.palletsprojects.com/en/8.0.x/shell-completion/#enabling-completion).
 
 #### Help command
 ```bash
