@@ -1,18 +1,81 @@
-from typing import Optional
+from typing import Optional, Callable
 from time import sleep
+from pathlib import Path
+from functools import partial
 import logging
+import sys
 
+from daemons.prefab.run import RunDaemon
 from mpris_server.server import Server
 
 from .base import get_chromecast, Seconds, get_chromecast_via_host, \
   NoChromecastFoundException, LOG_LEVEL, get_chromecast_via_uuid, \
-  DEFAULT_RETRY_WAIT
+  DEFAULT_RETRY_WAIT, NoChromecastFoundException, RC_NO_CHROMECAST, \
+  DATA_DIR, NAME
 from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
 DEFAULT_WAIT: Seconds = 30
 NO_DEVICE: str = 'Device'
+
+RC_NOT_RUNNING: int = 3
+PID: Path = DATA_DIR / f'{NAME}.pid'
+
+
+FuncMaybe = Optional[Callable]
+
+
+class MprisDaemon(RunDaemon):
+  target: FuncMaybe = None
+
+  def set_target(self, func: FuncMaybe = None, *args, **kwargs):
+    if not func:
+      self.target = None
+      return
+
+    self.target = partial(func, *args, **kwargs)
+
+  def run(self):
+    if self.target:
+      self.target()
+
+
+def get_daemon(
+  func: FuncMaybe = None,
+  *args,
+  pidfile: str = str(PID),
+  **kwargs
+) -> MprisDaemon:
+  daemon = MprisDaemon(pidfile=pidfile)
+  daemon.set_target(func, *args, **kwargs)
+
+  return daemon
+
+
+def run_safe(
+  name: Optional[str],
+  host: Optional[str],
+  uuid: Optional[str],
+  wait: Optional[float],
+  retry_wait: Optional[float],
+  icon: bool,
+  log_level: str
+):
+  try:
+    run_server(
+      name,
+      host,
+      uuid,
+      wait,
+      retry_wait,
+      icon,
+      log_level
+    )
+
+  except NoChromecastFoundException as e:
+    logging.warning(f"Device {e} not found")
+    sys.exit(RC_NO_CHROMECAST)
 
 
 def set_log_level(level: str = LOG_LEVEL):

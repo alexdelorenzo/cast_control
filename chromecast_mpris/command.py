@@ -4,79 +4,20 @@ from functools import partial
 import logging
 import sys
 
-import click
 from daemons.prefab.run import RunDaemon
-from daemons import daemonizer
+import click
 
 from .base import NoChromecastFoundException, \
   RC_NO_CHROMECAST, LOG_LEVEL, DEFAULT_RETRY_WAIT, \
   DATA_DIR, NAME
-from .run import run_server
+from .run import get_daemon, run_safe
 
-
-RC_NOT_RUNNING: int = 3
-PID: Path = DATA_DIR / f'{NAME}.pid'
 
 HELP: str = """
 Control casting devices via Linux media controls and desktops.
 
 This daemon connects your casting device directly to the D-Bus media player interface.
 """
-
-
-FuncMaybe = Optional[Callable]
-
-
-class MprisDaemon(RunDaemon):
-  target: FuncMaybe = None
-
-  def set_target(self, func: FuncMaybe = None, *args, **kwargs):
-    if not func:
-      self.target = None
-      return
-
-    self.target = partial(func, *args, **kwargs)
-
-  def run(self):
-    if self.target:
-      self.target()
-
-
-def get_daemon(
-  func: FuncMaybe = None,
-  *args,
-  pidfile: str = str(PID),
-  **kwargs
-) -> MprisDaemon:
-  daemon = MprisDaemon(pidfile=pidfile)
-  daemon.set_target(func, *args, **kwargs)
-
-  return daemon
-
-
-def run_safe(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  wait: Optional[float],
-  retry_wait: Optional[float],
-  icon: bool,
-  log_level: str
-):
-  try:
-    run_server(
-      name,
-      host,
-      uuid,
-      wait,
-      retry_wait,
-      icon,
-      log_level
-    )
-
-  except NoChromecastFoundException as e:
-    logging.warning(f"Device {e} not found")
-    sys.exit(RC_NO_CHROMECAST)
 
 
 @click.group(help=HELP)
