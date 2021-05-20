@@ -37,6 +37,7 @@ YT_VID_URL: str = f'https://{YT_LONG}watch?v='
 
 RESOLUTION: int = 1
 NO_SUFFIX: str = ''
+# NO_DURATION = None
 
 
 class Wrapper(ABC):
@@ -405,24 +406,6 @@ class PlaybackMixin(Wrapper):
 
     return PlayState.STOPPED
 
-  def can_play_next(self) -> Optional[bool]:
-    if self.media_status:
-      return self.media_status.supports_queue_next
-
-    return False
-
-  def can_play_prev(self) -> Optional[bool]:
-    if self.media_status:
-      return self.media_status.supports_queue_prev
-
-    return False
-
-  def can_pause(self) -> Optional[bool]:
-    return self.media_status.supports_pause
-
-  def can_seek(self) -> Optional[bool]:
-    return self.media_status.supports_seek
-
   def play_next(self):
     self.cc.media_controller.queue_next()
 
@@ -502,13 +485,39 @@ class AbilitiesMixin(Wrapper):
     return True
 
   def can_play(self) -> bool:
-    return True
+    state = self.get_playstate()
+
+    if state is PlayState.PAUSED:
+      return True
+
+    return False
 
   def can_control(self) -> bool:
     return True
+    #return self.can_play() or self.can_pause() or \
+      #self.can_play_next() or self.can_play_prev() or \
+      #self.can_seek()
 
   def can_edit_track(self) -> bool:
     return False
+
+  def can_play_next(self) -> Optional[bool]:
+    if self.media_status:
+      return self.media_status.supports_queue_next
+
+    return False
+
+  def can_play_prev(self) -> Optional[bool]:
+    if self.media_status:
+      return self.media_status.supports_queue_prev
+
+    return False
+
+  def can_pause(self) -> Optional[bool]:
+    return self.media_status.supports_pause
+
+  def can_seek(self) -> Optional[bool]:
+    return self.media_status.supports_seek
 
 
 class ChromecastWrapper(
