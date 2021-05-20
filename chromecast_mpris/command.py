@@ -66,13 +66,6 @@ def run_safe(
     sys.exit(RC_NO_CHROMECAST)
 
 
-run_safe_daemon = daemonizer.run(
-  pidfile=str(PID)
-)(
-  run_safe
-)
-
-
 @click.group(help=HELP)
 def cmd():
   pass
