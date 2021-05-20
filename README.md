@@ -104,6 +104,15 @@ $ python3 -m chromecast_mpris
 ```
 
 ### Help
+#### Shell completion
+To enable Bash completion for `chromecast_mpris`, add the following to your `~/.bashrc`:
+```bash
+eval "$(_CHROMECAST_MPRIS_COMPLETE=bash_source chromecast_mpris)"
+```
+
+For the `zsh` and `fish` shells, check out [the documentation here](https://click.palletsprojects.com/en/8.0.x/shell-completion/#enabling-completion)
+
+#### Help command
 ```bash
 $ chromecast_mpris --help
 Usage: chromecast_mpris [OPTIONS]

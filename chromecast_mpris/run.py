@@ -12,7 +12,11 @@ from .listeners import register_mpris_adapter
 
 
 DEFAULT_WAIT: Seconds = 30
-NO_DEVICE = 'Device'
+NO_DEVICE: str = 'Device'
+
+
+def set_log_level(level: str = LOG_LEVEL):
+  logging.basicConfig(level=level.upper())
 
 
 def create_adapters_and_server(
@@ -77,7 +81,7 @@ def run_server(
   icon: bool = False,
   log_level: str = LOG_LEVEL
 ):
-  logging.basicConfig(level=log_level.upper())
+  set_log_level(log_level)
   mpris = retry_until_found(name, host, uuid, wait, retry_wait)
 
   if mpris and icon:
