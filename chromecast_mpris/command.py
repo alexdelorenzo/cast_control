@@ -162,31 +162,7 @@ def start(
 @service.command(
   help='Stop the background service.'
 )
-@click.option('--name', '-n', default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its name, otherwise control the first device found.")
-@click.option('--host', '-h', default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its hostname or IP address, otherwise control the first device found.")
-@click.option('--uuid', '-u', default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its UUID, otherwise control the first device found\n")
-@click.option('--wait', '-w', default=None, show_default=True, type=click.FLOAT,
-  help="Seconds to wait between trying to make initial successful connections to a device.")
-@click.option('--retry-wait', '-r',
-  default=DEFAULT_RETRY_WAIT, show_default=True, type=click.FLOAT,
-  help="Seconds to wait between reconnection attempts if a successful connection is interrupted.")
-@click.option('--icon', '-i', is_flag=True,
-  default=False, show_default=True, type=click.BOOL,
-  help="Use a lighter icon instead of the dark icon. The lighter icon goes well with dark themes.")
-@click.option('--log-level', '-l', default=LOG_LEVEL, show_default=True, type=click.STRING,
-  help='Set the debugging log level.')
-def stop(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  wait: Optional[float],
-  retry_wait: Optional[float],
-  icon: bool,
-  log_level: str
-):
+def stop():
   daemon = get_daemon()
   daemon.stop()
 
