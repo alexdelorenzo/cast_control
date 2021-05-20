@@ -125,7 +125,8 @@ def retry_until_found(
     if mpris or wait is None:
       return mpris
 
-    logging.info(f"{name or NO_DEVICE} not found. Waiting {wait} seconds before retrying.")
+    dev_name = name or NO_DEVICE
+    logging.info(f"{dev_name} not found. Waiting {wait} seconds before retrying.")
     sleep(wait)
 
 

@@ -24,7 +24,7 @@ def cmd():
 
 
 @cmd.command(
-  help='Run the service locally.',
+  help='Run the service in the foreground.',
 )
 @click.option('--name', '-n',
   default=None, show_default=True, type=click.STRING,
@@ -68,7 +68,7 @@ def run(
 
 
 @cmd.group(
-  help='Start, stop or restart the background service.'
+  help='Run, stop or restart the service in the background.'
 )
 def service():
   pass
