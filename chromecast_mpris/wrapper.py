@@ -416,6 +416,18 @@ class PlaybackMixin(Wrapper):
 
     return PlayState.STOPPED
 
+  def is_repeating(self) -> bool:
+    return False
+
+  def is_playlist(self) -> bool:
+    return self.can_go_next() or self.can_go_previous()
+
+  def get_shuffle(self) -> bool:
+    return False
+
+  def set_shuffle(self, val: bool):
+    return False
+
   def play_next(self):
     self.cc.media_controller.queue_next()
 
@@ -443,23 +455,11 @@ class PlaybackMixin(Wrapper):
   def play(self):
     self.cc.media_controller.play()
 
-  def is_repeating(self) -> bool:
-    return False
-
-  def is_playlist(self) -> bool:
-    return self.can_go_next() or self.can_go_previous()
-
   def set_repeating(self, val: bool):
     pass
 
   def set_loop_status(self, val: str):
     pass
-
-  def get_shuffle(self) -> bool:
-    return False
-
-  def set_shuffle(self, val: bool):
-    return False
 
 
 class VolumeMixin(Wrapper):
