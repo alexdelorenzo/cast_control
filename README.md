@@ -3,7 +3,9 @@
 
 **Note**: This project will be renamed to *Cast Control* in June, and the `chromecast_mpris` package and executable will be renamed to `cast_control`. The only thing that's changing is the name.
 
-This page will redirect to the new one when the change is made, and the package migration will happen automatically for current users. As of right now, you can launch this project after installing it and running either `chromecast_mpris` or `cast_control`, as both are included in the installation.
+This page will redirect to the new one when the change is made, and the package migration will happen automatically for current users. 
+
+As of right now, you can launch this project after installing it and running either `chromecast_mpris` or `cast_control`, as both are included in the installation.
 
 ### Integrations
 `chromecast_mpris` controls Chromecasts and casting devices via D-Bus and [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
@@ -115,43 +117,99 @@ For the `zsh` and `fish` shells, check out [the documentation here](https://clic
 #### Help command
 ```bash
 $ chromecast_mpris --help
-Usage: chromecast_mpris [OPTIONS]
+Usage: chromecast_mpris [OPTIONS] COMMAND [ARGS]...
 
   Control casting devices via Linux media controls and desktops.
 
-  This daemon connects your casting device directly to the D-Bus media
-  player interface.
+  This daemon connects your casting device directly to the D-Bus media player
+  interface.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  run      Run the service locally.
+  service  Start, stop or restart the background service.
+```
+
+##### `run` command
+```bash
+$ chromecast_mpris run --help
+Usage: chromecast_mpris run [OPTIONS]
+
+  Run the service locally.
 
 Options:
   -n, --name TEXT         Connect to a device via its name, otherwise control
                           the first device found.
-
   -h, --host TEXT         Connect to a device via its hostname or IP address,
                           otherwise control the first device found.
-
   -u, --uuid TEXT         Connect to a device via its UUID, otherwise control
-                          the first device found
-
+                          the first device found.
   -w, --wait FLOAT        Seconds to wait between trying to make initial
                           successful connections to a device.
-
   -r, --retry-wait FLOAT  Seconds to wait between reconnection attempts if a
                           successful connection is interrupted.  [default:
                           5.0]
-
   -i, --icon              Use a lighter icon instead of the dark icon. The
                           lighter icon goes well with dark themes.  [default:
                           False]
+  -l, --log-level TEXT    Set the debugging log level.  [default: WARN]
+  --help                  Show this message and exit.
+```
 
+##### `service` command
+```bash
+$ chromecast_mpris service --help
+Usage: chromecast_mpris service [OPTIONS] COMMAND [ARGS]...
+
+  Start, stop or restart the background service.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  restart  Restart the background service.
+  run      Run the service in the background.
+  stop     Stop the background service.
+
+```
+
+###### `service run` command
+```bash
+$ chromecast_mpris service run --help
+Usage: chromecast_mpris service run [OPTIONS]
+
+  Run the service in the background.
+
+Options:
+  -n, --name TEXT         Connect to a device via its name, otherwise control
+                          the first device found.
+  -h, --host TEXT         Connect to a device via its hostname or IP address,
+                          otherwise control the first device found.
+  -u, --uuid TEXT         Connect to a device via its UUID, otherwise control
+                          the first device found.
+  -w, --wait FLOAT        Seconds to wait between trying to make initial
+                          successful connections to a device.
+  -r, --retry-wait FLOAT  Seconds to wait between reconnection attempts if a
+                          successful connection is interrupted.  [default:
+                          5.0]
+  -i, --icon              Use a lighter icon instead of the dark icon. The
+                          lighter icon goes well with dark themes.  [default:
+                          False]
   -l, --log-level TEXT    Set the debugging log level.  [default: WARN]
   --help                  Show this message and exit.
 ```
 
 ### Connect to a device
-Connect to a device named "My Device" and run `chromecast_mpris` in the background.
+Connect to a device named "My Device":
 ```bash
-$ chromecast_mpris --name "My Device" &
-[1] 1234
+$ chromecast_mpris run --name "My Device"
+```
+
+Connect to a device named "My Device" and run `chromecast_mpris` in the background:
+```bash
+$ chromecast_mpris service run --name "My Device"
 ```
 
 After launching `chromecast_mpris`, you can use any MPRIS client to interact with it. MPRIS support is built in directly to Plasma Desktop and GNOME 3, and you can use `playerctl` on the command-line. 
