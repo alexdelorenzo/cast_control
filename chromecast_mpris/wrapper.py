@@ -349,6 +349,10 @@ class MetadataMixin(Wrapper):
     artists = [artist] if artist else []
     dbus_name: DbusObj = get_track_id(title)
     comments: List[str] = []
+    track_no: Optional[int] = None
+
+    if self.media_status:
+      track_no = self.media_status.track
 
     metadata = {
       'mpris:trackid': dbus_name,
@@ -360,12 +364,14 @@ class MetadataMixin(Wrapper):
       'xesam:album': self.get_album(title, artist),
       'xesam:albumArtist': artists,
       'xesam:discNumber': DEFAULT_DISC_NO,
-      'xesam:trackNumber': self.media_status.track,
+      'xesam:trackNumber': track_no,
       'xesam:comment': comments,
     }
 
     return metadata
 
+  # TODO: no need to keep this method around
+  # as long as metadata() is implemented
   def get_current_track(self) -> Track:
     title = self.get_stream_title()
     artist_name = self.get_artist()
@@ -373,6 +379,10 @@ class MetadataMixin(Wrapper):
     art_url = self.get_art_url()
     content_id = self._get_url()
     duration = int(self.get_duration())
+    track_no: Optional[int] = None
+
+    if self.media_status:
+      track_no = self.media_status.track
 
     album = Album(
       name=self.get_album(title, artist_name),
@@ -383,7 +393,7 @@ class MetadataMixin(Wrapper):
     track = Track(
       track_id=get_track_id(title),
       name=title,
-      track_no=self.media_status.track,
+      track_no=track_no,
       length=duration,
       uri=content_id,
       artists=(artist,),
@@ -501,23 +511,29 @@ class AbilitiesMixin(Wrapper):
   def can_edit_track(self) -> bool:
     return False
 
-  def can_play_next(self) -> Optional[bool]:
+  def can_play_next(self) -> bool:
     if self.media_status:
       return self.media_status.supports_queue_next
 
     return False
 
-  def can_play_prev(self) -> Optional[bool]:
+  def can_play_prev(self) -> bool:
     if self.media_status:
       return self.media_status.supports_queue_prev
 
     return False
 
-  def can_pause(self) -> Optional[bool]:
-    return self.media_status.supports_pause
+  def can_pause(self) -> bool:
+    if self.media_status:
+      return self.media_status.supports_pause
 
-  def can_seek(self) -> Optional[bool]:
-    return self.media_status.supports_seek
+    return False
+
+  def can_seek(self) -> bool:
+    if self.media_status:
+      return self.media_status.supports_seek
+
+    return False
 
 
 class ChromecastWrapper(
@@ -557,7 +573,9 @@ def get_track_id(name: str) -> DbusObj:
   return f'/track/{get_dbus_name(name)}'
 
 
-def get_media_type(cc: ChromecastWrapper) -> Optional[ChromecastMediaType]:
+def get_media_type(
+  cc: ChromecastWrapper
+) -> Optional[ChromecastMediaType]:
   status = cc.media_status
 
   if not status:
@@ -587,6 +605,9 @@ def is_youtube(uri: str) -> bool:
 
 
 def get_video_id(uri: str) -> Optional[str]:
+  if not is_youtube(uri):
+    return None
+
   video_id: Optional[str] = None
 
   if YT_LONG in uri:
