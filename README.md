@@ -1,7 +1,7 @@
 # 📺 Control Chromecasts from Linux
 `chromecast_mpris` is [a daemon](https://en.wikipedia.org/wiki/Daemon_(computing)) utility that allows you to control media playback on casting devices from the Linux desktop. 
 
-While this service runs, it will publish data about the media and apps playing on your casting devices to your computer.
+While this service runs, it publishes data about the media and apps playing on your casting devices to your computer.
 
 **Note**: This project will be renamed to *Cast Control* in June, and the `chromecast_mpris` package and executable will be renamed to `cast_control`. The only thing that's changing is the name.
 
