@@ -55,15 +55,20 @@ class ChromecastEventHandler(
        or muted != self.adapter.is_mute():
       self.on_volume()
 
-  def new_media_status(self, status: MediaStatus):
+  def _update_metadata(self, status: Status):
+    # wire up mpris_server with cc events
     self.check_volume(status)
     self.on_playback()
     self.on_options()
 
+    # wire up local integration with mpris
     self.adapter.wrapper.on_new_status()
 
+  def new_media_status(self, status: MediaStatus):
+    self._update_metadata(status)
+
   def new_cast_status(self, status: CastStatus):
-    self.check_volume(status)
+    self._update_metadata(status)
 
 
 def register_mpris_adapter(
