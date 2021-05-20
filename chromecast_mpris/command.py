@@ -24,7 +24,7 @@ PID: Path = DATA_DIR / f'{NAME}.pid'
 
 
 class MprisDaemon(RunDaemon):
-  def set_target(self, func, *args, **kwargs):
+  def set_target(self, func=None, *args, **kwargs):
     if not func:
       return
 
