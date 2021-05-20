@@ -1,6 +1,4 @@
 from typing import Optional, Callable
-from pathlib import Path
-from functools import partial
 import logging
 import sys
 

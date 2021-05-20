@@ -5,57 +5,59 @@ from enum import auto
 import logging
 
 from appdirs import AppDirs
-
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast import Chromecast, get_chromecasts, \
   get_chromecast_from_host
-
 from mpris_server.base import AutoName
 
 
 NAME: str = 'chromecast_mpris'
-DESKTOP_NAME: str = "Cast Control"
-
-RC_NO_CHROMECAST: int = 1
-NO_DURATION: float = 0.0
-NO_DELTA: int = 0
-NO_CHROMECAST_NAME: str = "NO_NAME"
-FIRST_CHROMECAST: int = 0
-
-YOUTUBE: str = "YouTube"
-
-NO_STR: str = ''
-NO_PORT: Optional[int] = None
-
+DESKTOP_NAME: str = 'Cast Control'
 LOG_LEVEL: str = 'WARN'
 
+RC_NO_CHROMECAST: int = 1
+RC_NOT_RUNNING: int = 2
+
+NO_DURATION: float = 0.0
+NO_DELTA: int = 0
+NO_CHROMECAST_NAME: str = 'NO_NAME'
+NO_STR: str = ''
+NO_PORT: Optional[int] = None
+NO_DEVICE: str = 'Device'
+
+YOUTUBE: str = 'YouTube'
+
 US_IN_SEC: int = 1_000_000  # seconds to microseconds
-DEFAULT_TRACK: str = "/track/1"
+DEFAULT_TRACK: str = '/track/1'
 DEFAULT_DISC_NO: int = 1
 
 DEFAULT_RETRY_WAIT: float = 5.0
+DEFAULT_WAIT: Seconds = 30
 
 DESKTOP_SUFFIX: str = '.desktop'
 NO_DESKTOP_FILE: str = ''
 
+APP_DIRS = AppDirs(NAME)
+DATA_DIR = Path(APP_DIRS.user_data_dir)
+
+if not DATA_DIR.exists():
+  DATA_DIR.mkdir()
+
+PID: Path = DATA_DIR / f'{NAME}.pid'
+
 SRC_DIR = Path(__file__).parent
-ASSETS_DIR: Path = SRC_DIR / "assets"
-DESKTOP_FILE_LOCAL: Path = ASSETS_DIR / f"{NAME}{DESKTOP_SUFFIX}"
+ASSETS_DIR: Path = SRC_DIR / 'assets'
+DESKTOP_FILE_LOCAL: Path = ASSETS_DIR / f'{NAME}{DESKTOP_SUFFIX}'
 
 ICON_DIR: Path = ASSETS_DIR / 'icon'
 LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
 DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
 
-APP_DIRS = AppDirs(NAME)
-DATA_DIR = Path(APP_DIRS.user_data_dir)
 DESKTOP_FILE_DATA: Path = DATA_DIR / DESKTOP_FILE_LOCAL.name
 
 
 def create_desktop_file(light_icon: bool = True) -> Path:
-  if not DATA_DIR.exists():
-    DATA_DIR.mkdir()
-
   if light_icon:
     icon_path = str(LIGHT_ICON.absolute())
     file = DATA_DIR / f'{NAME}-light{DESKTOP_SUFFIX}'
