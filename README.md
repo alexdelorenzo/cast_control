@@ -1,5 +1,7 @@
 # 📺 Control Chromecasts from Linux
-`chromecast_mpris` is [a daemon](https://en.wikipedia.org/wiki/Daemon_(computing)) utility that allows you to control media playback on casting devices from the Linux desktop. While this service runs, it will publish data about the media and apps playing on your casting devices to your computer.
+`chromecast_mpris` is [a daemon](https://en.wikipedia.org/wiki/Daemon_(computing)) utility that allows you to control media playback on casting devices from the Linux desktop.
+
+While this service runs, it will publish data about the media and apps playing on your casting devices to your computer.
 
 **Note**: This project will be renamed to *Cast Control* in June, and the `chromecast_mpris` package and executable will be renamed to `cast_control`. The only thing that's changing is the name.
 
@@ -121,7 +123,7 @@ Usage: chromecast_mpris [OPTIONS] COMMAND [ARGS]...
 
   Control casting devices via Linux media controls and desktops.
 
-  This daemon connects your casting device directly to the D-Bus media player
+  This daemon connects your casting device to the D-Bus media player
   interface.
 
 Options:
@@ -163,7 +165,7 @@ Options:
 $ chromecast_mpris service --help
 Usage: chromecast_mpris service [OPTIONS] COMMAND [ARGS]...
 
-  Start, stop or restart the background service.
+  Run, stop or restart the background service.
 
 Options:
   --help  Show this message and exit.
@@ -248,6 +250,14 @@ You can cast YouTube videos the same way you can cast a generic URI.
 $ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
 $ playerctl --player My_Device open "$VIDEO"
 ```
+
+### Debug
+You can set the log level using the `-l/--log-level` flag with the `run` or `service run` commands:
+```bash
+$ chromecast_mpris run --log-level debug
+```
+
+Here's a [list of log levels supported by `chromecast_mpris`](https://docs.python.org/3/library/logging.html#logging-levels).
 
 ## Support
 Want to support this project and [other open-source projects](https://github.com/alexdelorenzo) like it?
