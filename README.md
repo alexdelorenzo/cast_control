@@ -139,7 +139,7 @@ Commands:
 $ chromecast_mpris run --help
 Usage: chromecast_mpris run [OPTIONS]
 
-  Run the service locally.
+  Run the service in the foreground.
 
 Options:
   -n, --name TEXT         Connect to a device via its name, otherwise control
