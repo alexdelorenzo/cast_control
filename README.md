@@ -3,11 +3,7 @@
 
 While this service runs, it gathers and  publishes data about the media and apps playing on your casting devices.
 
-**Note**: This project will be renamed to *Cast Control* in June, and the `chromecast_mpris` package and executable will be renamed to `cast_control`. The only thing that's changing is the name.
-
-This page will redirect to the new one when the change is made, and the package migration will happen automatically for current users. 
-
-As of right now, you can launch this project after installing it and running either `chromecast_mpris` or `cast_control`, as both are included in the installation.
+**Note**: This package is now called Cast Control, and is available on PyPI as `cast_control`. Please upgrade to `cast_control` for new features and bug fixes. 
 
 ### Integrations
 `chromecast_mpris` controls Chromecasts and casting devices via D-Bus and [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
