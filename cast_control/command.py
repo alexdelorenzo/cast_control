@@ -154,10 +154,10 @@ def connect(
     icon,
     log_level
   )
-  args.save()
-
   daemon = get_daemon(run_safe, *args)
+
   daemon.start()
+  args.save()
 
 
 @service.command(
@@ -165,8 +165,8 @@ def connect(
 )
 def disconnect():
   daemon = get_daemon()
-  daemon.stop()
 
+  daemon.stop()
   DaemonArgs.delete()
 
 
