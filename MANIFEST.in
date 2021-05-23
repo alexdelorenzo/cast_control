@@ -1,5 +1,5 @@
 include requirements.txt 
 include README.md 
 include LICENSE 
-include chromecast_mpris/assets/*.desktop
-include chromecast_mpris/assets/icon/*.png
+include cast_control/assets/*.desktop
+include cast_control/assets/icon/*.png
