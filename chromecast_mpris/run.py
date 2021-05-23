@@ -148,5 +148,5 @@ def run_safe(
     )
 
   except NoChromecastFoundException as e:
-    logging.warning(f"Device {e} not found")
+    logging.warning(f"{e} not found")
     sys.exit(RC_NO_CHROMECAST)
