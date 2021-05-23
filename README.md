@@ -123,21 +123,21 @@ Usage: chromecast_mpris [OPTIONS] COMMAND [ARGS]...
 
   Control casting devices via Linux media controls and desktops.
 
-  This daemon connects your casting device to the D-Bus media player
+  This daemon connects your casting device directly to the D-Bus media player
   interface.
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  run      Run the service locally.
-  service  Start, stop or restart the background service.
+  connect  Run the service in the foreground.
+  service  Connect or disconnect the background service to/from your device.
 ```
 
-##### `run` command
+##### `connect` command
 ```bash
-$ chromecast_mpris run --help
-Usage: chromecast_mpris run [OPTIONS]
+$ chromecast_mpris connect --help
+Usage: chromecast_mpris connect [OPTIONS]
 
   Run the service in the foreground.
 
@@ -165,24 +165,22 @@ Options:
 $ chromecast_mpris service --help
 Usage: chromecast_mpris service [OPTIONS] COMMAND [ARGS]...
 
-  Run, stop or restart the background service.
+  Connect or disconnect the background service to/from your device.
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  restart  Restart the background service.
-  run      Run the service in the background.
-  stop     Stop the background service.
-
+  connect     Connect the background service from the device.
+  disconnect  Disconnect the background service from the device.
 ```
 
 ###### `service run` command
 ```bash
-$ chromecast_mpris service run --help
-Usage: chromecast_mpris service run [OPTIONS]
+$ chromecast_mpris service connect --help
+Usage: chromecast_mpris service connect [OPTIONS]
 
-  Run the service in the background.
+  Connect the background service from the device.
 
 Options:
   -n, --name TEXT         Connect to a device via its name, otherwise control
@@ -206,12 +204,12 @@ Options:
 ### Connect to a device
 Connect to a device named "My Device":
 ```bash
-$ chromecast_mpris run --name "My Device"
+$ chromecast_mpris connect --name "My Device"
 ```
 
 Connect to a device named "My Device" and run `chromecast_mpris` in the background:
 ```bash
-$ chromecast_mpris service run --name "My Device"
+$ chromecast_mpris service connect --name "My Device"
 ```
 
 After launching `chromecast_mpris`, you can use any MPRIS client to interact with it. MPRIS support is built in directly to Plasma Desktop and GNOME 3, and you can use `playerctl` on the command-line. 
@@ -222,9 +220,9 @@ You can use the `-w/--wait` flag to specify a waiting period in seconds before `
 For example, if you want to wait 60 seconds between scans for devices, you can run the following:
 ```bash
 $ export SECONDS=60
-$ chromecast_mpris run --wait $SECONDS
+$ chromecast_mpris connect --wait $SECONDS
 # or
-$ chromecast_mpris service run --wait $SECONDS
+$ chromecast_mpris service connect --wait $SECONDS
 ```
 
 This is useful if you'd like to start `chromecast_mpris` at login, and there is a chance that your device isn't on, or you're on a different network. 
@@ -254,7 +252,7 @@ $ playerctl --player My_Device open "$VIDEO"
 ### Debug
 You can set the log level using the `-l/--log-level` flag with the `run` or `service run` commands:
 ```bash
-$ chromecast_mpris run --log-level debug
+$ chromecast_mpris connect --log-level debug
 ```
 
 Here's a [list of log levels supported by `chromecast_mpris`](https://docs.python.org/3/library/logging.html#logging-levels).
