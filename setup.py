@@ -9,13 +9,9 @@ VERSION: str = '0.9.0'
 LICENSE: str = 'AGPL-3.0'
 PY_VERSION: str = '>=3.7'
 
-# decided new name
-NEW_NAME: str = 'cast_control'
-
 ENTRY_POINTS: Dict[str, List[str]] = {
   'console_scripts': [
     f'{NAME} = {NAME}.command:cmd',
-    f'{NEW_NAME} = {NAME}.command:cmd'
   ]
 }
 
@@ -27,7 +23,7 @@ README: str = Path('README.md').read_text()
 
 ASSET_DIRS: List[str] = [
   'assets/cast_control.desktop',
-  'assets/icon/cc-*.png'
+  'assets/icon/cc-*.png',
 ]
 
 PKG_DATA: Dict[str, List[str]] = {
