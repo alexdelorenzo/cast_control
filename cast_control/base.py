@@ -7,12 +7,14 @@ import logging
 from appdirs import AppDirs
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
+from pychromecast.socket_client import ConnectionStatus
 from pychromecast import Chromecast, get_chromecasts, \
   get_chromecast_from_host
 from mpris_server.base import AutoName
 
 
 Seconds = int
+
 
 NAME: str = 'cast_control'
 DESKTOP_NAME: str = 'Cast Control'
@@ -73,6 +75,9 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     lines = (*lines, name, icon)
     data = '\n'.join(lines)
 
+    if not DATA_DIR.exists():
+      DATA_DIR.mkdir()
+
     file.write_text(data)
 
   return file
@@ -93,7 +98,7 @@ except Exception as e:
   logging.warn(f"Couldn't create {DESKTOP_SUFFIX} files in {DATA_DIR}.")
 
 
-Status = Union[MediaStatus, CastStatus]
+Status = Union[MediaStatus, CastStatus, ConnectionStatus]
 
 
 class NoChromecastFoundException(Exception):
