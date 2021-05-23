@@ -51,31 +51,6 @@ def set_log_level(level: str = LOG_LEVEL):
   logging.basicConfig(level=level)
 
 
-def run_safe(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  wait: Optional[float],
-  retry_wait: Optional[float],
-  icon: bool,
-  log_level: str
-):
-  try:
-    run_server(
-      name,
-      host,
-      uuid,
-      wait,
-      retry_wait,
-      icon,
-      log_level
-    )
-
-  except NoChromecastFoundException as e:
-    logging.warning(f"Device {e} not found")
-    sys.exit(RC_NO_CHROMECAST)
-
-
 def create_adapters_and_server(
   name: Optional[str],
   host: Optional[str],
@@ -125,8 +100,8 @@ def retry_until_found(
     if mpris or wait is None:
       return mpris
 
-    dev_name = name or NO_DEVICE
-    logging.info(f"{dev_name} not found. Waiting {wait} seconds before retrying.")
+    device = name or host or uuid or NO_DEVICE
+    logging.info(f"{device} not found. Waiting {wait} seconds before retrying.")
     sleep(wait)
 
 
@@ -146,6 +121,32 @@ def run_server(
     mpris.adapter.wrapper.set_icon(True)
 
   if not mpris:
-    raise NoChromecastFoundException(name)
+    device = name or host or uuid or NO_DEVICE
+    raise NoChromecastFoundException(device)
 
   mpris.loop()
+
+
+def run_safe(
+  name: Optional[str],
+  host: Optional[str],
+  uuid: Optional[str],
+  wait: Optional[float],
+  retry_wait: Optional[float],
+  icon: bool,
+  log_level: str
+):
+  try:
+    run_server(
+      name,
+      host,
+      uuid,
+      wait,
+      retry_wait,
+      icon,
+      log_level
+    )
+
+  except NoChromecastFoundException as e:
+    logging.warning(f"Device {e} not found")
+    sys.exit(RC_NO_CHROMECAST)
