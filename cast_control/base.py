@@ -46,6 +46,7 @@ APP_DIRS = AppDirs(NAME)
 DATA_DIR = Path(APP_DIRS.user_data_dir)
 
 PID: Path = DATA_DIR / f'{NAME}.pid'
+ARGS: Path = DATA_DIR / 'service-args.tmp'
 
 SRC_DIR = Path(__file__).parent
 ASSETS_DIR: Path = SRC_DIR / 'assets'

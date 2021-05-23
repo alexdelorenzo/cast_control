@@ -1,5 +1,7 @@
-from typing import Optional, Callable
+from __future__ import annotations
+from typing import Optional, Callable, NamedTuple
 import logging
+import pickle
 import sys
 
 from daemons.prefab.run import RunDaemon
@@ -7,8 +9,8 @@ import click
 
 from .base import NoChromecastFoundException, \
   RC_NO_CHROMECAST, LOG_LEVEL, DEFAULT_RETRY_WAIT, \
-  DATA_DIR, NAME
-from .run import get_daemon, run_safe
+  DATA_DIR, NAME, ARGS, NO_DEVICE, RC_NOT_RUNNING
+from .run import get_daemon, run_safe, MprisDaemon
 
 
 HELP: str = """
@@ -18,13 +20,47 @@ This daemon connects your casting device directly to the D-Bus media player inte
 """
 
 
+class DaemonArgs(NamedTuple):
+  name: Optional[str]
+  host: Optional[str]
+  uuid: Optional[str]
+  wait: Optional[float]
+  retry_wait: Optional[float]
+  icon: bool
+  log_level: str
+
+  @property
+  def file(self) -> Path:
+    name, host, uuid, *_ = self
+    device = name or host or uuid or NO_DEVICE
+
+    return ARGS.with_stem(f'{device}-args')
+
+  @staticmethod
+  def load() -> Optional[DaemonArgs]:
+    if ARGS.exists():
+      dump = ARGS.read_bytes()
+      return pickle.loads(dump)
+
+    return None
+
+  @staticmethod
+  def delete():
+    if ARGS.exists():
+      ARGS.unlink()
+
+  def save(self) -> Path:
+    dump = pickle.dumps(self)
+    ARGS.write_bytes(dump)
+
+
 @click.group(help=HELP)
 def cmd():
   pass
 
 
 @cmd.command(
-  help='Run the service in the foreground.',
+  help='Connect to the device and run the service in the foreground.',
 )
 @click.option('--name', '-n',
   default=None, show_default=True, type=click.STRING,
@@ -56,7 +92,7 @@ def connect(
   icon: bool,
   log_level: str
 ):
-  run_safe(
+  args = DaemonArgs(
     name,
     host,
     uuid,
@@ -66,16 +102,18 @@ def connect(
     log_level
   )
 
+  run_safe(*args)
+
 
 @cmd.group(
-  help='Connect or disconnect the background service to/from your device.'
+  help='Connect, disconnect or reconnect the background service to or from your device.'
 )
 def service():
   pass
 
 
 @service.command(
-  help='Connect the background service from the device.'
+  help='Connect the background service to the device.'
 )
 @click.option('--name', '-n',
   default=None, show_default=True, type=click.STRING,
@@ -107,8 +145,7 @@ def connect(
   icon: bool,
   log_level: str
 ):
-  daemon = get_daemon(
-    run_safe,
+  args = DaemonArgs(
     name,
     host,
     uuid,
@@ -117,7 +154,9 @@ def connect(
     icon,
     log_level
   )
+  args.save()
 
+  daemon = get_daemon(run_safe, *args)
   daemon.start()
 
 
@@ -128,18 +167,24 @@ def disconnect():
   daemon = get_daemon()
   daemon.stop()
 
+  DaemonArgs.delete()
 
-#@service.command(
-  #help='Restart the background service.'
-#)
-#def reconnect():
-  #daemon = get_daemon()
 
-  #if not daemon.pid:
-    #logging.warn("Daemon isn't running.")
-    #sys.exit(RC_NOT_RUNNING)
+@service.command(
+  help='Reconnect the background service to the device.'
+)
+def reconnect():
+  daemon: Optional[MprisDaemon] = None
+  args = DaemonArgs.load()
 
-  #daemon.restart()
+  if args:
+    daemon = get_daemon(run_safe, *args)
+
+  if not args or not daemon.pid:
+    logging.warn("Daemon isn't running.")
+    sys.exit(RC_NOT_RUNNING)
+
+  daemon.restart()
 
 
 if __name__ == "__main__":

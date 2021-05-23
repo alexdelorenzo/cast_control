@@ -18,7 +18,7 @@ from .base import Status
 
 
 # status with volume attributes
-VolumeStatus = Union[Mediastatus, CastStatus]
+VolumeStatus = Union[MediaStatus, CastStatus]
 
 
 class ChromecastEventListener(
