@@ -4,10 +4,10 @@ from setuptools import setup
 from pathlib import Path
 
 
-NAME: str = 'chromecast_mpris'
-VERSION: str = '0.8.3'
+NAME: str = 'cast_control'
+VERSION: str = '0.9.0'
 LICENSE: str = 'AGPL-3.0'
-PY_VERSION: str = '>=3.6'
+PY_VERSION: str = '>=3.7'
 
 # decided new name
 NEW_NAME: str = 'cast_control'
@@ -26,7 +26,7 @@ REQS: List[str] = Path('requirements.txt') \
 README: str = Path('README.md').read_text()
 
 ASSET_DIRS: List[str] = [
-  'assets/chromecast_mpris.desktop',
+  'assets/cast_control.desktop',
   'assets/icon/cc-*.png'
 ]
 
@@ -41,7 +41,7 @@ setup(
   description='📺 Control Chromecasts from Linux and D-Bus',
   long_description=README,
   long_description_content_type='text/markdown',
-  url='https://github.com/alexdelorenzo/chromecast_mpris',
+  url='https://github.com/alexdelorenzo/cast_control',
   author=__author__,
   license=LICENSE,
   packages=[NAME],
