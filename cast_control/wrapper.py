@@ -183,7 +183,6 @@ class TitlesMixin(Wrapper):
       title = self.get_stream_title()
 
     subtitle = self.get_subtitle()
-
     artist: Optional[str] = None
 
     if not self.media_status:
@@ -313,18 +312,19 @@ class IconsMixin(Wrapper):
 
   def get_art_url(self, track: Optional[int] = None) -> str:
     thumb = self.media_controller.thumbnail
+
+    if thumb:
+      return thumb
+
     icon: Optional[str] = None
 
     if self.cast_status:
       icon = self.cast_status.icon_url
 
-    if thumb:
-      return thumb
-
-    elif icon:
+    if icon:
       return icon
 
-    elif self.light_icon:
+    if self.light_icon:
       return str(LIGHT_THUMB)
 
     return str(DEFAULT_THUMB)

@@ -6,14 +6,27 @@ from mpris_server.adapters import MprisAdapter
 from mpris_server.events import EventAdapter
 from mpris_server.server import Server
 
-from pychromecast.controllers.media import MediaStatus
-from pychromecast.controllers.receiver import CastStatus
+from pychromecast.controllers.media import MediaStatus, \
+  MediaStatusListener
+from pychromecast.controllers.receiver import CastStatus, \
+  CastStatusListener
+from pychromecast.socket_client import ConnectionStatus, \
+  ConnectionStatusListener
 from pychromecast import Chromecast
 
 from .base import Status
 
 
-class ChromecastEventListener(ABC):
+# status with volume attributes
+VolumeStatus = Union[MediaStatus, CastStatus]
+
+
+class ChromecastEventListener(
+  MediaStatusListener,
+  CastStatusListener,
+  ConnectionStatusListener,
+  ABC
+):
   """
   Event listeners that conform to pychromecast's API
   """
@@ -24,6 +37,10 @@ class ChromecastEventListener(ABC):
 
   @abstractmethod
   def new_cast_status(self, status: CastStatus):
+    pass
+
+  @abstractmethod
+  def new_connection_status(self, status: ConnectionStatus):
     pass
 
 
@@ -48,16 +65,20 @@ class ChromecastEventHandler(
   ChromecastEventListener
 ):
   def check_volume(self, status: Status):
+    if not isinstance(status, VolumeStatus.__args__):
+      return
+
     vol = status.volume_level
     muted = status.volume_muted
 
-    if vol != self.adapter.get_volume() \
-       or muted != self.adapter.is_mute():
+    if vol != self.adapter.get_volume() or \
+       muted != self.adapter.is_mute():
       self.on_volume()
 
   def _update_metadata(self, status: Status):
-    # wire up mpris_server with cc events
     self.check_volume(status)
+
+    # wire up mpris_server with cc events
     self.on_playback()
     self.on_options()
 
@@ -68,6 +89,9 @@ class ChromecastEventHandler(
     self._update_metadata(status)
 
   def new_cast_status(self, status: CastStatus):
+    self._update_metadata(status)
+
+  def new_connection_status(self, status: ConnectionStatus):
     self._update_metadata(status)
 
 

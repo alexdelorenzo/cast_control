@@ -1,15 +1,15 @@
 [tool]
 [tool.poetry]
-name = "chromecast_mpris"
-version = "0.8.5"
+name = "cast_control"
+version = "0.9.1"
 description = "📺 Control Chromecasts from Linux and D-Bus"
 license = "AGPL-3.0"
-homepage = "https://github.com/alexdelorenzo/chromecast_mpris"
+homepage = "https://github.com/alexdelorenzo/cast_control"
 authors = ["Alex DeLorenzo"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.6"
+python = ">=3.7"
 appdirs = "==1.4.4"
 click = "==8.0.1"
 daemons = "==1.3.1"

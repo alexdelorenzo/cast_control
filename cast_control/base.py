@@ -7,6 +7,7 @@ import logging
 from appdirs import AppDirs
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
+from pychromecast.socket_client import ConnectionStatus
 from pychromecast import Chromecast, get_chromecasts, \
   get_chromecast_from_host
 from mpris_server.base import AutoName
@@ -15,7 +16,7 @@ from mpris_server.base import AutoName
 Seconds = int
 
 
-NAME: str = 'chromecast_mpris'
+NAME: str = 'cast_control'
 DESKTOP_NAME: str = 'Cast Control'
 LOG_LEVEL: str = 'WARN'
 
@@ -44,20 +45,16 @@ NO_DESKTOP_FILE: str = ''
 APP_DIRS = AppDirs(NAME)
 DATA_DIR = Path(APP_DIRS.user_data_dir)
 
-if not DATA_DIR.exists():
-  DATA_DIR.mkdir()
-
 PID: Path = DATA_DIR / f'{NAME}.pid'
+ARGS: Path = DATA_DIR / 'service-args.tmp'
 
 SRC_DIR = Path(__file__).parent
 ASSETS_DIR: Path = SRC_DIR / 'assets'
-DESKTOP_FILE_LOCAL: Path = ASSETS_DIR / f'{NAME}{DESKTOP_SUFFIX}'
+DESKTOP_TEMPLATE: Path = ASSETS_DIR / f'{NAME}{DESKTOP_SUFFIX}'
 
 ICON_DIR: Path = ASSETS_DIR / 'icon'
 LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
 DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
-
-DESKTOP_FILE_DATA: Path = DATA_DIR / DESKTOP_FILE_LOCAL.name
 
 
 def create_desktop_file(light_icon: bool = True) -> Path:
@@ -70,7 +67,7 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     file = DATA_DIR / f'{NAME}-dark{DESKTOP_SUFFIX}'
 
   if not file.exists():
-    *lines, name, icon = DESKTOP_FILE_LOCAL \
+    *lines, name, icon = DESKTOP_TEMPLATE \
       .read_text() \
       .splitlines()
 
@@ -78,6 +75,9 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     icon += icon_path
     lines = (*lines, name, icon)
     data = '\n'.join(lines)
+
+    if not DATA_DIR.exists():
+      DATA_DIR.mkdir()
 
     file.write_text(data)
 
@@ -88,6 +88,9 @@ DESKTOP_FILE_LIGHT: Optional[Path] = None
 DESKTOP_FILE_DARK: Optional[Path] = None
 
 try:
+  if not DATA_DIR.exists():
+    DATA_DIR.mkdir()
+
   DESKTOP_FILE_LIGHT = create_desktop_file(light_icon=True)
   DESKTOP_FILE_DARK = create_desktop_file(light_icon=False)
 
@@ -96,7 +99,7 @@ except Exception as e:
   logging.warn(f"Couldn't create {DESKTOP_SUFFIX} files in {DATA_DIR}.")
 
 
-Status = Union[MediaStatus, CastStatus]
+Status = Union[MediaStatus, CastStatus, ConnectionStatus]
 
 
 class NoChromecastFoundException(Exception):
