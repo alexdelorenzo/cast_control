@@ -223,6 +223,14 @@ $ cast_control service connect --wait $SECONDS
 
 This is useful if you'd like to start `cast_control` at login, and there is a chance that your device isn't on, or you're on a different network. 
 
+### Reconnect or disconnect the background service
+If the background service is running, you can force it to reconnect and restart, or to disconnect it entirely.
+```bash
+$ cast_control service reconnect
+# or
+$ cast_control service disconnect
+```
+
 ### Open a URI on a Chromecast
  Get the D-Bus name for your device using `playerctl`.
 ```bash
@@ -243,14 +251,6 @@ You can cast YouTube videos the same way you can cast a generic URI.
 ```bash
 $ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
 $ playerctl --player My_Device open "$VIDEO"
-```
-
-### Reconnect or disconnect the background service
-If the background service is running, you can force it to reconnect, or disconnect it entirely.
-```bash
-$ cast_control service reconnect
-# or
-$ cast_control service disconnect
 ```
 
 ### Debug
