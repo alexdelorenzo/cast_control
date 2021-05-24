@@ -7,14 +7,16 @@ from .base import LOG_LEVEL, DEFAULT_RETRY_WAIT
 from .run import run_safe
 
 
-HELP: str = """
+DEPRECATION_WARNING: str = \
+  "The chromecast_mpris command is deprecated. Please run cast_control instead."
+
+HELP: str = f"""
 Control casting devices via Linux media controls and desktops.
 
 This daemon connects your casting device directly to the D-Bus media player interface.
-"""
 
-DEPRECATION_WARNING: str = \
-  "The chromecast_mpris command is deprecated. Please run cast_control instead."
+NOTE: {DEPRECATION_WARNING}
+"""
 
 
 @cmd.command(
