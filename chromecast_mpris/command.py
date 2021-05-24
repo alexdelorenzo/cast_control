@@ -19,7 +19,7 @@ NOTE: {DEPRECATION_WARNING}
 """
 
 
-@cmd.command(
+@click.command(
   help=HELP
 )
 @click.option('--name', '-n',

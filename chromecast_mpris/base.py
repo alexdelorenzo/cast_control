@@ -12,6 +12,9 @@ from pychromecast import Chromecast, get_chromecasts, \
 from mpris_server.base import AutoName
 
 
+Seconds = int
+
+
 NAME: str = 'chromecast_mpris'
 DESKTOP_NAME: str = 'Cast Control'
 LOG_LEVEL: str = 'WARN'
@@ -93,7 +96,6 @@ except Exception as e:
   logging.warn(f"Couldn't create {DESKTOP_SUFFIX} files in {DATA_DIR}.")
 
 
-Seconds = int
 Status = Union[MediaStatus, CastStatus]
 
 
