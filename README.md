@@ -256,7 +256,7 @@ $ playerctl --player My_Device open "$VIDEO"
 ```
 
 ### Debug
-You can set the log level using the `-l/--log-level` flag with the `run` or `service run` commands:
+You can set the log level using the `-l/--log-level` flag with the `connect` or `service connect` commands:
 ```bash
 $ cast_control connect --log-level debug
 ```
