@@ -69,7 +69,7 @@ You'll get a `cast_control` executable added to your `$PATH`.
 If you're on Arch, you can install `cast_control` [directly from the AUR](https://aur.archlinux.org/packages/cast_control/).
 
 ```bash
-$ yay -S chromecast_mpris
+$ yay -S cast_control
 ```
 
 ### Upgrades
