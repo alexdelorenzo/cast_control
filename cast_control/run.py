@@ -46,8 +46,7 @@ def find_device(
   if no_identifiers:
     chromecast = get_chromecast(retry_wait=retry_wait)
 
-  if not chromecast:
-    return None
+  return chromecast
 
 
 def create_adapters_and_server(
