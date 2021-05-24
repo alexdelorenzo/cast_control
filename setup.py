@@ -5,13 +5,16 @@ from pathlib import Path
 
 
 NAME: str = 'cast_control'
+SHORT_NAME: str = 'castctl'
 VERSION: str = '0.9.0'
 LICENSE: str = 'AGPL-3.0'
 PY_VERSION: str = '>=3.7'
 
+
 ENTRY_POINTS: Dict[str, List[str]] = {
   'console_scripts': [
     f'{NAME} = {NAME}.command:cmd',
+    f'{SHORT_NAME} = {NAME}.command:cmd',
   ]
 }
 
