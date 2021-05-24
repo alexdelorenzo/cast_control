@@ -5,6 +5,7 @@ from functools import partial
 import logging
 import sys
 
+from pychromecast import Chromecast
 from mpris_server.server import Server
 
 from .base import get_chromecast, Seconds, get_chromecast_via_host, \
@@ -23,24 +24,40 @@ def set_log_level(level: str = LOG_LEVEL):
   logging.basicConfig(level=level)
 
 
+def find_device(
+  name: Optional[str],
+  host: Optional[str],
+  uuid: Optional[str],
+  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
+) -> Optional[Chromecast]:
+  chromecast: Optional[Chromecast] = None
+ 
+  if host:
+    chromecast = get_chromecast_via_host(host, retry_wait)
+
+  if uuid and not chromecast:
+    chromecast = get_chromecast_via_uuid(uuid, retry_wait)
+
+  if name and not chromecast:
+    chromecast = get_chromecast(name, retry_wait)
+
+  no_identifiers = not (host or name or uuid)
+
+  if no_identifiers:
+    chromecast = get_chromecast(retry_wait=retry_wait)
+
+  if not chromecast:
+    return None
+
+
 def create_adapters_and_server(
   name: Optional[str],
   host: Optional[str],
   uuid: Optional[str],
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Server]:
-  if host:
-    chromecast = get_chromecast_via_host(host, retry_wait)
-
-  elif name:
-    chromecast = get_chromecast(name, retry_wait)
-
-  elif uuid:
-    chromecast = get_chromecast_via_uuid(uuid, retry_wait)
-
-  else:
-    chromecast = get_chromecast(retry_wait=retry_wait)
-
+  chromecast = find_device(name, host, uuid, retry_wait)
+  
   if not chromecast:
     return None
 
