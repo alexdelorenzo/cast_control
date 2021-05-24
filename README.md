@@ -124,8 +124,8 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  connect  Run the service in the foreground.
-  service  Connect or disconnect the background service to/from your device.
+  connect  Connect to the device and run the service in the foreground.
+  service  Connect, disconnect or reconnect the background service to or...
 ```
 
 ##### `connect` command
@@ -133,7 +133,7 @@ Commands:
 $ cast_control connect --help
 Usage: cast_control connect [OPTIONS]
 
-  Run the service in the foreground.
+  Connect to the device and run the service in the foreground.
 
 Options:
   -n, --name TEXT         Connect to a device via its name, otherwise control
@@ -159,22 +159,24 @@ Options:
 $ cast_control service --help
 Usage: cast_control service [OPTIONS] COMMAND [ARGS]...
 
-  Connect or disconnect the background service to/from your device.
+  Connect, disconnect or reconnect the background service to or from your
+  device.
 
 Options:
   --help  Show this message and exit.
 
 Commands:
-  connect     Connect the background service from the device.
+  connect     Connect the background service to the device.
   disconnect  Disconnect the background service from the device.
+  reconnect   Reconnect the background service to the device.
 ```
 
-###### `service run` command
+###### `service connect` command
 ```bash
 $ cast_control service connect --help
 Usage: cast_control service connect [OPTIONS]
 
-  Connect the background service from the device.
+  Connect the background service to the device.
 
 Options:
   -n, --name TEXT         Connect to a device via its name, otherwise control
@@ -241,6 +243,13 @@ You can cast YouTube videos the same way you can cast a generic URI.
 ```bash
 $ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
 $ playerctl --player My_Device open "$VIDEO"
+```
+
+# Reconnect or disconnect the background service
+If the service is running, you can force it to reconnect, or disconnect it entirely.
+```bash
+$ cast_control service reconnect
+$ cast_control service disconnect
 ```
 
 ### Debug
