@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 NAME: str = 'chromecast_mpris'
-VERSION: str = '0.8.6'
+VERSION: str = '0.8.7'
 LICENSE: str = 'AGPL-3.0'
 PY_VERSION: str = '>=3.6'
 
