@@ -19,6 +19,40 @@ This daemon connects your casting device directly to the D-Bus media player inte
 """
 
 
+class DaemonArgs(NamedTuple):
+  name: Optional[str]
+  host: Optional[str]
+  uuid: Optional[str]
+  wait: Optional[float]
+  retry_wait: Optional[float]
+  icon: bool
+  log_level: str
+
+  @property
+  def file(self) -> Path:
+    name, host, uuid, *_ = self
+    device = name or host or uuid or NO_DEVICE
+
+    return ARGS.with_stem(f'{device}-args')
+
+  @staticmethod
+  def load() -> Optional[DaemonArgs]:
+    if ARGS.exists():
+      dump = ARGS.read_bytes()
+      return pickle.loads(dump)
+
+    return None
+
+  @staticmethod
+  def delete():
+    if ARGS.exists():
+      ARGS.unlink()
+
+  def save(self) -> Path:
+    dump = pickle.dumps(self)
+    ARGS.write_bytes(dump)
+
+
 @click.group(help=HELP)
 def cmd():
   pass
