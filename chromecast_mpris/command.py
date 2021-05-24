@@ -1,14 +1,10 @@
-from typing import Optional, Callable
+from typing import Optional
 import logging
-import sys
 
-from daemons.prefab.run import RunDaemon
 import click
 
-from .base import NoChromecastFoundException, \
-  RC_NO_CHROMECAST, LOG_LEVEL, DEFAULT_RETRY_WAIT, \
-  DATA_DIR, NAME
-from .run import get_daemon, run_safe
+from .base import LOG_LEVEL, DEFAULT_RETRY_WAIT
+from .run import run_safe
 
 
 HELP: str = """
