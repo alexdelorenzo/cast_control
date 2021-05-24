@@ -18,19 +18,19 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/name_change/cast_control/assets/mpris_widget.png" height="225" /> <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/name_change/cast_control/assets/mpris_plasma.png" height="225" />
 
 ## Features
- * [x] Control music and video playback
- * [x] Control app playback
- * [x] View playback information in real-time
- * [x] Display thumbnail and title
- * [x] Display playback position and media length
- * [x] Seek forward and backward
- * [x] Play, pause, and stop playback
- * [x] Volume up and down
- * [x] Play next and previous
- * [x] Quit casted app
- * [x] Open media from D-Bus
- * [x] Play YouTube videos
- * [ ] Playlist integration
+  * [x] Control music and video playback
+  * [x] Control app playback
+  * [x] View playback information in real-time
+  * [x] Display thumbnail and title
+  * [x] Display playback position and media length
+  * [x] Seek forward and backward
+  * [x] Play, pause, and stop playback
+  * [x] Volume up and down
+  * [x] Play next and previous
+  * [x] Quit casted app
+  * [x] Open media from D-Bus
+  * [x] Play YouTube videos
+  * [ ] Playlist integration
 
 ## Installation
 ### Requirements
