@@ -245,10 +245,11 @@ $ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
 $ playerctl --player My_Device open "$VIDEO"
 ```
 
-# Reconnect or disconnect the background service
-If the service is running, you can force it to reconnect, or disconnect it entirely.
+### Reconnect or disconnect the background service
+If the background service is running, you can force it to reconnect, or disconnect it entirely.
 ```bash
 $ cast_control service reconnect
+# or
 $ cast_control service disconnect
 ```
 
