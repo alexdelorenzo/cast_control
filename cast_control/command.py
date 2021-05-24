@@ -19,7 +19,12 @@ This daemon connects your casting device directly to the D-Bus media player inte
 """
 
 
-@click.command(
+@click.group(help=HELP)
+def cmd():
+  pass
+
+
+@cmd.command(
   help='Connect to the device and run the service in the foreground.',
 )
 @click.option('--name', '-n',
