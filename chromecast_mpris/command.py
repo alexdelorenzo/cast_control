@@ -17,6 +17,10 @@ Control casting devices via Linux media controls and desktops.
 This daemon connects your casting device directly to the D-Bus media player interface.
 """
 
+DEPRECATION_WARNING: str = \
+  "The chromecast_mpris command is deprecated. Please run cast_control instead."
+
+
 @cmd.command(
   help=HELP
 )
@@ -50,6 +54,8 @@ def cmd(
   icon: bool,
   log_level: str
 ):
+  logging.warn(DEPRECATION_WARNING)
+
   run_safe(
     name,
     host,
@@ -59,7 +65,6 @@ def cmd(
     icon,
     log_level
   )
-
 
 
 if __name__ == "__main__":
