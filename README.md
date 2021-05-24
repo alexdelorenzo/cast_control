@@ -94,6 +94,9 @@ $ which cast_control
 If you have your `pip` executables path added to your shell's `$PATH`, you can launch `cast_control` like so:
 ```bash
 $ cast_control --help
+
+# or you can use the short name
+$ castctl --help
 ```
 
 You can also launch `cast_control` via its Python module. This can be useful if your `$PATH` doesn't point to your `pip` executables.
