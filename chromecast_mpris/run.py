@@ -5,7 +5,6 @@ from functools import partial
 import logging
 import sys
 
-from daemons.prefab.run import RunDaemon
 from mpris_server.server import Server
 
 from .base import get_chromecast, Seconds, get_chromecast_via_host, \
@@ -17,33 +16,6 @@ from .listeners import register_mpris_adapter
 
 
 FuncMaybe = Optional[Callable]
-
-
-class MprisDaemon(RunDaemon):
-  target: FuncMaybe = None
-
-  def set_target(self, func: FuncMaybe = None, *args, **kwargs):
-    if not func:
-      self.target = None
-      return
-
-    self.target = partial(func, *args, **kwargs)
-
-  def run(self):
-    if self.target:
-      self.target()
-
-
-def get_daemon(
-  func: FuncMaybe = None,
-  *args,
-  pidfile: str = str(PID),
-  **kwargs
-) -> MprisDaemon:
-  daemon = MprisDaemon(pidfile=pidfile)
-  daemon.set_target(func, *args, **kwargs)
-
-  return daemon
 
 
 def set_log_level(level: str = LOG_LEVEL):

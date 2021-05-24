@@ -3,11 +3,9 @@
 
 While this service runs, it gathers and  publishes data about the media and apps playing on your casting devices.
 
-**Note**: This project will be renamed to *Cast Control* in June, and the `chromecast_mpris` package and executable will be renamed to `cast_control`. The only thing that's changing is the name.
+**Note**: This package is now called Cast Control, and is [available on PyPI as `cast_control`](https://pypi.org/project/cast-control/). 
 
-This page will redirect to the new one when the change is made, and the package migration will happen automatically for current users. 
-
-As of right now, you can launch this project after installing it and running either `chromecast_mpris` or `cast_control`, as both are included in the installation.
+Please upgrade to `cast_control` for new features and bug fixes. 
 
 ### Integrations
 `chromecast_mpris` controls Chromecasts and casting devices via D-Bus and [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
@@ -24,19 +22,19 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/chromecast_mpris/assets/mpris_widget.png" height="225" /> <img src="https://github.com/alexdelorenzo/chromecast_mpris/raw/master/chromecast_mpris/assets/mpris_plasma.png" height="225" />
 
 ## Features
-  * [x] Control music and video playback
-  * [x] Control app playback
-  * [x] View playback information in real-time
-  * [x] Display thumbnail and title
-  * [x] Display playback position and media length
-  * [x] Seek forward and backward
-  * [x] Play, pause, and stop playback
-  * [x] Volume up and down
-  * [x] Play next and previous
-  * [x] Quit casted app
-  * [x] Open media from D-Bus
-  * [x] Play YouTube videos
-  * [ ] Playlist integration
+ * [x] Control music and video playback
+ * [x] Control app playback
+ * [x] View playback information in real-time
+ * [x] Display thumbnail and title
+ * [x] Display playback position and media length
+ * [x] Seek forward and backward
+ * [x] Play, pause, and stop playback
+ * [x] Volume up and down
+ * [x] Play next and previous
+ * [x] Quit casted app
+ * [x] Open media from D-Bus
+ * [x] Play YouTube videos
+ * [ ] Playlist integration
 
 ## Installation
 ### Requirements

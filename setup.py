@@ -5,17 +5,14 @@ from pathlib import Path
 
 
 NAME: str = 'chromecast_mpris'
-VERSION: str = '0.8.3'
+VERSION: str = '0.8.5'
 LICENSE: str = 'AGPL-3.0'
 PY_VERSION: str = '>=3.6'
 
-# decided new name
-NEW_NAME: str = 'cast_control'
 
 ENTRY_POINTS: Dict[str, List[str]] = {
   'console_scripts': [
     f'{NAME} = {NAME}.command:cmd',
-    f'{NEW_NAME} = {NAME}.command:cmd'
   ]
 }
 
