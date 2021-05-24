@@ -107,7 +107,7 @@ $ python3 -m cast_control --help
 #### Shell completion
 To enable Bash completion for `cast_control`, add the following to your `~/.bashrc`:
 ```bash
-eval "$(_CHROMECAST_MPRIS_COMPLETE=bash_source cast_control)"
+eval "$(_CAST_CONTROL_COMPLETE=bash_source cast_control)"
 ```
 
 For the `zsh` and `fish` shells, check out [the documentation here](https://click.palletsprojects.com/en/8.0.x/shell-completion/#enabling-completion).
