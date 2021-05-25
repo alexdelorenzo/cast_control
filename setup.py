@@ -6,7 +6,7 @@ from pathlib import Path
 
 NAME: str = 'cast_control'
 SHORT_NAME: str = 'castctl'
-VERSION: str = '0.9.6'
+VERSION: str = '0.10.0'
 LICENSE: str = 'AGPL-3.0'
 PY_VERSION: str = '>=3.7'
 
