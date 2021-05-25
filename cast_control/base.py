@@ -47,6 +47,8 @@ DATA_DIR = Path(APP_DIRS.user_data_dir)
 
 PID: Path = DATA_DIR / f'{NAME}.pid'
 ARGS: Path = DATA_DIR / 'service-args.tmp'
+LOG: Path = DATA_DIR / f'{NAME}.log'
+print(LOG)
 
 SRC_DIR = Path(__file__).parent
 ASSETS_DIR: Path = SRC_DIR / 'assets'
@@ -96,7 +98,7 @@ try:
 
 except Exception as e:
   logging.exception(e)
-  logging.warn(f"Couldn't create {DESKTOP_SUFFIX} files in {DATA_DIR}.")
+  logging.warning(f"Couldn't create {DESKTOP_SUFFIX} files in {DATA_DIR}.")
 
 
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]

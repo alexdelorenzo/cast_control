@@ -13,9 +13,8 @@ from mpris_server.server import Server
 
 from .base import get_chromecast, Seconds, get_chromecast_via_host, \
   NoChromecastFoundException, LOG_LEVEL, get_chromecast_via_uuid, \
-  DEFAULT_RETRY_WAIT, NoChromecastFoundException, RC_NO_CHROMECAST, \
-  DATA_DIR, NAME, RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, \
-  ARGS
+  DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, DATA_DIR, NAME, LOG, \
+  RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS
 from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
@@ -25,16 +24,37 @@ FuncMaybe = Optional[Callable]
 
 class MprisDaemon(RunDaemon):
   target: FuncMaybe = None
+  args: Optional[DaemonArgs] = None
 
-  def set_target(self, func: FuncMaybe = None, *args, **kwargs):
+  def set_target(
+    self,
+    func: FuncMaybe = None,
+    *args,
+    **kwargs
+  ):
     if not func:
       self.target = None
       return
 
     self.target = partial(func, *args, **kwargs)
 
+  def set_target_via_args(
+    self,
+    func: FuncMaybe = None,
+    args: Optional[DaemonArgs] = None
+  ):
+    if not func:
+      self.target = None
+      return
+
+    self.args = args
+    self.target = partial(func, *args)
+
   def run(self):
     if self.target:
+      if self.args:
+         set_log_level(self.args.log_level, file=LOG)
+
       self.target()
 
 
@@ -75,18 +95,32 @@ class DaemonArgs(NamedTuple):
 def get_daemon(
   func: FuncMaybe = None,
   *args,
-  pidfile: str = str(PID),
+  _pidfile: str = str(PID),
   **kwargs,
 ) -> MprisDaemon:
-  daemon = MprisDaemon(pidfile=pidfile)
+  daemon = MprisDaemon(pidfile=_pidfile)
   daemon.set_target(func, *args, **kwargs)
 
   return daemon
 
 
-def set_log_level(level: str = LOG_LEVEL):
+def get_daemon_from_args(
+  func: FuncMaybe = None,
+  args: DaemonArgs = None,
+  _pidfile: str = str(PID),
+) -> MprisDaemon:
+  daemon = MprisDaemon(pidfile=_pidfile)
+  daemon.set_target_via_args(func, args)
+
+  return daemon
+
+
+def set_log_level(
+  level: str = LOG_LEVEL,
+  file: Optional[Path] = None,
+):
   level = level.upper()
-  logging.basicConfig(level=level)
+  logging.basicConfig(level=level, filename=file)
 
 
 def find_device(
@@ -95,23 +129,23 @@ def find_device(
   uuid: Optional[str],
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
-  chromecast: Optional[Chromecast] = None
- 
+  device: Optional[Chromecast] = None
+
   if host:
-    chromecast = get_chromecast_via_host(host, retry_wait)
+    device = get_chromecast_via_host(host, retry_wait)
 
-  if uuid and not chromecast:
-    chromecast = get_chromecast_via_uuid(uuid, retry_wait)
+  if uuid and not device:
+    device = get_chromecast_via_uuid(uuid, retry_wait)
 
-  if name and not chromecast:
-    chromecast = get_chromecast(name, retry_wait)
+  if name and not device:
+    device = get_chromecast(name, retry_wait)
 
   no_identifiers = not (host or name or uuid)
 
   if no_identifiers:
-    chromecast = get_chromecast(retry_wait=retry_wait)
+    device = get_chromecast(retry_wait=retry_wait)
 
-  return chromecast
+  return device
 
 
 def create_adapters_and_server(
@@ -120,16 +154,16 @@ def create_adapters_and_server(
   uuid: Optional[str],
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Server]:
-  chromecast = find_device(name, host, uuid, retry_wait)
-  
-  if not chromecast:
+  device = find_device(name, host, uuid, retry_wait)
+
+  if not device:
     return None
 
-  chromecast_adapter = ChromecastAdapter(chromecast)
-  mpris = Server(name=chromecast.name, adapter=chromecast_adapter)
+  chromecast_adapter = ChromecastAdapter(device)
+  mpris = Server(name=device.name, adapter=chromecast_adapter)
   mpris.publish()
 
-  register_mpris_adapter(chromecast, mpris, chromecast_adapter)
+  register_mpris_adapter(device, mpris, chromecast_adapter)
 
   return mpris
 

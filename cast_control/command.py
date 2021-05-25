@@ -5,9 +5,9 @@ import sys
 import click
 
 from .base import RC_NO_CHROMECAST, LOG_LEVEL, \
-  DEFAULT_RETRY_WAIT, RC_NOT_RUNNING
+  DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG
 from .run import MprisDaemon, DaemonArgs, get_daemon, \
-  run_safe
+  run_safe, get_daemon_from_args
 
 
 HELP: str = f"""
@@ -120,7 +120,7 @@ def connect(
   args.save()
 
   try:
-    daemon = get_daemon(run_safe, *args)
+    daemon = get_daemon_from_args(run_safe, args)
     daemon.start()
 
   except Exception as e:
@@ -151,10 +151,17 @@ def reconnect():
     daemon = get_daemon(run_safe, *args)
 
   if not args or not daemon.pid:
-    logging.warn("Daemon isn't running.")
+    logging.warning("Daemon isn't running.")
     sys.exit(RC_NOT_RUNNING)
 
   daemon.restart()
+
+
+@service.command(
+  help='Show the service log.'
+)
+def show_log():
+  print(LOG.read_text())
 
 
 if __name__ == "__main__":
