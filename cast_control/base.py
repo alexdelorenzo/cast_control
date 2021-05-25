@@ -61,7 +61,7 @@ def get_user_dirs() -> Tuple[Path, Path, Path]:
 DATA_DIR, LOG_DIR, STATE_DIR = get_user_dirs()
 
 PID: Path = STATE_DIR / f'{NAME}.pid'
-ARGS: Path = DATA_DIR / 'service-args.tmp'
+ARGS: Path = STATE_DIR / 'service-args.tmp'
 LOG: Path = LOG_DIR / f'{NAME}.log'
 
 SRC_DIR = Path(__file__).parent
