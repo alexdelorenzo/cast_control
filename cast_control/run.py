@@ -23,7 +23,6 @@ LOG_FILE_MODE: str = 'w'  # create a new log file on each run
 
 
 FuncMaybe = Optional[Callable]
-ArgsMaybe = Optional[DaemonArgs]
 
 
 class MprisDaemon(RunDaemon):
@@ -100,6 +99,9 @@ class DaemonArgs(NamedTuple):
   def save(self) -> Path:
     dump = pickle.dumps(self)
     ARGS.write_bytes(dump)
+
+
+ArgsMaybe = Optional[DaemonArgs]
 
 
 def get_daemon(
