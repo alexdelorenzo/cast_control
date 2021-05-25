@@ -255,10 +255,15 @@ $ export VIDEO="https://www.youtube.com/watch?v=I4nkgJdVZFA"
 $ playerctl --player My_Device open "$VIDEO"
 ```
 
-### Debug
+### Logs
 You can set the log level using the `-l/--log-level` flag with the `connect` or `service connect` commands:
 ```bash
 $ cast_control connect --log-level debug
+```
+
+You can view the background service's log file with the `service show-log` command:
+```bash
+$ cast_control service show-log
 ```
 
 Here's a [list of log levels supported by `cast_control`](https://docs.python.org/3/library/logging.html#logging-levels).
