@@ -10,4 +10,4 @@ PyGObject>=3.34.0
 mpris_server==0.2.18
 
 # new package
-cast_control>=0.9.4; python_version >= '3.7'
+cast_control>=0.10.0; python_version >= '3.7'
