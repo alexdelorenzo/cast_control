@@ -1,7 +1,9 @@
-from typing import Optional, Callable
+from __future__ import annotations
+from typing import Optional, Callable, NamedTuple
 from time import sleep
 from pathlib import Path
 from functools import partial
+import pickle
 import logging
 import sys
 
@@ -12,7 +14,8 @@ from mpris_server.server import Server
 from .base import get_chromecast, Seconds, get_chromecast_via_host, \
   NoChromecastFoundException, LOG_LEVEL, get_chromecast_via_uuid, \
   DEFAULT_RETRY_WAIT, NoChromecastFoundException, RC_NO_CHROMECAST, \
-  DATA_DIR, NAME, RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT
+  DATA_DIR, NAME, RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, \
+  ARGS
 from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
@@ -33,6 +36,40 @@ class MprisDaemon(RunDaemon):
   def run(self):
     if self.target:
       self.target()
+
+
+class DaemonArgs(NamedTuple):
+  name: Optional[str]
+  host: Optional[str]
+  uuid: Optional[str]
+  wait: Optional[float]
+  retry_wait: Optional[float]
+  icon: bool
+  log_level: str
+
+  @property
+  def file(self) -> Path:
+    name, host, uuid, *_ = self
+    device = name or host or uuid or NO_DEVICE
+
+    return ARGS.with_stem(f'{device}-args')
+
+  @staticmethod
+  def load() -> Optional[DaemonArgs]:
+    if ARGS.exists():
+      dump = ARGS.read_bytes()
+      return pickle.loads(dump)
+
+    return None
+
+  @staticmethod
+  def delete():
+    if ARGS.exists():
+      ARGS.unlink()
+
+  def save(self) -> Path:
+    dump = pickle.dumps(self)
+    ARGS.write_bytes(dump)
 
 
 def get_daemon(

@@ -1,15 +1,13 @@
-from __future__ import annotations
-from typing import Optional, Callable, NamedTuple
+from typing import Optional
 import logging
-import pickle
 import sys
 
 import click
 
-from .base import NoChromecastFoundException, \
-  RC_NO_CHROMECAST, LOG_LEVEL, DEFAULT_RETRY_WAIT, \
-  DATA_DIR, NAME, ARGS, NO_DEVICE, RC_NOT_RUNNING
-from .run import get_daemon, run_safe, MprisDaemon
+from .base import RC_NO_CHROMECAST, LOG_LEVEL, \
+  DEFAULT_RETRY_WAIT, RC_NOT_RUNNING
+from .run import MprisDaemon, DaemonArgs, get_daemon, \
+  run_safe
 
 
 HELP: str = f"""
@@ -17,40 +15,6 @@ Control casting devices via Linux media controls and desktops.
 
 This daemon connects your casting device directly to the D-Bus media player interface.
 """
-
-
-class DaemonArgs(NamedTuple):
-  name: Optional[str]
-  host: Optional[str]
-  uuid: Optional[str]
-  wait: Optional[float]
-  retry_wait: Optional[float]
-  icon: bool
-  log_level: str
-
-  @property
-  def file(self) -> Path:
-    name, host, uuid, *_ = self
-    device = name or host or uuid or NO_DEVICE
-
-    return ARGS.with_stem(f'{device}-args')
-
-  @staticmethod
-  def load() -> Optional[DaemonArgs]:
-    if ARGS.exists():
-      dump = ARGS.read_bytes()
-      return pickle.loads(dump)
-
-    return None
-
-  @staticmethod
-  def delete():
-    if ARGS.exists():
-      ARGS.unlink()
-
-  def save(self) -> Path:
-    dump = pickle.dumps(self)
-    ARGS.write_bytes(dump)
 
 
 @click.group(help=HELP)
@@ -153,10 +117,10 @@ def connect(
     icon,
     log_level
   )
-  daemon = get_daemon(run_safe, *args)
-
-  daemon.start()
   args.save()
+
+  daemon = get_daemon(run_safe, *args)
+  daemon.start()
 
 
 @service.command(
