@@ -23,11 +23,12 @@ LOG_FILE_MODE: str = 'w'  # create a new log file on each run
 
 
 FuncMaybe = Optional[Callable]
+ArgsMaybe = Optional[DaemonArgs]
 
 
 class MprisDaemon(RunDaemon):
   target: FuncMaybe = None
-  args: Optional[DaemonArgs] = None
+  args: ArgsMaybe = None
 
   def set_target(
     self,
@@ -44,7 +45,7 @@ class MprisDaemon(RunDaemon):
   def set_target_via_args(
     self,
     func: FuncMaybe = None,
-    args: Optional[DaemonArgs] = None
+    args: ArgsMaybe = None
   ):
     if not func:
       self.target = None
@@ -54,13 +55,17 @@ class MprisDaemon(RunDaemon):
     self.target = partial(func, *args)
 
   def setup_logging(self):
-    if self.args:
-      set_log_level(self.args.log_level, file=LOG)
+    if not self.args:
+      return
+
+    set_log_level(self.args.log_level, file=LOG)
 
   def run(self):
-    if self.target:
-      self.setup_logging()
-      self.target()
+    if not self.target:
+      return
+
+    self.setup_logging()
+    self.target()
 
 
 class DaemonArgs(NamedTuple):
@@ -80,7 +85,7 @@ class DaemonArgs(NamedTuple):
     return ARGS.with_stem(f'{device}-args')
 
   @staticmethod
-  def load() -> Optional[DaemonArgs]:
+  def load() -> ArgsMaybe:
     if ARGS.exists():
       dump = ARGS.read_bytes()
       return pickle.loads(dump)
@@ -111,7 +116,7 @@ def get_daemon(
 
 def get_daemon_from_args(
   func: FuncMaybe = None,
-  args: DaemonArgs = None,
+  args: ArgsMaybe = None,
   _pidfile: str = str(PID),
 ) -> MprisDaemon:
   daemon = MprisDaemon(pidfile=_pidfile)
