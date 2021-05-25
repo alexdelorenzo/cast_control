@@ -160,6 +160,13 @@ class ControllersMixin(Wrapper):
 
 
 class TitlesMixin(Wrapper):
+  def get_titles(self):
+    title = self.cc.media_controller.title
+    subtitle = self.get_subtitle()
+    album = self.media_status.album_name
+    artist = self.media_status.artist
+    app_name = self.cc.app_display_name
+
   def get_stream_title(self) -> Optional[str]:
     title = self.cc.media_controller.title
     app_name = self.cc.app_display_name

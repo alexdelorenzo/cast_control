@@ -13,7 +13,7 @@ from .run import MprisDaemon, DaemonArgs, get_daemon, \
 LOG_MODE: str = 'r'
 LOG_END: str = ''
 
-HELP: str = f"""
+HELP: str = """
 Control casting devices via Linux media controls and desktops.
 
 This daemon connects your casting device directly to the D-Bus media player interface.
@@ -138,8 +138,8 @@ def connect(
 )
 def disconnect():
   daemon = get_daemon()
-
   daemon.stop()
+
   DaemonArgs.delete()
 
 
@@ -164,9 +164,10 @@ def reconnect():
   help='Show the service log.'
 )
 def show_log():
-  # iterate over the text instead of using Path.read_text()
-  #  the latter will crash Python and possibly the system 
-  #  if the log is huge
+  print(f"<Log file: {LOG}>")
+
+  # a large log could crash Python or the system
+  # iterate over the file instead of using Path.read_text()
   with LOG.open(LOG_MODE) as log:
     for line in log:
       print(line, end=LOG_END)

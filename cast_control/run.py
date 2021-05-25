@@ -19,7 +19,7 @@ from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-LOG_MODE: str = 'w'  # create a new log file on each run
+LOG_FILE_MODE: str = 'w'  # create a new log file on each run
 
 
 FuncMaybe = Optional[Callable]
@@ -53,11 +53,13 @@ class MprisDaemon(RunDaemon):
     self.args = args
     self.target = partial(func, *args)
 
+  def setup_logging(self):
+    if self.args:
+      set_log_level(self.args.log_level, file=LOG)
+
   def run(self):
     if self.target:
-      if self.args:
-        set_log_level(self.args.log_level, file=LOG)
-
+      self.setup_logging()
       self.target()
 
 
@@ -126,7 +128,7 @@ def set_log_level(
   logging.basicConfig(
     level=level,
     filename=file,
-    filemode=LOG_MODE
+    filemode=LOG_FILE_MODE
   )
 
 
