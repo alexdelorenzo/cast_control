@@ -171,7 +171,7 @@ Commands:
   connect     Connect the background service to the device.
   disconnect  Disconnect the background service from the device.
   reconnect   Reconnect the background service to the device.
-  show    Show the service log.
+  show        Show the service log.
 ```
 
 ###### `service connect` command
