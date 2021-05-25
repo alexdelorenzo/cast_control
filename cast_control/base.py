@@ -1,4 +1,5 @@
-from typing import Optional, Union, NamedTuple
+from typing import Optional, Union, NamedTuple, \
+  Tuple
 from pathlib import Path
 from uuid import UUID
 from enum import auto
@@ -43,11 +44,25 @@ DESKTOP_SUFFIX: str = '.desktop'
 NO_DESKTOP_FILE: str = ''
 
 APP_DIRS = AppDirs(NAME)
-DATA_DIR = Path(APP_DIRS.user_data_dir)
 
-PID: Path = DATA_DIR / f'{NAME}.pid'
+
+def get_user_dirs() -> Tuple[Path, Path, Path]:
+  data_dir = Path(APP_DIRS.user_data_dir)
+  log_dir = Path(APP_DIRS.user_log_dir)
+  state_dir = Path(APP_DIRS.user_state_dir)
+  dirs = data_dir, log_dir, state_dir
+
+  for dir in dirs:
+    dir.mkdir(parents=True, exist_ok=True)
+
+  return data_dir, log_dir, state_dir
+
+
+DATA_DIR, LOG_DIR, STATE_DIR = get_user_dirs()
+
+PID: Path = STATE_DIR / f'{NAME}.pid'
 ARGS: Path = DATA_DIR / 'service-args.tmp'
-LOG: Path = DATA_DIR / f'{NAME}.log'
+LOG: Path = LOG_DIR / f'{NAME}.log'
 
 SRC_DIR = Path(__file__).parent
 ASSETS_DIR: Path = SRC_DIR / 'assets'
@@ -60,26 +75,26 @@ DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
 
 def create_desktop_file(light_icon: bool = True) -> Path:
   if light_icon:
-    icon_path = str(LIGHT_ICON.absolute())
-    file = DATA_DIR / f'{NAME}-light{DESKTOP_SUFFIX}'
+    path = LIGHT_ICON
+    name_suffix = '-light'
 
   else:
-    icon_path = str(DARK_ICON.absolute())
-    file = DATA_DIR / f'{NAME}-dark{DESKTOP_SUFFIX}'
+    path = DARK_ICON
+    name_suffix = '-dark'
 
-  if not file.exists():
-    *lines, name, icon = DESKTOP_TEMPLATE \
-      .read_text() \
-      .splitlines()
+  icon_path = str(path.absolute())
+  file = DATA_DIR / f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
 
-    name += DESKTOP_NAME
-    icon += icon_path
-    lines = (*lines, name, icon)
-    data = '\n'.join(lines)
+  *lines, name, icon = DESKTOP_TEMPLATE \
+    .read_text() \
+    .splitlines()
 
-    if not DATA_DIR.exists():
-      DATA_DIR.mkdir()
+  name += DESKTOP_NAME
+  icon += icon_path
+  lines = (*lines, name, icon)
+  data = '\n'.join(lines)
 
+  if not file.exists() or data != file.read_text():
     file.write_text(data)
 
   return file
@@ -89,9 +104,6 @@ DESKTOP_FILE_LIGHT: Optional[Path] = None
 DESKTOP_FILE_DARK: Optional[Path] = None
 
 try:
-  if not DATA_DIR.exists():
-    DATA_DIR.mkdir()
-
   DESKTOP_FILE_LIGHT = create_desktop_file(light_icon=True)
   DESKTOP_FILE_DARK = create_desktop_file(light_icon=False)
 

@@ -10,6 +10,9 @@ from .run import MprisDaemon, DaemonArgs, get_daemon, \
   run_safe, get_daemon_from_args
 
 
+LOG_MODE: str = 'r'
+LOG_END: str = ''
+
 HELP: str = f"""
 Control casting devices via Linux media controls and desktops.
 
@@ -161,7 +164,12 @@ def reconnect():
   help='Show the service log.'
 )
 def show_log():
-  print(LOG.read_text())
+  # iterate over the text instead of using Path.read_text()
+  #  the latter will crash Python and possibly the system 
+  #  if the log is huge
+  with LOG.open(LOG_MODE) as log:
+    for line in log:
+      print(line, end=LOG_END)
 
 
 if __name__ == "__main__":
