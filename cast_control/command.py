@@ -138,8 +138,12 @@ def connect(
 )
 def disconnect():
   daemon = get_daemon()
-  daemon.stop()
 
+  if not daemon.pid:
+    logging.warning("Daemon isn't running.")
+    sys.exit(RC_NOT_RUNNING)
+
+  daemon.stop()
   DaemonArgs.delete()
 
 
