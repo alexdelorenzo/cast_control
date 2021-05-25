@@ -119,8 +119,15 @@ def connect(
   )
   args.save()
 
-  daemon = get_daemon(run_safe, *args)
-  daemon.start()
+  try:
+    daemon = get_daemon(run_safe, *args)
+    daemon.start()
+
+  except Exception as e:
+    logging.exception(e)
+    logging.warning("Error launching daemon.")
+
+    args.delete()
 
 
 @service.command(
