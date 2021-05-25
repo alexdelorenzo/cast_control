@@ -167,7 +167,7 @@ def reconnect():
 @service.command(
   help='Show the service log.'
 )
-def show_log():
+def show():
   print(f"<Log file: {LOG}>")
 
   # a large log could crash Python or the system
