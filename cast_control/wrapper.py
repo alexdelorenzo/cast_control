@@ -5,7 +5,8 @@ from pathlib import Path
 from mimetypes import guess_type
 
 from pychromecast.controllers.receiver import CastStatus
-from pychromecast.controllers.media import MediaStatus, BaseController
+from pychromecast.controllers.media import MediaStatus, \
+  BaseController, MediaController
 from pychromecast.controllers.youtube import YouTubeController
 from pychromecast.controllers.spotify import SpotifyController
 from pychromecast.controllers.dashcast import DashCastController
@@ -52,19 +53,8 @@ class Wrapper(ABC):
   def media_status(self) -> Optional[MediaStatus]:
     pass
 
-  def can_play_next(self) -> Optional[bool]:
-    pass
-
-  def can_play_prev(self) -> Optional[bool]:
-    pass
-
-  def play_next(self):
-    pass
-
-  def play_prev(self):
-    pass
-
-  def open_uri(self, uri: str):
+  @property
+  def media_controller(self) -> MediaController:
     pass
 
   def add_track(
@@ -89,10 +79,14 @@ class StatusMixin(Wrapper):
 
   @property
   def media_status(self) -> Optional[MediaStatus]:
-    if self.cc.media_controller.status:
-      return self.cc.media_controller.status
+    if self.media_controller.status:
+      return self.media_controller.status
 
     return None
+
+  @property
+  def media_controller(self) -> MediaController:
+    return self.cc.media_controller
 
 
 class ControllersMixin(Wrapper):
@@ -139,7 +133,7 @@ class ControllersMixin(Wrapper):
       return
 
     mimetype, _ = guess_type(uri)
-    self.cc.media_controller.play_media(uri, mimetype)
+    self.media_controller.play_media(uri, mimetype)
 
   def add_track(
     self,
@@ -161,14 +155,14 @@ class ControllersMixin(Wrapper):
 
 class TitlesMixin(Wrapper):
   def get_titles(self):
-    title = self.cc.media_controller.title
+    title = self.media_controller.title
     subtitle = self.get_subtitle()
     album = self.media_status.album_name
     artist = self.media_status.artist
     app_name = self.cc.app_display_name
 
   def get_stream_title(self) -> Optional[str]:
-    title = self.cc.media_controller.title
+    title = self.media_controller.title
     app_name = self.cc.app_display_name
     subtitle = self.get_subtitle()
 
@@ -296,7 +290,7 @@ class TimeMixin(Wrapper):
 
   def seek(self, time: Microseconds):
     seconds = int(round(time / US_IN_SEC))
-    self.cc.media_controller.seek(seconds)
+    self.media_controller.seek(seconds)
 
   def get_rate(self) -> RateDecimal:
     if not self.media_status:
@@ -415,10 +409,10 @@ class MetadataMixin(Wrapper):
 
 class PlaybackMixin(Wrapper):
   def get_playstate(self) -> PlayState:
-    if self.cc.media_controller.is_paused:
+    if self.media_controller.is_paused:
       return PlayState.PAUSED
 
-    elif self.cc.media_controller.is_playing:
+    elif self.media_controller.is_playing:
       return PlayState.PLAYING
 
     return PlayState.STOPPED
@@ -436,10 +430,10 @@ class PlaybackMixin(Wrapper):
     return False
 
   def play_next(self):
-    self.cc.media_controller.queue_next()
+    self.media_controller.queue_next()
 
   def play_prev(self):
-    self.cc.media_controller.queue_prev()
+    self.media_controller.queue_prev()
 
   def quit(self):
     self.cc.quit_app()
@@ -451,16 +445,16 @@ class PlaybackMixin(Wrapper):
     self.play_prev()
 
   def pause(self):
-    self.cc.media_controller.pause()
+    self.media_controller.pause()
 
   def resume(self):
     self.play()
 
   def stop(self):
-    self.cc.media_controller.stop()
+    self.media_controller.stop()
 
   def play(self):
-    self.cc.media_controller.play()
+    self.media_controller.play()
 
   def set_repeating(self, val: bool):
     pass

@@ -21,15 +21,13 @@ from .base import Status
 VolumeStatus = Union[MediaStatus, CastStatus]
 
 
-class ChromecastEventListener(
+class DeviceEventListenerBase(
   MediaStatusListener,
   CastStatusListener,
   ConnectionStatusListener,
   ABC
 ):
-  """
-  Event listeners that conform to pychromecast's API
-  """
+  """Event listeners that conform to PyChromecast's API"""
 
   @abstractmethod
   def new_media_status(self, status: MediaStatus):
@@ -44,7 +42,7 @@ class ChromecastEventListener(
     pass
 
 
-class ChromecastEventAdapter(EventAdapter):
+class DeviceEventAdapter(EventAdapter):
   def __init__(
     self,
     name: str,
@@ -60,11 +58,11 @@ class ChromecastEventAdapter(EventAdapter):
     super().__init__(self.server.player, self.server.root)
 
 
-class ChromecastEventHandler(
-  ChromecastEventAdapter,
-  ChromecastEventListener
+class DeviceEventListener(
+  DeviceEventAdapter,
+  DeviceEventListenerBase
 ):
-  def check_volume(self, status: Status):
+  def _check_volume(self, status: Status):
     if not isinstance(status, VolumeStatus.__args__):
       return
 
@@ -76,7 +74,7 @@ class ChromecastEventHandler(
       self.on_volume()
 
   def _update_metadata(self, status: Status):
-    self.check_volume(status)
+    self._check_volume(status)
 
     # wire up mpris_server with cc events
     self.on_playback()
@@ -101,6 +99,6 @@ def register_mpris_adapter(
   adapter: MprisAdapter
 ):
   event_listener = \
-    ChromecastEventHandler(chromecast.name, chromecast, server, adapter)
+    DeviceEventListener(chromecast.name, chromecast, server, adapter)
   chromecast.media_controller.register_status_listener(event_listener)
   chromecast.register_status_listener(event_listener)

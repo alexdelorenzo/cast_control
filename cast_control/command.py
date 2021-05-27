@@ -1,4 +1,5 @@
-from typing import Optional
+from typing import Optional, List
+import collections
 import logging
 import sys
 
@@ -18,6 +19,12 @@ Control casting devices via Linux media controls and desktops.
 
 This daemon connects your casting device directly to the D-Bus media player interface.
 """
+
+
+class OrderCommands(click.Group):
+  """List `click` commands in the order they're declared."""
+  def list_commands(self, *args) -> List[str]:
+    return list(self.commands)
 
 
 @click.group(help=HELP)
@@ -72,7 +79,8 @@ def connect(
 
 
 @cmd.group(
-  help='Connect, disconnect or reconnect the background service to or from your device.'
+  cls=OrderCommands,
+  help='Connect, disconnect or reconnect the background service to or from your device.',
 )
 def service():
   pass

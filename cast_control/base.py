@@ -199,3 +199,28 @@ def get_chromecast(
       return chromecast
 
   return None
+
+
+def find_device(
+  name: Optional[str],
+  host: Optional[str],
+  uuid: Optional[str],
+  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
+) -> Optional[Chromecast]:
+  device: Optional[Chromecast] = None
+
+  if host:
+    device = get_chromecast_via_host(host, retry_wait)
+
+  if uuid and not device:
+    device = get_chromecast_via_uuid(uuid, retry_wait)
+
+  if name and not device:
+    device = get_chromecast(name, retry_wait)
+
+  no_identifiers = not (host or name or uuid)
+
+  if no_identifiers:
+    device = get_chromecast(retry_wait=retry_wait)
+
+  return device
