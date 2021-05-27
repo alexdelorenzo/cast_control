@@ -14,7 +14,7 @@ from mpris_server.server import Server
 from .base import get_chromecast, Seconds, get_chromecast_via_host, \
   NoChromecastFoundException, LOG_LEVEL, get_chromecast_via_uuid, \
   DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, DATA_DIR, NAME, LOG, \
-  RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS
+  RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS, find_device
 from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
@@ -137,31 +137,6 @@ def set_log_level(
     filename=file,
     filemode=LOG_FILE_MODE
   )
-
-
-def find_device(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Chromecast]:
-  device: Optional[Chromecast] = None
-
-  if host:
-    device = get_chromecast_via_host(host, retry_wait)
-
-  if uuid and not device:
-    device = get_chromecast_via_uuid(uuid, retry_wait)
-
-  if name and not device:
-    device = get_chromecast(name, retry_wait)
-
-  no_identifiers = not (host or name or uuid)
-
-  if no_identifiers:
-    device = get_chromecast(retry_wait=retry_wait)
-
-  return device
 
 
 def create_adapters_and_server(
