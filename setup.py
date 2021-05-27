@@ -1,12 +1,14 @@
-__author__ = 'Alex DeLorenzo'
 from typing import Dict, List
 from setuptools import setup
 from pathlib import Path
 
+from cast_control import \
+  __version__, __author__
+
 
 NAME: str = 'cast_control'
 SHORT_NAME: str = 'castctl'
-VERSION: str = '0.10.0'
+VERSION: str = __version__
 LICENSE: str = 'AGPL-3.0'
 PY_VERSION: str = '>=3.7'
 
