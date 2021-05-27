@@ -8,15 +8,15 @@ from cast_control import \
 
 NAME: str = 'cast_control'
 SHORT_NAME: str = 'castctl'
-VERSION: str = __version__
 LICENSE: str = 'AGPL-3.0'
 PY_VERSION: str = '>=3.7'
 
+CMD_PT: str = f'{NAME}.command:cmd'
 
 ENTRY_POINTS: Dict[str, List[str]] = {
   'console_scripts': [
-    f'{NAME} = {NAME}.command:cmd',
-    f'{SHORT_NAME} = {NAME}.command:cmd',
+    f'{NAME} = {CMD_PT},
+    f'{SHORT_NAME} = {CMD_PT}',
   ]
 }
 
@@ -35,14 +35,18 @@ PKG_DATA: Dict[str, List[str]] = {
   NAME: ASSET_DIRS
 }
 
+PROJECT_URLS: Dict[str, str] = {
+  'Homepage': 'https://alexdelorenzo.dev/'
+}
 
 setup(
   name=NAME,
-  version=VERSION,
+  version=__version__,
   description='📺 Control Chromecasts from Linux and D-Bus',
   long_description=README,
   long_description_content_type='text/markdown',
   url='https://github.com/alexdelorenzo/cast_control',
+  project_urls=PROJECT_URLS,
   author=__author__,
   license=LICENSE,
   packages=[NAME],
