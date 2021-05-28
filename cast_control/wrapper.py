@@ -21,8 +21,8 @@ from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, \
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
-  US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType, DESKTOP_FILE_DARK, \
-  DESKTOP_FILE_LIGHT, NO_DESKTOP_FILE, NAME
+  US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType, NO_DESKTOP_FILE, \
+  NAME, create_desktop_file
 
 
 DEFAULT_NAME: str = NAME
@@ -331,8 +331,7 @@ class IconsMixin(Wrapper):
     return str(DEFAULT_THUMB)
 
   def get_desktop_entry(self) -> str:
-    path = \
-      DESKTOP_FILE_LIGHT if self.light_icon else DESKTOP_FILE_DARK
+    path = create_desktop_file(light_icon=self.light_icon)
 
     if not path:
       return NO_DESKTOP_FILE

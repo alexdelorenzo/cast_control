@@ -95,6 +95,7 @@ def is_older_than_module(other: Path) -> bool:
   return src_stat.st_ctime > other_stat.st_ctime
 
 
+@lru_cache
 def create_desktop_file(light_icon: bool = True) -> Path:
   if light_icon:
     path = LIGHT_ICON
@@ -104,7 +105,6 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     path = DARK_ICON
     name_suffix = '-dark'
 
-  icon_path = str(path)
   file = DATA_DIR / f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
 
   if file.exists() and not is_older_than_module(file):
@@ -112,25 +112,13 @@ def create_desktop_file(light_icon: bool = True) -> Path:
 
   *lines, name, icon = get_template()
   name += DESKTOP_NAME
-  icon += icon_path
+  icon += str(path)
   lines = (*lines, name, icon)
-  data = '\n'.join(lines)
+  text = '\n'.join(lines)
 
-  file.write_text(data)
+  file.write_text(text)
 
   return file
-
-
-DESKTOP_FILE_LIGHT: Optional[Path] = None
-DESKTOP_FILE_DARK: Optional[Path] = None
-
-try:
-  DESKTOP_FILE_LIGHT = create_desktop_file(light_icon=True)
-  DESKTOP_FILE_DARK = create_desktop_file(light_icon=False)
-
-except Exception as e:
-  logging.exception(e)
-  logging.warning(f"Couldn't create {DESKTOP_SUFFIX} files in {DATA_DIR}.")
 
 
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]
