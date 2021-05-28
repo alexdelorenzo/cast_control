@@ -75,7 +75,7 @@ def connect(
     log_level
   )
 
-  run_safe(*args)
+  run_safe(*args, set_logging=True)
 
 
 @cmd.group(

@@ -190,9 +190,12 @@ def run_server(
   wait: Optional[float] = DEFAULT_WAIT,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
   icon: bool = False,
-  log_level: str = LOG_LEVEL
+  log_level: str = LOG_LEVEL,
+  set_logging: bool = False,
 ):
-  set_log_level(log_level)
+  if set_logging:
+    set_log_level(log_level)
+
   mpris = retry_until_found(name, host, uuid, wait, retry_wait)
 
   if mpris and icon:

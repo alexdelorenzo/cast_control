@@ -89,8 +89,8 @@ def get_template() -> List[str]:
 
 @lru_cache
 def is_older_than_module(other: Path) -> bool:
-  other_stat = get_stat(other)
   src_stat = get_stat(SRC_DIR)
+  other_stat = get_stat(other)
 
   if src_stat.st_ctime > other_stat.st_ctime:
     return True
