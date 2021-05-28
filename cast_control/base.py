@@ -210,26 +210,26 @@ def is_older_than_module(other: Path) -> bool:
 
 
 @lru_cache
-def create_desktop_file(light_icon: bool = True) -> Path:
-  if light_icon:
-    path = LIGHT_ICON
-    name_suffix = '-light'
-
-  else:
-    path = DARK_ICON
-    name_suffix = '-dark'
-
-  file = DATA_DIR / f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
-
-  if file.exists() and not is_older_than_module(file):
-    return file
-
+def new_file_from_template(file: Path, icon_path: Path) -> Path:
   *lines, name, icon = get_template()
   name += DESKTOP_NAME
-  icon += str(path)
+  icon += str(icon_path)
   lines = (*lines, name, icon)
   text = '\n'.join(lines)
 
   file.write_text(text)
 
   return file
+
+
+@lru_cache
+def create_desktop_file(light_icon: bool = True) -> Path:
+  icon_path = LIGHT_ICON if light_icon else DARK_ICON
+  name_suffix = '-light' if light_icon else '-dark'
+
+  file = DATA_DIR / f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
+
+  if file.exists() and not is_older_than_module(file):
+    return file
+
+  return new_file_from_template(file, icon_path)
