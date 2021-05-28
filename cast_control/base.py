@@ -75,52 +75,6 @@ LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
 DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
 
 
-@lru_cache
-def get_stat(file: Path) -> stat_result:
-  return file.stat()
-
-
-@lru_cache
-def get_template() -> List[str]:
-  return DESKTOP_TEMPLATE \
-    .read_text() \
-    .splitlines()
-
-
-@lru_cache
-def is_older_than_module(other: Path) -> bool:
-  src_stat = get_stat(SRC_DIR)
-  other_stat = get_stat(other)
-
-  return src_stat.st_ctime > other_stat.st_ctime
-
-
-@lru_cache
-def create_desktop_file(light_icon: bool = True) -> Path:
-  if light_icon:
-    path = LIGHT_ICON
-    name_suffix = '-light'
-
-  else:
-    path = DARK_ICON
-    name_suffix = '-dark'
-
-  file = DATA_DIR / f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
-
-  if file.exists() and not is_older_than_module(file):
-    return file
-
-  *lines, name, icon = get_template()
-  name += DESKTOP_NAME
-  icon += str(path)
-  lines = (*lines, name, icon)
-  text = '\n'.join(lines)
-
-  file.write_text(text)
-
-  return file
-
-
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]
 
 
@@ -233,3 +187,49 @@ def find_device(
     device = get_chromecast(retry_wait=retry_wait)
 
   return device
+
+
+@lru_cache
+def get_stat(file: Path) -> stat_result:
+  return file.stat()
+
+
+@lru_cache
+def get_template() -> List[str]:
+  return DESKTOP_TEMPLATE \
+    .read_text() \
+    .splitlines()
+
+
+@lru_cache
+def is_older_than_module(other: Path) -> bool:
+  src_stat = get_stat(SRC_DIR)
+  other_stat = get_stat(other)
+
+  return src_stat.st_ctime > other_stat.st_ctime
+
+
+@lru_cache
+def create_desktop_file(light_icon: bool = True) -> Path:
+  if light_icon:
+    path = LIGHT_ICON
+    name_suffix = '-light'
+
+  else:
+    path = DARK_ICON
+    name_suffix = '-dark'
+
+  file = DATA_DIR / f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
+
+  if file.exists() and not is_older_than_module(file):
+    return file
+
+  *lines, name, icon = get_template()
+  name += DESKTOP_NAME
+  icon += str(path)
+  lines = (*lines, name, icon)
+  text = '\n'.join(lines)
+
+  file.write_text(text)
+
+  return file
