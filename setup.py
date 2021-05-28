@@ -15,7 +15,7 @@ CMD_PT: str = f'{NAME}.command:cmd'
 
 ENTRY_POINTS: Dict[str, List[str]] = {
   'console_scripts': [
-    f'{NAME} = {CMD_PT},
+    f'{NAME} = {CMD_PT}',
     f'{SHORT_NAME} = {CMD_PT}',
   ]
 }

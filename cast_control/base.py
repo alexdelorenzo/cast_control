@@ -1,8 +1,10 @@
 from typing import Optional, Union, NamedTuple, \
-  Tuple
+  Tuple, List
 from pathlib import Path
 from uuid import UUID
 from enum import auto
+from os import stat_result
+from functools import lru_cache
 import logging
 
 from appdirs import AppDirs
@@ -73,6 +75,29 @@ LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
 DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
 
 
+@lru_cache
+def get_stat(file: Path) -> stat_result:
+  return file.stat()
+
+
+@lru_cache
+def get_template() -> List[str]:
+  return DESKTOP_TEMPLATE \
+    .read_text() \
+    .splitlines()
+
+
+@lru_cache
+def is_older_than_module(other: Path) -> bool:
+  other_stat = get_stat(other)
+  src_stat = get_stat(SRC_DIR)
+
+  if src_stat.st_ctime > other_stat.st_ctime:
+    return True
+
+  return False
+
+
 def create_desktop_file(light_icon: bool = True) -> Path:
   if light_icon:
     path = LIGHT_ICON
@@ -82,20 +107,19 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     path = DARK_ICON
     name_suffix = '-dark'
 
-  icon_path = str(path.absolute())
+  icon_path = str(path)
   file = DATA_DIR / f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
 
-  *lines, name, icon = DESKTOP_TEMPLATE \
-    .read_text() \
-    .splitlines()
+  if file.exists() and not is_older_than_module(file):
+    return file
 
+  *lines, name, icon = get_template()
   name += DESKTOP_NAME
   icon += icon_path
   lines = (*lines, name, icon)
   data = '\n'.join(lines)
 
-  if not file.exists() or data != file.read_text():
-    file.write_text(data)
+  file.write_text(data)
 
   return file
 

@@ -1,7 +1,7 @@
 [tool]
 [tool.poetry]
 name = "cast_control"
-version = "0.10.0"
+version = "0.10.1"
 description = "📺 Control Chromecasts from Linux and D-Bus"
 license = "AGPL-3.0"
 homepage = "https://github.com/alexdelorenzo/cast_control"
