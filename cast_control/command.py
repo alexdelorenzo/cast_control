@@ -23,7 +23,8 @@ This daemon connects your casting device directly to the D-Bus media player inte
 
 class OrderCommands(click.Group):
   """List `click` commands in the order they're declared."""
-  def list_commands(self, *args) -> List[str]:
+
+  def list_commands(self, ctx: click.Command) -> List[str]:
     return list(self.commands)
 
 
@@ -163,7 +164,7 @@ def reconnect():
   args = DaemonArgs.load()
 
   if args:
-    daemon = get_daemon(run_safe, *args)
+    daemon = get_daemon_from_args(run_safe, args)
 
   if not args or not daemon.pid:
     logging.warning("Daemon isn't running.")
