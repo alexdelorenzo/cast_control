@@ -174,7 +174,7 @@ Commands:
   connect     Connect the background service to the device.
   disconnect  Disconnect the background service from the device.
   reconnect   Reconnect the background service to the device.
-  show        Show the service log.
+  log        Show the service log.
 ```
 
 ###### `service connect` command
@@ -265,9 +265,9 @@ You can set the log level using the `-l/--log-level` flag with the `connect` or 
 $ cast_control connect --log-level debug
 ```
 
-You can view the background service's log file with the `service show` command:
+You can view the background service's log file with the `service log` command:
 ```bash
-$ cast_control service show
+$ cast_control service log
 ```
 
 Here's a [list of log levels supported by `cast_control`](https://docs.python.org/3/library/logging.html#logging-levels).
