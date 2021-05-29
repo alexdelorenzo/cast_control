@@ -7,5 +7,5 @@ pydbus>=0.6.0
 PyGObject>=3.34.0
 
 # local
+aiopath>=0.5.6
 mpris_server==0.2.18
-

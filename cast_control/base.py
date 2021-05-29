@@ -5,6 +5,7 @@ from uuid import UUID
 from enum import auto
 from os import stat_result
 from functools import lru_cache
+from asyncio import gather, run
 import logging
 
 from appdirs import AppDirs
@@ -14,6 +15,7 @@ from pychromecast.socket_client import ConnectionStatus
 from pychromecast import Chromecast, get_chromecasts, \
   get_chromecast_from_host
 from mpris_server.base import AutoName
+from aiopath import AsyncPath
 
 
 Seconds = int
@@ -48,19 +50,25 @@ NO_DESKTOP_FILE: str = ''
 APP_DIRS = AppDirs(NAME)
 
 
-def get_user_dirs() -> Tuple[Path, Path, Path]:
-  data_dir = Path(APP_DIRS.user_data_dir)
-  log_dir = Path(APP_DIRS.user_log_dir)
-  state_dir = Path(APP_DIRS.user_state_dir)
+async def get_user_dirs() -> Tuple[Path, Path, Path]:
+  data_dir = AsyncPath(APP_DIRS.user_data_dir)
+  log_dir = AsyncPath(APP_DIRS.user_log_dir)
+  state_dir = AsyncPath(APP_DIRS.user_state_dir)
   dirs = data_dir, log_dir, state_dir
 
-  for dir in dirs:
+  coros = (
     dir.mkdir(parents=True, exist_ok=True)
+    for dir in dirs
+  )
 
-  return data_dir, log_dir, state_dir
+  await gather(*coros)
+
+  return list(map(Path, dirs))
 
 
-DATA_DIR, LOG_DIR, STATE_DIR = get_user_dirs()
+DATA_DIR, LOG_DIR, STATE_DIR = run(
+  get_user_dirs()
+)
 
 PID: Path = STATE_DIR / f'{NAME}.pid'
 ARGS: Path = STATE_DIR / 'service-args.tmp'
@@ -233,3 +241,15 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     return file
 
   return new_file_from_template(file, icon_path)
+
+
+def _get_user_dirs() -> Tuple[Path, Path, Path]:
+  data_dir = Path(APP_DIRS.user_data_dir)
+  log_dir = Path(APP_DIRS.user_log_dir)
+  state_dir = Path(APP_DIRS.user_state_dir)
+  dirs = data_dir, log_dir, state_dir
+
+  for dir in dirs:
+    dir.mkdir(parents=True, exist_ok=True)
+
+  return data_dir, log_dir, state_dir
