@@ -154,7 +154,8 @@ class Titles(NamedTuple):
 
 
 class TitlesMixin(Wrapper):
-  def get_titles(self) -> Titles:
+  @property
+  def titles(self) -> Titles:
     titles: List[str] = list()
 
     title = self.media_controller.title
@@ -199,23 +200,17 @@ class TitlesMixin(Wrapper):
     return None
 
   def get_stream_title(self) -> Optional[str]:
-    titles = self.get_titles()
-
-    return titles.title
+    return self.titles.title
 
   def get_artist(self, title: Optional[str] = None) -> Optional[str]:
-    titles = self.get_titles()
-
-    return titles.artist
+    return self.titles.artist
 
   def get_album(
     self,
     title: Optional[str] = None,
     artist: Optional[str] = None,
   ) -> Optional[str]:
-    titles = self.get_titles()
-
-    return titles.album
+    return self.titles.album
 
 
 class TimeMixin(Wrapper):
