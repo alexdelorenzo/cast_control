@@ -446,7 +446,7 @@ class AbilitiesMixin(Wrapper):
   def can_play(self) -> bool:
     state = self.get_playstate()
 
-    if state is PlayState.PAUSED:
+    if state is not PlayState.PLAYING:
       return True
 
     return False
