@@ -213,14 +213,10 @@ class TitlesMixin(Wrapper):
   def get_stream_title(self) -> Optional[str]:
     return self.titles.title
 
-  def get_artist(self, title: Optional[str] = None) -> Optional[str]:
+  def get_artist(self) -> Optional[str]:
     return self.titles.artist
 
-  def get_album(
-    self,
-    title: Optional[str] = None,
-    artist: Optional[str] = None,
-  ) -> Optional[str]:
+  def get_album(self) -> Optional[str]:
     return self.titles.album
 
 
@@ -274,9 +270,9 @@ class TimeMixin(Wrapper):
     if not status or not status.current_time:
       return False
 
-    rounded = round(status.current_time, RESOLUTION)
+    current_time = round(status.current_time, RESOLUTION)
 
-    return rounded > BEGINNING
+    return current_time > BEGINNING
 
   def seek(self, time: Microseconds):
     seconds = int(round(time / US_IN_SEC))
