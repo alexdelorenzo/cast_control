@@ -81,7 +81,7 @@ class DeviceEventListener(
     self.on_options()
 
     # wire up local integration with mpris
-    self.adapter.wrapper.on_new_status()
+    self.adapter.on_new_status()
 
   def new_media_status(self, status: MediaStatus):
     self._update_metadata(status)

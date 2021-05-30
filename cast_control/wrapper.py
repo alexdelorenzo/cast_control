@@ -29,6 +29,7 @@ from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
 DEFAULT_NAME: str = NAME
 NO_ARTIST: str = ''
 TITLE_SEP: str = ' - '
+TITLE_COUNT: int = 3
 
 YOUTUBE_URLS: Set[str] = {
   'youtube.com/',
@@ -148,15 +149,14 @@ class ControllersMixin(Wrapper):
 
 class Titles(NamedTuple):
   title: Optional[str] = None
-  subtitle: Optional[str] = None
   artist: Optional[str] = None
   album: Optional[str] = None
-  app: Optional[str] = None
 
 
 class TitlesMixin(Wrapper):
   def get_titles(self) -> Titles:
     titles: List[str] = list()
+
     title = self.media_controller.title
 
     if title:
@@ -167,31 +167,25 @@ class TitlesMixin(Wrapper):
     if subtitle:
       titles.append(subtitle)
 
-    artist = self.media_status.artist
+    if self.media_status:
+      artist = self.media_status.artist
 
-    if artist:
-      titles.append(artist)
+      if artist:
+        titles.append(artist)
 
-    album = self.media_status.album_name
+      album = self.media_status.album_name
 
-    if album:
-      titles.append(album)
+      if album:
+        titles.append(album)
 
     app_name = self.cc.app_display_name
 
     if app_name:
       titles.append(app_name)
 
+    titles = titles[:TITLE_COUNT]
+
     return Titles(*titles)
-
-  def get_stream_title(self) -> Optional[str]:
-    titles = self.get_titles()
-    return titles.title
-    #title = self.media_controller.title
-    #app_name = self.cc.app_display_name
-    #subtitle = self.get_subtitle()
-
-    #return title or app_name or subtitle
 
   def get_subtitle(self) -> Optional[str]:
     if not self.media_status:
@@ -204,30 +198,15 @@ class TitlesMixin(Wrapper):
 
     return None
 
+  def get_stream_title(self) -> Optional[str]:
+    titles = self.get_titles()
+
+    return titles.title
+
   def get_artist(self, title: Optional[str] = None) -> Optional[str]:
     titles = self.get_titles()
+
     return titles.artist
-    #if not title:
-      #title = self.get_stream_title()
-
-    #subtitle = self.get_subtitle()
-    #artist: Optional[str] = None
-
-    #if not self.media_status:
-      #artist = self.media_status.artist
-
-    #app_name: Optional[str] = self.cc.app_display_name
-
-    #if artist:
-      #return artist
-
-    #elif subtitle:
-      #return subtitle
-
-    #elif app_name and app_name != title:
-      #return app_name
-
-    #return None
 
   def get_album(
     self,
@@ -235,32 +214,8 @@ class TitlesMixin(Wrapper):
     artist: Optional[str] = None,
   ) -> Optional[str]:
     titles = self.get_titles()
+
     return titles.album
-    #if not title:
-      #title = self.get_stream_title()
-
-    #if not artist:
-      #artist = self.get_artist()
-
-    #album: Optional[str] = None
-
-    #if not self.media_status:
-      #album = self.media_status.album_name
-
-    #app_name = self.cc.app_display_name
-    #subtitle = self.get_subtitle()
-    #titles = {artist, title}
-
-    #if album:
-      #return album
-
-    #elif subtitle and subtitle not in titles:
-      #return subtitle
-
-    #elif app_name and app_name not in titles:
-      #return app_name
-
-    #return None
 
 
 class TimeMixin(Wrapper):

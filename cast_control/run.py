@@ -215,7 +215,8 @@ def run_safe(
   wait: Optional[float],
   retry_wait: Optional[float],
   icon: bool,
-  log_level: str
+  log_level: str,
+  set_logging: bool = False,
 ):
   try:
     run_server(
@@ -225,7 +226,8 @@ def run_safe(
       wait,
       retry_wait,
       icon,
-      log_level
+      log_level,
+      set_logging
     )
 
   except NoChromecastFoundException as e:
