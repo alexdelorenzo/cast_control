@@ -181,7 +181,7 @@ def reconnect():
 def log():
   print(f"<Log file: {LOG}>")
 
-  # a large log could crash Python or the system
+  # a large log could hang Python or the system
   # iterate over the file instead of using Path.read_text()
   with LOG.open(LOG_MODE) as log:
     for line in log:

@@ -1,7 +1,7 @@
 [tool]
 [tool.poetry]
 name = "cast_control"
-version = "0.10.3"
+version = "0.10.4"
 description = "📺 Control Chromecasts from Linux and D-Bus"
 license = "AGPL-3.0"
 homepage = "https://github.com/alexdelorenzo/cast_control"
@@ -18,3 +18,4 @@ mpris-server = "==0.2.18"
 pychromecast = "==9.1.2"
 pydbus = ">=0.6.0"
 pygobject = ">=3.34.0"
+typing-extensions = {version = ">=3.10.0.0", python = "<3.10"}

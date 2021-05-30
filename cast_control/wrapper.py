@@ -1,6 +1,12 @@
-from abc import ABC
 from typing import Optional, Any, List, Union, Tuple, \
   NamedTuple, Callable, Set
+
+try:
+  from typing import Protocol
+
+except ImportError:
+  from typing_extensions import Protocol
+
 from pathlib import Path
 from mimetypes import guess_type
 from functools import lru_cache
@@ -29,7 +35,7 @@ from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
 DEFAULT_NAME: str = NAME
 NO_ARTIST: str = ''
 TITLE_SEP: str = ' - '
-TITLE_COUNT: int = 3
+MAX_TITLES: int = 3
 
 YOUTUBE_URLS: Set[str] = {
   'youtube.com/',
@@ -43,7 +49,13 @@ NO_SUFFIX: str = ''
 # NO_DURATION = None
 
 
-class Wrapper(ABC):
+class Titles(NamedTuple):
+  title: Optional[str] = None
+  artist: Optional[str] = None
+  album: Optional[str] = None
+
+
+class Wrapper(Protocol):
   cc: Chromecast
   light_icon: bool = False
 
@@ -57,6 +69,10 @@ class Wrapper(ABC):
 
   @property
   def media_controller(self) -> MediaController:
+    pass
+
+  @property
+  def titles(self) -> Titles:
     pass
 
 
@@ -147,12 +163,6 @@ class ControllersMixin(Wrapper):
       self.open_uri(uri)
 
 
-class Titles(NamedTuple):
-  title: Optional[str] = None
-  artist: Optional[str] = None
-  album: Optional[str] = None
-
-
 class TitlesMixin(Wrapper):
   @property
   def titles(self) -> Titles:
@@ -184,7 +194,7 @@ class TitlesMixin(Wrapper):
     if app_name:
       titles.append(app_name)
 
-    titles = titles[:TITLE_COUNT]
+    titles = titles[:MAX_TITLES]
 
     return Titles(*titles)
 
@@ -324,8 +334,8 @@ class IconsMixin(Wrapper):
 
 class MetadataMixin(Wrapper):
   def metadata(self) -> Metadata:
-    title: Optional[str] = self.get_stream_title()
-    artist = self.get_artist()
+    title, artist, album = self.titles
+
     artists = [artist] if artist else []
     dbus_name: DbusObj = get_track_id(title)
     comments: List[str] = []
@@ -341,7 +351,7 @@ class MetadataMixin(Wrapper):
       'xesam:url': self._get_url(),
       'xesam:title': title,
       'xesam:artist': artists,
-      'xesam:album': self.get_album(title, artist),
+      'xesam:album': album,
       'xesam:albumArtist': artists,
       'xesam:discNumber': DEFAULT_DISC_NO,
       'xesam:trackNumber': track_no,
@@ -416,14 +426,14 @@ class VolumeMixin(Wrapper):
 
   def set_volume(self, val: VolumeDecimal):
     curr = self.get_volume()
-    diff = val - curr
+    delta = val - curr
 
     # can't adjust vol by 0
-    if diff > NO_DELTA:  # vol up
-      self.cc.volume_up(diff)
+    if delta > NO_DELTA:  # vol up
+      self.cc.volume_up(delta)
 
-    elif diff < NO_DELTA:
-      self.cc.volume_down(abs(diff))
+    elif delta < NO_DELTA:
+      self.cc.volume_down(abs(delta))
 
   def is_mute(self) -> Optional[bool]:
     if self.cast_status:

@@ -5,6 +5,7 @@ daemons==1.3.2
 PyChromecast==9.1.2
 pydbus>=0.6.0
 PyGObject>=3.34.0
+typing-extensions>=3.10.0.0; python_version < '3.10'
 
 # local
 aiopath>=0.5.6
