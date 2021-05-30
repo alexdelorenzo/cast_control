@@ -50,7 +50,7 @@ NO_DESKTOP_FILE: str = ''
 APP_DIRS = AppDirs(NAME)
 
 
-async def get_user_dirs() -> List[Path, Path, Path]:
+async def get_user_dirs() -> List[Path]:
   data_dir = AsyncPath(APP_DIRS.user_data_dir)
   log_dir = AsyncPath(APP_DIRS.user_log_dir)
   state_dir = AsyncPath(APP_DIRS.user_state_dir)
