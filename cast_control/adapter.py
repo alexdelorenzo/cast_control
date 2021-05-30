@@ -10,7 +10,17 @@ from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
 from .wrapper import ChromecastWrapper
 
 
-class ChromecastAdapter(MprisAdapter):
+class WrapperIntegration:
+  wrapper: ChromecastWrapper
+
+  def set_icon(self, light_icon: bool):
+    self.wrapper.set_icon(light_icon)
+
+  def on_new_status(self, *args, **kwargs):
+    self.wrapper.on_new_status(*args, **kwargs)
+
+
+class ChromecastAdapter(WrapperIntegration, MprisAdapter):
   def __init__(self, chromecast: Chromecast):
     self.wrapper = ChromecastWrapper(chromecast)
     super().__init__(self.wrapper.name)

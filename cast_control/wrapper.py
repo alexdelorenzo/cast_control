@@ -3,6 +3,7 @@ from typing import Optional, Any, List, Union, Tuple, \
   NamedTuple, Callable, Set
 from pathlib import Path
 from mimetypes import guess_type
+from collections import deque
 
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.controllers.media import MediaStatus, \
@@ -55,14 +56,6 @@ class Wrapper(ABC):
 
   @property
   def media_controller(self) -> MediaController:
-    pass
-
-  def add_track(
-    self,
-    uri: str,
-    after_track: DbusObj,
-    set_as_current: bool
-  ):
     pass
 
 
@@ -153,20 +146,52 @@ class ControllersMixin(Wrapper):
       self.open_uri(uri)
 
 
+class Titles(NamedTuple):
+  title: Optional[str] = None
+  subtitle: Optional[str] = None
+  artist: Optional[str] = None
+  album: Optional[str] = None
+  app: Optional[str] = None
+
+
 class TitlesMixin(Wrapper):
-  def get_titles(self):
+  def get_titles(self) -> Titles:
+    titles: List[str] = list()
     title = self.media_controller.title
+
+    if title:
+      titles.append(title)
+
     subtitle = self.get_subtitle()
-    album = self.media_status.album_name
+
+    if subtitle:
+      titles.append(subtitle)
+
     artist = self.media_status.artist
+
+    if artist:
+      titles.append(artist)
+
+    album = self.media_status.album_name
+
+    if album:
+      titles.append(album)
+
     app_name = self.cc.app_display_name
+
+    if app_name:
+      titles.append(app_name)
+
+    return Titles(*titles)
 
   def get_stream_title(self) -> Optional[str]:
-    title = self.media_controller.title
-    app_name = self.cc.app_display_name
-    subtitle = self.get_subtitle()
+    titles = self.get_titles()
+    return titles.title
+    #title = self.media_controller.title
+    #app_name = self.cc.app_display_name
+    #subtitle = self.get_subtitle()
 
-    return title or app_name or subtitle
+    #return title or app_name or subtitle
 
   def get_subtitle(self) -> Optional[str]:
     if not self.media_status:
@@ -180,58 +205,62 @@ class TitlesMixin(Wrapper):
     return None
 
   def get_artist(self, title: Optional[str] = None) -> Optional[str]:
-    if not title:
-      title = self.get_stream_title()
+    titles = self.get_titles()
+    return titles.artist
+    #if not title:
+      #title = self.get_stream_title()
 
-    subtitle = self.get_subtitle()
-    artist: Optional[str] = None
+    #subtitle = self.get_subtitle()
+    #artist: Optional[str] = None
 
-    if not self.media_status:
-      artist = self.media_status.artist
+    #if not self.media_status:
+      #artist = self.media_status.artist
 
-    app_name: Optional[str] = self.cc.app_display_name
+    #app_name: Optional[str] = self.cc.app_display_name
 
-    if artist:
-      return artist
+    #if artist:
+      #return artist
 
-    elif subtitle:
-      return subtitle
+    #elif subtitle:
+      #return subtitle
 
-    elif app_name and app_name != title:
-      return app_name
+    #elif app_name and app_name != title:
+      #return app_name
 
-    return None
+    #return None
 
   def get_album(
     self,
     title: Optional[str] = None,
     artist: Optional[str] = None,
   ) -> Optional[str]:
-    if not title:
-      title = self.get_stream_title()
+    titles = self.get_titles()
+    return titles.album
+    #if not title:
+      #title = self.get_stream_title()
 
-    if not artist:
-      artist = self.get_artist()
+    #if not artist:
+      #artist = self.get_artist()
 
-    album: Optional[str] = None
+    #album: Optional[str] = None
 
-    if not self.media_status:
-      album = self.media_status.album_name
+    #if not self.media_status:
+      #album = self.media_status.album_name
 
-    app_name = self.cc.app_display_name
-    subtitle = self.get_subtitle()
-    titles = {artist, title}
+    #app_name = self.cc.app_display_name
+    #subtitle = self.get_subtitle()
+    #titles = {artist, title}
 
-    if album:
-      return album
+    #if album:
+      #return album
 
-    elif subtitle and subtitle not in titles:
-      return subtitle
+    #elif subtitle and subtitle not in titles:
+      #return subtitle
 
-    elif app_name and app_name not in titles:
-      return app_name
+    #elif app_name and app_name not in titles:
+      #return app_name
 
-    return None
+    #return None
 
 
 class TimeMixin(Wrapper):
@@ -369,41 +398,6 @@ class MetadataMixin(Wrapper):
     }
 
     return metadata
-
-  # TODO: no need to keep this method around
-  # as long as metadata() is implemented
-  def get_current_track(self) -> Track:
-    title = self.get_stream_title()
-    artist_name = self.get_artist()
-    artist = Artist(artist_name)
-    art_url = self.get_art_url()
-    content_id = self._get_url()
-    duration = int(self.get_duration())
-    track_no: Optional[int] = None
-
-    if self.media_status:
-      track_no = self.media_status.track
-
-    album = Album(
-      name=self.get_album(title, artist_name),
-      artists=(artist,),
-      art_url=art_url,
-    )
-
-    track = Track(
-      track_id=get_track_id(title),
-      name=title,
-      track_no=track_no,
-      length=duration,
-      uri=content_id,
-      artists=(artist,),
-      album=album,
-      art_url=art_url,
-      disc_no=DEFAULT_DISC_NO,
-      type=get_media_type(self)
-    )
-
-    return track
 
 
 class PlaybackMixin(Wrapper):

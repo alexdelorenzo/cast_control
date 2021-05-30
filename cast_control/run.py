@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, Callable, NamedTuple
+from typing import Optional, Callable, NamedTuple, Tuple
 from time import sleep
 from pathlib import Path
 from functools import partial
@@ -19,7 +19,7 @@ from .adapter import ChromecastAdapter
 from .listeners import register_mpris_adapter
 
 
-LOG_FILE_MODE: str = 'w'  # create a new log file on each run
+LOG_FILE_MODE: str = 'w'  # create a new log on service start
 
 
 FuncMaybe = Optional[Callable]
@@ -76,13 +76,6 @@ class DaemonArgs(NamedTuple):
   icon: bool
   log_level: str
 
-  @property
-  def file(self) -> Path:
-    name, host, uuid, *_ = self
-    device = name or host or uuid or NO_DEVICE
-
-    return ARGS.with_stem(f'{device}-args')
-
   @staticmethod
   def load() -> ArgsMaybe:
     if ARGS.exists():
@@ -95,6 +88,13 @@ class DaemonArgs(NamedTuple):
   def delete():
     if ARGS.exists():
       ARGS.unlink()
+
+  @property
+  def file(self) -> Path:
+    name, host, uuid, *_ = self
+    device = name or host or uuid or NO_DEVICE
+
+    return ARGS.with_stem(f'{device}-args')
 
   def save(self) -> Path:
     dump = pickle.dumps(self)
@@ -199,7 +199,7 @@ def run_server(
   mpris = retry_until_found(name, host, uuid, wait, retry_wait)
 
   if mpris and icon:
-    mpris.adapter.wrapper.set_icon(True)
+    mpris.adapter.set_icon(True)
 
   if not mpris:
     device = name or host or uuid or NO_DEVICE

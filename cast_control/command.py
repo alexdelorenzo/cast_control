@@ -13,6 +13,7 @@ from .run import MprisDaemon, DaemonArgs, get_daemon, \
 
 LOG_MODE: str = 'r'
 LOG_END: str = ''
+NOT_RUNNING_MSG: str = "Daemon isn't running."
 
 HELP: str = """
 Control casting devices via Linux media controls and desktops.
@@ -21,6 +22,7 @@ This daemon connects your casting device directly to the D-Bus media player inte
 """
 
 
+# see https://alexdelorenzo.dev/notes/click
 class OrderCommands(click.Group):
   """List `click` commands in the order they're declared."""
 
@@ -149,7 +151,7 @@ def disconnect():
   daemon = get_daemon()
 
   if not daemon.pid:
-    logging.warning("Daemon isn't running.")
+    logging.warning(NOT_RUNNING_MSG)
     sys.exit(RC_NOT_RUNNING)
 
   daemon.stop()
@@ -167,7 +169,7 @@ def reconnect():
     daemon = get_daemon_from_args(run_safe, args)
 
   if not args or not daemon.pid:
-    logging.warning("Daemon isn't running.")
+    logging.warning(NOT_RUNNING_MSG)
     sys.exit(RC_NOT_RUNNING)
 
   daemon.restart()
@@ -176,7 +178,7 @@ def reconnect():
 @service.command(
   help='Show the service log.'
 )
-def show():
+def log():
   print(f"<Log file: {LOG}>")
 
   # a large log could crash Python or the system
