@@ -3,7 +3,7 @@ from typing import Optional, Any, List, Union, Tuple, \
   NamedTuple, Callable, Set
 from pathlib import Path
 from mimetypes import guess_type
-from collections import deque
+from functools import lru_cache
 
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.controllers.media import MediaStatus, \
@@ -309,6 +309,7 @@ class IconsMixin(Wrapper):
 
     return str(DEFAULT_THUMB)
 
+  @lru_cache
   def get_desktop_entry(self) -> str:
     path = create_desktop_file(light_icon=self.light_icon)
 
