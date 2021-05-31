@@ -490,11 +490,7 @@ class DeviceWrapper(
   VolumeMixin,
   AbilitiesMixin,
 ):
-  '''
-  A wrapper to make it easier to switch out backend implementations.
-
-  Holds common logic for dealing with underlying Chromecast API.
-  '''
+  '''Wraps implementation details for device API'''
 
   def __init__(self, dev: Chromecast):
     self.dev = dev
