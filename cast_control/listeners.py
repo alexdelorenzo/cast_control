@@ -46,15 +46,14 @@ class DeviceEventAdapter(EventAdapter):
   def __init__(
     self,
     name: str,
-    chromecast: Chromecast,
+    device: Chromecast,
     server: Server,
     adapter: Optional[MprisAdapter] = None
   ):
     self.name = name
-    self.chromecast = chromecast
+    self.dev = device
     self.server = server
     self.adapter = adapter
-    self.cc = chromecast
     super().__init__(self.server.player, self.server.root)
 
 
@@ -94,11 +93,11 @@ class DeviceEventListener(
 
 
 def register_mpris_adapter(
-  chromecast: Chromecast,
+  device: Chromecast,
   server: Server,
   adapter: MprisAdapter
 ):
   event_listener = \
-    DeviceEventListener(chromecast.name, chromecast, server, adapter)
-  chromecast.media_controller.register_status_listener(event_listener)
-  chromecast.register_status_listener(event_listener)
+    DeviceEventListener(device.name, device, server, adapter)
+  device.media_controller.register_status_listener(event_listener)
+  device.register_status_listener(event_listener)

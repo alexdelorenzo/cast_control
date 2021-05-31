@@ -57,7 +57,7 @@ class Titles(NamedTuple):
 
 
 class Wrapper(Protocol):
-  cc: Chromecast
+  dev: Chromecast
   light_icon: bool = False
 
   @property
@@ -79,12 +79,12 @@ class Wrapper(Protocol):
 
 class StatusMixin(Wrapper):
   def __getattr__(self, name: str) -> Any:
-    return getattr(self.cc, name)
+    return getattr(self.dev, name)
 
   @property
   def cast_status(self) -> Optional[CastStatus]:
-    if self.cc.status:
-      return self.cc.status
+    if self.dev.status:
+      return self.dev.status
 
     return None
 
@@ -97,7 +97,7 @@ class StatusMixin(Wrapper):
 
   @property
   def media_controller(self) -> MediaController:
-    return self.cc.media_controller
+    return self.dev.media_controller
 
 
 class ControllersMixin(Wrapper):
@@ -114,7 +114,7 @@ class ControllersMixin(Wrapper):
     super().__init__()
 
   def _register(self, controller: BaseController):
-    self.cc.register_handler(controller)
+    self.dev.register_handler(controller)
 
   def _launch_youtube(self):
     self.yt_ctl.launch()
@@ -190,7 +190,7 @@ class TitlesMixin(Wrapper):
       if album:
         titles.append(album)
 
-    app_name = self.cc.app_display_name
+    app_name = self.dev.app_display_name
 
     if app_name:
       titles.append(app_name)
@@ -387,7 +387,7 @@ class PlaybackMixin(Wrapper):
     self.media_controller.queue_prev()
 
   def quit(self):
-    self.cc.quit_app()
+    self.dev.quit_app()
 
   def next(self):
     self.play_next()
@@ -427,10 +427,10 @@ class VolumeMixin(Wrapper):
 
     # can't adjust vol by 0
     if delta > NO_DELTA:  # vol up
-      self.cc.volume_up(delta)
+      self.dev.volume_up(delta)
 
     elif delta < NO_DELTA:
-      self.cc.volume_down(abs(delta))
+      self.dev.volume_down(abs(delta))
 
   def is_mute(self) -> Optional[bool]:
     if self.cast_status:
@@ -439,7 +439,7 @@ class VolumeMixin(Wrapper):
     return False
 
   def set_mute(self, val: bool):
-    self.cc.set_volume_muted(val)
+    self.dev.set_volume_muted(val)
 
 
 class AbilitiesMixin(Wrapper):
@@ -505,19 +505,19 @@ class ChromecastWrapper(
   Holds common logic for dealing with underlying Chromecast API.
   '''
 
-  def __init__(self, cc: Chromecast):
-    self.cc = cc
+  def __init__(self, dev: Chromecast):
+    self.dev = dev
     super().__init__()
 
   def __repr__(self) -> str:
     cls = type(self)
     cls_name = cls.__name__
 
-    return f'<{cls_name} for {self.cc}>'
+    return f'<{cls_name} for {self.dev}>'
 
   @property
   def name(self) -> str:
-    return self.cc.name or DEFAULT_NAME
+    return self.dev.name or DEFAULT_NAME
 
 
 @enforce_dbus_length
@@ -526,9 +526,9 @@ def get_track_id(name: str) -> DbusObj:
 
 
 def get_media_type(
-  cc: ChromecastWrapper
+  dev: ChromecastWrapper
 ) -> Optional[ChromecastMediaType]:
-  status = cc.media_status
+  status = dev.media_status
 
   if not status:
     return None

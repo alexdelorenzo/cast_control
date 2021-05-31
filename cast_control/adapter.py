@@ -20,7 +20,7 @@ class WrapperIntegration:
     self.wrapper.on_new_status(*args, **kwargs)
 
 
-class ChromecastAdapter(WrapperIntegration, MprisAdapter):
+class CastAdapter(WrapperIntegration, MprisAdapter):
   def __init__(self, chromecast: Chromecast):
     self.wrapper = ChromecastWrapper(chromecast)
     super().__init__(self.wrapper.name)

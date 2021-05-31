@@ -11,11 +11,10 @@ from daemons.prefab.run import RunDaemon
 from pychromecast import Chromecast
 from mpris_server.server import Server
 
-from .base import get_chromecast, Seconds, get_chromecast_via_host, \
-  NoChromecastFoundException, LOG_LEVEL, get_chromecast_via_uuid, \
+from .base import Seconds, NoChromecastFoundException, LOG_LEVEL, \
   DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, DATA_DIR, NAME, LOG, \
   RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS, find_device
-from .adapter import ChromecastAdapter
+from .adapter import CastAdapter
 from .listeners import register_mpris_adapter
 
 
@@ -150,11 +149,11 @@ def create_adapters_and_server(
   if not device:
     return None
 
-  chromecast_adapter = ChromecastAdapter(device)
-  mpris = Server(name=device.name, adapter=chromecast_adapter)
+  adapter = CastAdapter(device)
+  mpris = Server(name=device.name, adapter=adapter)
   mpris.publish()
 
-  register_mpris_adapter(device, mpris, chromecast_adapter)
+  register_mpris_adapter(device, mpris, adapter)
 
   return mpris
 

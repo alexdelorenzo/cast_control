@@ -106,68 +106,68 @@ class Host(NamedTuple):
   friendly_name: str = NO_STR
 
 
-def get_chromecast_via_host(
+def get_device_via_host(
   host: str,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
   info = Host(host)
-  chromecast = get_chromecast_from_host(info, retry_wait=retry_wait)
+  device = get_chromecast_from_host(info, retry_wait=retry_wait)
 
-  if chromecast:
-    chromecast.wait()
-    return chromecast
+  if device:
+    device.wait()
+    return device
 
   return None  # explicit
 
 
-def get_chromecast_via_uuid(
+def get_device_via_uuid(
   uuid: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
-  chromecasts, service_browser = get_chromecasts(retry_wait=retry_wait)
+  devices, service_browser = get_chromecasts(retry_wait=retry_wait)
 
-  if not uuid and not chromecasts:
+  if not uuid and not devices:
     return None
 
   elif not uuid:
-    first, *_ = chromecasts
+    first, *_ = devices
     first.wait()
 
     return first
 
   uuid = UUID(uuid)
 
-  for chromecast in chromecasts:
-    if chromecast.uuid == uuid:
-      chromecast.wait()
+  for device in devices:
+    if device.uuid == uuid:
+      device.wait()
 
-      return chromecast
+      return device
 
   return None
 
 
-def get_chromecast(
+def get_device(
   name: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
-  chromecasts, service_browser = get_chromecasts(retry_wait=retry_wait)
+  devices, service_browser = get_chromecasts(retry_wait=retry_wait)
 
-  if not name and not chromecasts:
+  if not name and not devices:
     return None
 
   elif not name:
-    first, *_ = chromecasts
+    first, *_ = devices
     first.wait()
 
     return first
 
   name = name.lower()
 
-  for chromecast in chromecasts:
-    if chromecast.name.lower() == name:
-      chromecast.wait()
+  for device in devices:
+    if device.name.lower() == name:
+      device.wait()
 
-      return chromecast
+      return device
 
   return None
 
@@ -181,18 +181,18 @@ def find_device(
   device: Optional[Chromecast] = None
 
   if host:
-    device = get_chromecast_via_host(host, retry_wait)
+    device = get_device_via_host(host, retry_wait)
 
   if uuid and not device:
-    device = get_chromecast_via_uuid(uuid, retry_wait)
+    device = get_device_via_uuid(uuid, retry_wait)
 
   if name and not device:
-    device = get_chromecast(name, retry_wait)
+    device = get_device(name, retry_wait)
 
   no_identifiers = not (host or name or uuid)
 
   if no_identifiers:
-    device = get_chromecast(retry_wait=retry_wait)
+    device = get_device(retry_wait=retry_wait)
 
   return device
 
