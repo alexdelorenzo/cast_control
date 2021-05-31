@@ -29,7 +29,7 @@ from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, \
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
-  US_IN_SEC, DEFAULT_DISC_NO, ChromecastMediaType, NO_DESKTOP_FILE, \
+  US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, \
   NAME, create_desktop_file
 
 
@@ -488,7 +488,7 @@ class AbilitiesMixin(Wrapper):
     return False
 
 
-class ChromecastWrapper(
+class DeviceWrapper(
   StatusMixin,
   TitlesMixin,
   ControllersMixin,
@@ -526,27 +526,27 @@ def get_track_id(name: str) -> DbusObj:
 
 
 def get_media_type(
-  dev: ChromecastWrapper
-) -> Optional[ChromecastMediaType]:
+  dev: DeviceWrapper
+) -> Optional[MediaType]:
   status = dev.media_status
 
   if not status:
     return None
 
   if status.media_is_movie:
-    return ChromecastMediaType.MOVIE
+    return MediaType.MOVIE
 
   elif status.media_is_tvshow:
-    return ChromecastMediaType.TVSHOW
+    return MediaType.TVSHOW
 
   elif status.media_is_photo:
-    return ChromecastMediaType.PHOTO
+    return MediaType.PHOTO
 
   elif status.media_is_musictrack:
-    return ChromecastMediaType.MUSICTRACK
+    return MediaType.MUSICTRACK
 
   elif status.media_is_generic:
-    return ChromecastMediaType.GENERIC
+    return MediaType.GENERIC
 
   return None
 

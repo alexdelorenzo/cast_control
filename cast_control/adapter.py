@@ -7,11 +7,11 @@ from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
 from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
   Track
 
-from .wrapper import ChromecastWrapper
+from .wrapper import DeviceWrapper
 
 
 class WrapperIntegration:
-  wrapper: ChromecastWrapper
+  wrapper: DeviceWrapper
 
   def set_icon(self, light_icon: bool):
     self.wrapper.set_icon(light_icon)
@@ -21,8 +21,8 @@ class WrapperIntegration:
 
 
 class CastAdapter(WrapperIntegration, MprisAdapter):
-  def __init__(self, chromecast: Chromecast):
-    self.wrapper = ChromecastWrapper(chromecast)
+  def __init__(self, device: Chromecast):
+    self.wrapper = DeviceWrapper(device)
     super().__init__(self.wrapper.name)
 
   def get_uri_schemes(self) -> List[str]:

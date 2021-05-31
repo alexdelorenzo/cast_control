@@ -11,7 +11,7 @@ from daemons.prefab.run import RunDaemon
 from pychromecast import Chromecast
 from mpris_server.server import Server
 
-from .base import Seconds, NoChromecastFoundException, LOG_LEVEL, \
+from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
   DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, DATA_DIR, NAME, LOG, \
   RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS, find_device
 from .adapter import CastAdapter
@@ -202,7 +202,7 @@ def run_server(
 
   if not mpris:
     device = name or host or uuid or NO_DEVICE
-    raise NoChromecastFoundException(device)
+    raise NoDevicesFound(device)
 
   mpris.loop()
 
@@ -229,6 +229,6 @@ def run_safe(
       set_logging
     )
 
-  except NoChromecastFoundException as e:
+  except NoDevicesFound as e:
     logging.warning(f"{e} not found")
     sys.exit(RC_NO_CHROMECAST)

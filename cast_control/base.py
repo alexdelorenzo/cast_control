@@ -86,11 +86,11 @@ DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]
 
 
-class NoChromecastFoundException(Exception):
+class NoDevicesFound(Exception):
   pass
 
 
-class ChromecastMediaType(AutoName):
+class MediaType(AutoName):
   GENERIC = auto()
   MOVIE = auto()
   MUSICTRACK = auto()
