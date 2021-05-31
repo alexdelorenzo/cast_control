@@ -210,15 +210,6 @@ class TitlesMixin(Wrapper):
 
     return None
 
-  def get_stream_title(self) -> Optional[str]:
-    return self.titles.title
-
-  def get_artist(self) -> Optional[str]:
-    return self.titles.artist
-
-  def get_album(self) -> Optional[str]:
-    return self.titles.album
-
 
 class TimeMixin(Wrapper):
   def __init__(self,):
