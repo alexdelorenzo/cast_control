@@ -14,7 +14,9 @@ from .run import MprisDaemon, DaemonArgs, get_daemon, \
 
 LOG_MODE: str = 'r'
 LOG_END: str = ''
+
 NOT_RUNNING_MSG: str = "Daemon isn't running."
+
 COPYRIGHT: str = \
   f'Copyright 2021 {__author__}. Licensed under terms of the {LICENSE}.'
 VERSION_INFO: str = f'{NAME} v{__version__}'
