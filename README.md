@@ -1,7 +1,7 @@
 # 📺 Control Chromecasts from Linux
 `cast_control` is [a daemon](https://en.wikipedia.org/wiki/Daemon_(computing)) utility that allows you to control media playback on casting devices from the Linux desktop.
 
-While this service runs, it will collect data about the media and apps playing on your casting devices and display it on your computer.
+While this service runs, it will collect data about the media and apps playing on your casting devices and display it on your computer https://alexdelorenzo.dev/notes/click.
 
 ### Integrations
 `cast_control` controls Chromecasts and casting devices via D-Bus and [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
@@ -66,7 +66,7 @@ Once you have a source copy, run `python3 -m pip install -r requirements.txt`, f
 You'll get a `cast_control` executable added to your `$PATH`.
 
 ### AUR
-If you're on Arch, you can install `cast_control` [directly from the AUR](https://aur.archlinux.org/packages/cast_control/). Thanks,  [@yochananmarqos](https://github.com/yochananmarqos)!
+If you're on Arch, you can install `cast_control` [directly from the AUR](https://aur.archlinux.org/packages/cast_control/). Thanks, [@yochananmarqos](https://github.com/yochananmarqos)!
 
 ```bash
 $ yay -S cast_control
