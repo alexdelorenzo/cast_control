@@ -66,7 +66,7 @@ Once you have a source copy, run `python3 -m pip install -r requirements.txt`, f
 You'll get a `cast_control` executable added to your `$PATH`.
 
 ### AUR
-If you're on Arch, you can install `cast_control` [directly from the AUR](https://aur.archlinux.org/packages/cast_control/). Thanks, @yochananmarqos!
+If you're on Arch, you can install `cast_control` [directly from the AUR](https://aur.archlinux.org/packages/cast_control/). Thanks,  [@yochananmarqos](https://github.com/yochananmarqos)!
 
 ```bash
 $ yay -S cast_control
