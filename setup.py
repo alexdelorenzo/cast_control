@@ -37,7 +37,7 @@ PKG_DATA: Dict[str, List[str]] = {
 
 PROJECT_URLS: Dict[str, str] = {
   'Homepage': 'https://alexdelorenzo.dev/',
-  'GitHub': HOMEPAGE
+  'Source': HOMEPAGE
 }
 
 setup(
