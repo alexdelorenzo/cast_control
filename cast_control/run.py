@@ -19,6 +19,8 @@ from .listeners import register_mpris_adapter
 
 
 LOG_FILE_MODE: str = 'w'  # create a new log on service start
+DEFAULT_ICON: bool = False
+DEFAULT_SET_LOG: bool = False
 
 
 FuncMaybe = Optional[Callable]
@@ -27,6 +29,15 @@ FuncMaybe = Optional[Callable]
 class MprisDaemon(RunDaemon):
   target: FuncMaybe = None
   args: ArgsMaybe = None
+  _logging: Optional[str] = None
+
+  @property
+  def logging(self) -> Optional[str]:
+    return self._logging
+
+  @logging.setter
+  def logging(self, val: Optional[str]):
+    self._logging = val
 
   def set_target(
     self,
@@ -50,13 +61,17 @@ class MprisDaemon(RunDaemon):
       return
 
     self.args = args
-    self.target = partial(func, *args)
+    self.logging = args.set_logging
+    self.target = partial(func, args)
 
   def setup_logging(self):
-    if not self.args:
-      return
+    if self.args:
+      level = self.args.log_level
 
-    set_log_level(self.args.log_level, file=LOG)
+    else:
+      level = self.logging
+
+    set_log_level(level, file=LOG)
 
   def run(self):
     if not self.target:
@@ -70,10 +85,11 @@ class DaemonArgs(NamedTuple):
   name: Optional[str]
   host: Optional[str]
   uuid: Optional[str]
-  wait: Optional[float]
-  retry_wait: Optional[float]
-  icon: bool
-  log_level: str
+  wait: Optional[float] = DEFAULT_WAIT
+  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT
+  icon: bool = DEFAULT_ICON
+  log_level: str = LOG_LEVEL
+  set_logging: bool = DEFAULT_SET_LOG
 
   @staticmethod
   def load() -> ArgsMaybe:
@@ -88,16 +104,16 @@ class DaemonArgs(NamedTuple):
     if ARGS.exists():
       ARGS.unlink()
 
+  def save(self) -> Path:
+    dump = pickle.dumps(self)
+    ARGS.write_bytes(dump)
+
   @property
   def file(self) -> Path:
     name, host, uuid, *_ = self
     device = name or host or uuid or NO_DEVICE
 
     return ARGS.with_stem(f'{device}-args')
-
-  def save(self) -> Path:
-    dump = pickle.dumps(self)
-    ARGS.write_bytes(dump)
 
 
 ArgsMaybe = Optional[DaemonArgs]
@@ -188,9 +204,9 @@ def run_server(
   uuid: Optional[str],
   wait: Optional[float] = DEFAULT_WAIT,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-  icon: bool = False,
+  icon: bool = DEFAULT_ICON,
   log_level: str = LOG_LEVEL,
-  set_logging: bool = False,
+  set_logging: bool = DEFAULT_SET_LOG,
 ):
   if set_logging:
     set_log_level(log_level)
@@ -208,26 +224,10 @@ def run_server(
 
 
 def run_safe(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  wait: Optional[float],
-  retry_wait: Optional[float],
-  icon: bool,
-  log_level: str,
-  set_logging: bool = False,
+  args: DaemonArgs
 ):
   try:
-    run_server(
-      name,
-      host,
-      uuid,
-      wait,
-      retry_wait,
-      icon,
-      log_level,
-      set_logging
-    )
+    run_server(*args)
 
   except NoDevicesFound as e:
     logging.warning(f"{e} not found")
