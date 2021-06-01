@@ -17,11 +17,12 @@ from pychromecast import Chromecast, get_chromecasts, \
 from mpris_server.base import AutoName
 from aiopath import AsyncPath
 
+from . import NAME
+
 
 Seconds = int
 
 
-NAME: str = 'cast_control'
 DESKTOP_NAME: str = 'Cast Control'
 LOG_LEVEL: str = 'WARN'
 

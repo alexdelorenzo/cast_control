@@ -2,13 +2,10 @@ from typing import Dict, List
 from setuptools import setup
 from pathlib import Path
 
-from cast_control import HOMEPAGE, \
-  __version__, __author__
+from cast_control import HOMEPAGE, LICENSE, NAME, \
+  SHORT_NAME, DESCRIPTION, __version__, __author__
 
 
-NAME: str = 'cast_control'
-SHORT_NAME: str = 'castctl'
-LICENSE: str = 'AGPL-3.0'
 PY_VERSION: str = '>=3.7'
 
 CMD_PT: str = f'{NAME}.command:cmd'
@@ -25,6 +22,7 @@ REQS: List[str] = Path('requirements.txt') \
   .split('\n')
 
 README: str = Path('README.md').read_text()
+CONTENT_TYPE: str = 'text/markdown'
 
 ASSET_DIRS: List[str] = [
   'assets/cast_control.desktop',
@@ -43,9 +41,9 @@ PROJECT_URLS: Dict[str, str] = {
 setup(
   name=NAME,
   version=__version__,
-  description='📺 Control Chromecasts from Linux and D-Bus',
+  description=DESCRIPTION,
   long_description=README,
-  long_description_content_type='text/markdown',
+  long_description_content_type=CONTENT_TYPE,
   url=HOMEPAGE,
   project_urls=PROJECT_URLS,
   author=__author__,
