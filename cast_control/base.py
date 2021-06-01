@@ -53,7 +53,7 @@ NO_DESKTOP_FILE: str = ''
 APP_DIRS = AppDirs(NAME)
 
 
-async def get_user_dirs() -> List[Path]:
+async def get_user_dirs() -> Tuple[Path, Path, Path]:
   data_dir = AsyncPath(APP_DIRS.user_data_dir)
   log_dir = AsyncPath(APP_DIRS.user_log_dir)
   state_dir = AsyncPath(APP_DIRS.user_state_dir)
@@ -66,7 +66,7 @@ async def get_user_dirs() -> List[Path]:
 
   await gather(*coros)
 
-  return list(map(Path, dirs))
+  return tuple(map(Path, dirs))
 
 
 DATA_DIR, LOG_DIR, STATE_DIR = run(
