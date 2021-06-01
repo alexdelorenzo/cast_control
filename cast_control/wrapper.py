@@ -246,7 +246,8 @@ class TimeMixin(Wrapper):
     position_secs = status.adjusted_current_time
 
     if position_secs:
-      return int(position_secs * US_IN_SEC)
+      position_us = position_secs * US_IN_SEC
+      return round(position_us)
 
     return BEGINNING
 
