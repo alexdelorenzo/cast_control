@@ -51,6 +51,8 @@ STAT_CACHE_SIZE: int = 2
 DESKTOP_SUFFIX: str = '.desktop'
 NO_DESKTOP_FILE: str = ''
 
+ARGS_STEM: str = '-args'
+
 APP_DIRS = AppDirs(NAME)
 
 
@@ -75,7 +77,7 @@ DATA_DIR, LOG_DIR, STATE_DIR = run(
 )
 
 PID: Path = STATE_DIR / f'{NAME}.pid'
-ARGS: Path = STATE_DIR / 'service-args.tmp'
+ARGS: Path = STATE_DIR / f'service{ARGS_STEM}.tmp'
 LOG: Path = LOG_DIR / f'{NAME}.log'
 
 SRC_DIR = Path(__file__).parent

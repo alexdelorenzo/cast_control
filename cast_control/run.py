@@ -13,7 +13,8 @@ from mpris_server.server import Server
 
 from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
   DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, DATA_DIR, NAME, LOG, \
-  RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS, find_device
+  RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS, find_device, \
+  ARGS_STEM
 from .adapter import CastAdapter
 from .listeners import register_mpris_adapter
 
@@ -82,9 +83,9 @@ class MprisDaemon(RunDaemon):
 
 
 class DaemonArgs(NamedTuple):
-  name: Optional[str]
-  host: Optional[str]
-  uuid: Optional[str]
+  name: Optional[str] = None
+  host: Optional[str] = None
+  uuid: Optional[str] = None
   wait: Optional[float] = DEFAULT_WAIT
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT
   icon: bool = DEFAULT_ICON
@@ -113,7 +114,7 @@ class DaemonArgs(NamedTuple):
     name, host, uuid, *_ = self
     device = name or host or uuid or NO_DEVICE
 
-    return ARGS.with_stem(f'{device}-args')
+    return ARGS.with_stem(f'{device}{ARGS_STEM}')
 
 
 ArgsMaybe = Optional[DaemonArgs]

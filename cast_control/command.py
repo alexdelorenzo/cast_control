@@ -46,16 +46,16 @@ class OrderCommands(click.Group):
   is_flag=True, default=False, type=click.BOOL,
   help="Show version information.")
 @click.pass_context
-def cmd(
+def cli(
   ctx: click.Context,
   license: bool,
   version: bool,
 ):
   if license:
-    print(COPYRIGHT)
+    click.echo(COPYRIGHT)
 
   if version:
-    print(VERSION_INFO)
+    click.echo(VERSION_INFO)
 
   if license or version:
     sys.exit(RC_OK)
@@ -63,11 +63,11 @@ def cmd(
   elif ctx.invoked_subcommand:
     return
 
-  help = cmd.get_help(ctx)
+  help: str = cli.get_help(ctx)
   click.echo(help)
 
 
-@cmd.command(
+@cli.command(
   help='Connect to the device and run the service in the foreground.',
 )
 @click.option('--name', '-n',
@@ -114,7 +114,7 @@ def connect(
   run_safe(args)
 
 
-@cmd.group(
+@cli.group(
   cls=OrderCommands,
   help='Connect, disconnect or reconnect the background service to or from your device.',
 )
@@ -212,7 +212,7 @@ def reconnect():
   help='Show the service log.'
 )
 def log():
-  print(f"<Log file: {LOG}>")
+  click.echo(f"<Log file: {LOG}>")
 
   # a large log could hang Python or the system
   # iterate over the file instead of using Path.read_text()
@@ -222,4 +222,4 @@ def log():
 
 
 if __name__ == "__main__":
-  cmd()
+  cli()
