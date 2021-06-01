@@ -19,7 +19,7 @@ ENTRY_POINTS: Dict[str, List[str]] = {
 
 REQS: List[str] = Path('requirements.txt') \
   .read_text() \
-  .split('\n')
+  .splitlines()
 
 README: str = Path('README.md').read_text()
 CONTENT_TYPE: str = 'text/markdown'
