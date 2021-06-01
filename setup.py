@@ -2,7 +2,7 @@ from typing import Dict, List
 from setuptools import setup
 from pathlib import Path
 
-from cast_control import \
+from cast_control import HOMEPAGE, \
   __version__, __author__
 
 
@@ -36,7 +36,8 @@ PKG_DATA: Dict[str, List[str]] = {
 }
 
 PROJECT_URLS: Dict[str, str] = {
-  'Homepage': 'https://alexdelorenzo.dev/'
+  'Homepage': 'https://alexdelorenzo.dev/',
+  'GitHub': HOMEPAGE
 }
 
 setup(
@@ -45,7 +46,7 @@ setup(
   description='📺 Control Chromecasts from Linux and D-Bus',
   long_description=README,
   long_description_content_type='text/markdown',
-  url='https://github.com/alexdelorenzo/cast_control',
+  url=HOMEPAGE,
   project_urls=PROJECT_URLS,
   author=__author__,
   license=LICENSE,
