@@ -125,8 +125,12 @@ Usage: cast_control [OPTIONS] COMMAND [ARGS]...
   This daemon connects your casting device directly to the D-Bus media player
   interface.
 
+  See https://github.com/alexdelorenzo/cast_control for more information.
+
 Options:
-  --help  Show this message and exit.
+  -L, --license  Show license and copyright information.
+  -V, --version  Show version information.
+  --help         Show this message and exit.
 
 Commands:
   connect  Connect to the device and run the service in the foreground.
