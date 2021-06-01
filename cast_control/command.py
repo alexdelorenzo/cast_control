@@ -45,7 +45,12 @@ class OrderCommands(click.Group):
 @click.option('--version', '-V',
   is_flag=True, default=False, type=click.BOOL,
   help="Show version information.")
-def cmd(license: bool, version: bool):
+@click.pass_context
+def cmd(
+  ctx: click.Context,
+  license: bool,
+  version: bool,
+):
   if license:
     print(COPYRIGHT)
 
@@ -54,6 +59,12 @@ def cmd(license: bool, version: bool):
 
   if license or version:
     sys.exit(RC_OK)
+
+  elif ctx.invoked_subcommand:
+    return
+
+  help = cmd.get_help(ctx)
+  click.echo(help)
 
 
 @cmd.command(
