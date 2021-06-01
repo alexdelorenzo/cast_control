@@ -5,8 +5,9 @@ import sys
 
 import click
 
-from .base import RC_NO_CHROMECAST, LOG_LEVEL, \
-  DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG
+from . import __version__, __author__, LICENSE, HOMEPAGE
+from .base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
+  DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
 from .run import MprisDaemon, DaemonArgs, get_daemon, \
   run_safe, get_daemon_from_args
 
@@ -14,25 +15,43 @@ from .run import MprisDaemon, DaemonArgs, get_daemon, \
 LOG_MODE: str = 'r'
 LOG_END: str = ''
 NOT_RUNNING_MSG: str = "Daemon isn't running."
+COPYRIGHT: str = \
+  f'Copyright 2021 {__author__}. Licensed under terms of the {LICENSE}.'
+VERSION_INFO: str = f'{NAME} v{__version__}'
 
-HELP: str = """
+HELP: str = f"""
 Control casting devices via Linux media controls and desktops.
 
 This daemon connects your casting device directly to the D-Bus media player interface.
+
+See {HOMEPAGE} for more information.
 """
 
 
 # see https://alexdelorenzo.dev/notes/click
 class OrderCommands(click.Group):
-  """List `click` commands in the order they're declared."""
+  '''List `click` commands in the order they're declared.'''
 
   def list_commands(self, ctx: click.Command) -> List[str]:
     return list(self.commands)
 
 
-@click.group(help=HELP)
-def cmd():
-  pass
+@click.group(help=HELP, invoke_without_command=True)
+@click.option('--license', '-L',
+  is_flag=True, default=False, type=click.BOOL,
+  help="Show license and copyright information.")
+@click.option('--version', '-V',
+  is_flag=True, default=False, type=click.BOOL,
+  help="Show version information.")
+def cmd(license: bool, version: bool):
+  if license:
+    print(COPYRIGHT)
+
+  if version:
+    print(VERSION_INFO)
+
+  if license or version:
+    sys.exit(RC_OK)
 
 
 @cmd.command(
@@ -75,10 +94,11 @@ def connect(
     wait,
     retry_wait,
     icon,
-    log_level
+    log_level,
+    set_logging=True
   )
 
-  run_safe(*args, set_logging=True)
+  run_safe(args)
 
 
 @cmd.group(
