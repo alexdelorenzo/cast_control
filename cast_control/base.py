@@ -25,6 +25,7 @@ NAME: str = 'cast_control'
 DESKTOP_NAME: str = 'Cast Control'
 LOG_LEVEL: str = 'WARN'
 
+RC_OK: int = 0
 RC_NO_CHROMECAST: int = 1
 RC_NOT_RUNNING: int = 2
 
@@ -43,6 +44,8 @@ DEFAULT_DISC_NO: int = 1
 
 DEFAULT_RETRY_WAIT: float = 5.0
 DEFAULT_WAIT: Seconds = 30
+
+STAT_CACHE_SIZE: int = 2
 
 DESKTOP_SUFFIX: str = '.desktop'
 NO_DESKTOP_FILE: str = ''
@@ -197,7 +200,7 @@ def find_device(
   return device
 
 
-@lru_cache
+@lru_cache(maxsize=STAT_CACHE_SIZE)
 def get_stat(file: Path) -> stat_result:
   return file.stat()
 
@@ -209,7 +212,6 @@ def get_template() -> List[str]:
     .splitlines()
 
 
-@lru_cache
 def is_older_than_module(other: Path) -> bool:
   src_stat = get_stat(SRC_DIR)
   other_stat = get_stat(other)
