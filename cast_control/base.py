@@ -171,10 +171,10 @@ def get_device(
 
     return first
 
-  name = name.lower()
+  name = name.casefold()
 
   for device in devices:
-    if device.name.lower() == name:
+    if device.name.casefold() == name:
       device.wait()
 
       return device

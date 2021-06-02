@@ -23,7 +23,7 @@ from mpris_server.compat import get_dbus_name, enforce_dbus_length
 from .types import Protocol, runtime_checkable
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, \
-  NAME, create_desktop_file
+  NAME, create_desktop_file, DEFAULT_ICON
 
 
 DEFAULT_NAME: str = NAME
@@ -52,7 +52,7 @@ class Titles(NamedTuple):
 @runtime_checkable
 class Wrapper(Protocol):
   dev: Chromecast
-  light_icon: bool = False
+  light_icon: bool = DEFAULT_ICON
 
   @property
   def cast_status(self) -> Optional[CastStatus]:
@@ -119,13 +119,19 @@ class ControllersMixin(Wrapper):
 
     self.yt_ctl.play_video(video_id)
 
+  def _is_youtube_vid(self, content_id: str) -> bool:
+    if not content_id or not self.yt_ctl.is_active:
+      return False
+
+    return content_id.startswith('http')
+
   def _get_url(self) -> Optional[str]:
     content_id = None
 
     if self.media_status:
       content_id = self.media_status.content_id
 
-    if content_id and 'http' not in content_id and self.yt_ctl.is_active:
+    if self._is_youtube_vid(content_id):
       return f'{YT_VID_URL}{content_id}'
 
     return content_id
@@ -413,7 +419,7 @@ class VolumeMixin(Wrapper):
     if curr is None:
       return
 
-    delta = val - curr
+    delta: float = val - curr
 
     # can't adjust vol by 0
     if delta > NO_DELTA:  # vol up
@@ -538,7 +544,7 @@ def get_media_type(
 
 
 def is_youtube(uri: str) -> bool:
-  uri = uri.lower()
+  uri = uri.casefold()
   return any(yt in uri for yt in YOUTUBE_URLS)
 
 
