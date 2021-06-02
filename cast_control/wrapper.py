@@ -26,7 +26,6 @@ from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   NAME, create_desktop_file, DEFAULT_ICON
 
 
-DEFAULT_NAME: str = NAME
 NO_ARTIST: str = ''
 TITLE_SEP: str = ' - '
 MAX_TITLES: int = 3
@@ -53,6 +52,10 @@ class Titles(NamedTuple):
 class Wrapper(Protocol):
   dev: Chromecast
   light_icon: bool = DEFAULT_ICON
+
+  @property
+  def name(self) -> str:
+    return self.dev.name or NAME
 
   @property
   def cast_status(self) -> Optional[CastStatus]:
@@ -506,10 +509,6 @@ class DeviceWrapper(
     cls_name = cls.__name__
 
     return f'<{cls_name} for {self.dev}>'
-
-  @property
-  def name(self) -> str:
-    return self.dev.name or DEFAULT_NAME
 
 
 @enforce_dbus_length
