@@ -17,11 +17,10 @@ from pychromecast import Chromecast
 
 from mpris_server.adapters import Metadata, PlayState, \
   Microseconds, VolumeDecimal, RateDecimal
-from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, \
-  Track, Album, Artist
+from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
-from .types import Protocol
+from .types import Protocol, runtime_checkable
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, \
   NAME, create_desktop_file
@@ -50,6 +49,7 @@ class Titles(NamedTuple):
   album: Optional[str] = None
 
 
+@runtime_checkable
 class Wrapper(Protocol):
   dev: Chromecast
   light_icon: bool = False
@@ -401,7 +401,7 @@ class PlaybackMixin(Wrapper):
 
 
 class VolumeMixin(Wrapper):
-  def get_volume(self) -> VolumeDecimal:
+  def get_volume(self) -> Optional[VolumeDecimal]:
     if not self.cast_status:
       return None
 
@@ -409,6 +409,10 @@ class VolumeMixin(Wrapper):
 
   def set_volume(self, val: VolumeDecimal):
     curr = self.get_volume()
+
+    if curr is None:
+      return
+
     delta = val - curr
 
     # can't adjust vol by 0
