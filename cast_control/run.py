@@ -14,7 +14,7 @@ from mpris_server.server import Server
 from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
   DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, DATA_DIR, NAME, LOG, \
   RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS, find_device, \
-  ARGS_STEM, LOG_FILE_MODE, DEFAULT_ICON, DEFAULT_SET_LOG
+  ARGS_STEM, LOG_FILE_MODE, DEFAULT_ICON, DEFAULT_SET_LOG, set_log_level
 from .adapter import CastAdapter
 from .listeners import register_mpris_adapter
 from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
@@ -22,18 +22,6 @@ from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
 
 
 FuncMaybe = Optional[Callable]
-
-
-def set_log_level(
-  level: str = LOG_LEVEL,
-  file: Optional[Path] = None,
-):
-  level = level.upper()
-  logging.basicConfig(
-    level=level,
-    filename=file,
-    filemode=LOG_FILE_MODE
-  )
 
 
 def create_adapters_and_server(

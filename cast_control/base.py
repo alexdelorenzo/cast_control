@@ -207,6 +207,18 @@ def find_device(
   return device
 
 
+def set_log_level(
+  level: str = LOG_LEVEL,
+  file: Optional[Path] = None,
+):
+  level = level.upper()
+  logging.basicConfig(
+    level=level,
+    filename=file,
+    filemode=LOG_FILE_MODE
+  )
+
+
 def get_stat(file: Path) -> stat_result:
   return file.stat()
 
