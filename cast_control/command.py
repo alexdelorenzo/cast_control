@@ -5,7 +5,8 @@ import sys
 
 import click
 
-from . import __version__, __author__, LICENSE, HOMEPAGE
+from . import __version__, __author__, LICENSE, HOMEPAGE, \
+  ENTRYPOINT_NAME
 from .base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
 from .run import MprisDaemon, DaemonArgs, get_daemon, \
@@ -65,6 +66,9 @@ def cli(
 
   help: str = cli.get_help(ctx)
   click.echo(help)
+
+
+assert cli.__name__ == ENTRYPOINT_NAME
 
 
 @cli.command(

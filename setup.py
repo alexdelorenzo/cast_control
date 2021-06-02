@@ -3,12 +3,13 @@ from setuptools import setup
 from pathlib import Path
 
 from cast_control import HOMEPAGE, LICENSE, NAME, \
-  SHORT_NAME, DESCRIPTION, __version__, __author__
+  SHORT_NAME, DESCRIPTION, __version__, __author__, \
+  ENTRYPOINT_NAME
 
 
 PY_VERSION: str = '>=3.7'
 
-CMD_PT: str = f'{NAME}.command:cli'
+CMD_PT: str = f'{NAME}.command:{ENTRYPOINT_NAME}'
 
 ENTRY_POINTS: Dict[str, List[str]] = {
   'console_scripts': [
