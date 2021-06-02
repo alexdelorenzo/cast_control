@@ -8,7 +8,7 @@ from cast_control import HOMEPAGE, LICENSE, NAME, \
 
 PY_VERSION: str = '>=3.7'
 
-CMD_PT: str = f'{NAME}.command:cmd'
+CMD_PT: str = f'{NAME}.command:cli'
 
 ENTRY_POINTS: Dict[str, List[str]] = {
   'console_scripts': [
