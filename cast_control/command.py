@@ -25,7 +25,7 @@ VERSION_INFO: str = f'{NAME} v{__version__}'
 HELP: str = f'''
 Control casting devices via Linux media controls and desktops.
 
-This daemon connects your casting device directly to the D-Bus media player interface.
+This daemon connects your casting device to the D-Bus media player interface (MPRIS).
 
 See {HOMEPAGE} for more information.
 '''
