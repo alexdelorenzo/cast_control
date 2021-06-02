@@ -50,7 +50,7 @@ LOG_FILE_MODE: str = 'w'  # create a new log on service start
 DEFAULT_ICON: bool = False
 DEFAULT_SET_LOG: bool = False
 
-STAT_CACHE_SIZE: int = 2
+# STAT_CACHE_SIZE: int = 2
 
 DESKTOP_SUFFIX: str = '.desktop'
 NO_DESKTOP_FILE: str = ''
@@ -207,9 +207,13 @@ def find_device(
   return device
 
 
-@lru_cache(maxsize=STAT_CACHE_SIZE)
 def get_stat(file: Path) -> stat_result:
   return file.stat()
+
+
+@lru_cache
+def get_src_stat() -> stat_result:
+  return get_stat(SRC_DIR)
 
 
 @lru_cache
@@ -220,7 +224,7 @@ def get_template() -> List[str]:
 
 
 def is_older_than_module(other: Path) -> bool:
-  src_stat = get_stat(SRC_DIR)
+  src_stat = get_src_stat()
   other_stat = get_stat(other)
 
   return src_stat.st_ctime > other_stat.st_ctime
