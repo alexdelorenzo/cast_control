@@ -13,6 +13,9 @@ from .base import LOG_LEVEL, PID, \
   set_log_level
 
 
+FuncMaybe = Optional[Callable]
+
+
 class MprisDaemon(RunDaemon):
   target: FuncMaybe = None
   args: ArgsMaybe = None

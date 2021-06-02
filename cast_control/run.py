@@ -21,9 +21,6 @@ from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
   get_daemon_from_args
 
 
-FuncMaybe = Optional[Callable]
-
-
 def create_adapters_and_server(
   name: Optional[str],
   host: Optional[str],
