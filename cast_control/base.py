@@ -183,9 +183,9 @@ def get_device(
 
 
 def find_device(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
+  name: Optional[str] = None,
+  host: Optional[str] = None,
+  uuid: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
   device: Optional[Chromecast] = None
@@ -212,6 +212,7 @@ def set_log_level(
   file: Optional[Path] = None,
 ):
   level = level.upper()
+
   logging.basicConfig(
     level=level,
     filename=file,
