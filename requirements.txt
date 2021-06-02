@@ -1,12 +1,12 @@
 # foreign
-appdirs==1.4.4
-click==8.0.1
-PyChromecast==9.1.2
+appdirs>=1.4.4
+click>=8.0.1
+PyChromecast>=9.1.2
 pydbus>=0.6.0
 PyGObject>=3.34.0
 
 # local
-mpris_server==0.2.18
+mpris_server>=0.2.18
 
 # new package
 cast_control>=0.10.2; python_version >= '3.7'
