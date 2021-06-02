@@ -123,7 +123,7 @@ class ControllersMixin(Wrapper):
     if not content_id or not self.yt_ctl.is_active:
       return False
 
-    return content_id.startswith('http')
+    return not content_id.startswith('http')
 
   def _get_url(self) -> Optional[str]:
     content_id = None
