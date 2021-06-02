@@ -6,7 +6,7 @@ import sys
 import click
 
 from . import __version__, __author__, LICENSE, HOMEPAGE, \
-  ENTRYPOINT_NAME, get_name
+  ENTRYPOINT_NAME
 from .base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
 from .run import MprisDaemon, DaemonArgs, get_daemon, \
