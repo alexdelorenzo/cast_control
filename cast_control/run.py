@@ -1,20 +1,16 @@
 from __future__ import annotations
-from typing import Optional, Callable, NamedTuple, Tuple
+from typing import Optional, Callable
 from time import sleep
-from pathlib import Path
-from functools import partial
-import pickle
 import logging
 import sys
 
-from daemons.prefab.run import RunDaemon
 from pychromecast import Chromecast
 from mpris_server.server import Server
 
 from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
-  DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, DATA_DIR, NAME, LOG, \
-  RC_NOT_RUNNING, PID, NO_DEVICE, DEFAULT_WAIT, ARGS, find_device, \
-  ARGS_STEM, LOG_FILE_MODE, DEFAULT_ICON, DEFAULT_SET_LOG, set_log_level
+  DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, NAME, \
+  RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, find_device, \
+  DEFAULT_ICON, DEFAULT_SET_LOG, set_log_level
 from .adapter import CastAdapter
 from .listeners import register_mpris_adapter
 from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
