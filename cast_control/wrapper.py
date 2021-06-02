@@ -1,13 +1,6 @@
 from __future__ import annotations
 from typing import Optional, Any, List, Union, Tuple, \
   NamedTuple, Callable, Set
-
-try:
-  from typing import Protocol
-
-except ImportError:
-  from typing_extensions import Protocol
-
 from pathlib import Path
 from mimetypes import guess_type
 from functools import lru_cache
@@ -28,6 +21,7 @@ from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, \
   Track, Album, Artist
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 
+from .types import Protocol
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, \
   NAME, create_desktop_file

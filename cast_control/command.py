@@ -6,7 +6,7 @@ import sys
 import click
 
 from . import __version__, __author__, LICENSE, HOMEPAGE, \
-  ENTRYPOINT_NAME
+  ENTRYPOINT_NAME, get_name
 from .base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
 from .run import MprisDaemon, DaemonArgs, get_daemon, \
@@ -22,13 +22,13 @@ COPYRIGHT: str = \
   f'Copyright 2021 {__author__}. Licensed under terms of the {LICENSE}.'
 VERSION_INFO: str = f'{NAME} v{__version__}'
 
-HELP: str = f"""
+HELP: str = f'''
 Control casting devices via Linux media controls and desktops.
 
 This daemon connects your casting device directly to the D-Bus media player interface.
 
 See {HOMEPAGE} for more information.
-"""
+'''
 
 
 # see https://alexdelorenzo.dev/notes/click
@@ -68,7 +68,7 @@ def cli(
   click.echo(help)
 
 
-assert cli.__name__ == ENTRYPOINT_NAME
+assert cli.name == ENTRYPOINT_NAME
 
 
 @cli.command(

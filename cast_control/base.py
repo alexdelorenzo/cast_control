@@ -46,6 +46,10 @@ DEFAULT_DISC_NO: int = 1
 DEFAULT_RETRY_WAIT: float = 5.0
 DEFAULT_WAIT: Seconds = 30
 
+LOG_FILE_MODE: str = 'w'  # create a new log on service start
+DEFAULT_ICON: bool = False
+DEFAULT_SET_LOG: bool = False
+
 STAT_CACHE_SIZE: int = 2
 
 DESKTOP_SUFFIX: str = '.desktop'
