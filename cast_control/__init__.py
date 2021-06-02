@@ -1,4 +1,3 @@
-
 __version__ = '0.10.6'
 __author__ = 'Alex DeLorenzo <alex@alexdelorenzo.dev>'
 
@@ -10,4 +9,3 @@ SHORT_NAME: str = 'castctl'
 DESCRIPTION: str = '📺 Control Chromecasts from Linux and D-Bus'
 
 ENTRYPOINT_NAME: str = 'cli'
-
