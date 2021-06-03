@@ -61,14 +61,14 @@ class DeviceEventListener(
   DeviceEventAdapter,
   DeviceEventListenerBase
 ):
-  def _check_volume(self, status: Status):
+  def _update_volume(self, status: Status):
     if not isinstance(status, VolumeStatus.__args__):
       return
 
     self.on_volume()
 
   def _update_metadata(self, status: Status):
-    self._check_volume(status)
+    self._update_volume(status)
 
     # wire up mpris_server with cc events
     self.on_playback()
