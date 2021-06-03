@@ -65,12 +65,7 @@ class DeviceEventListener(
     if not isinstance(status, VolumeStatus.__args__):
       return
 
-    vol = status.volume_level
-    muted = status.volume_muted
-
-    if vol != self.adapter.get_volume() or \
-       muted != self.adapter.is_mute():
-      self.on_volume()
+    self.on_volume()
 
   def _update_metadata(self, status: Status):
     self._check_volume(status)
