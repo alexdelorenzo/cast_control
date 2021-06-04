@@ -1,7 +1,7 @@
 # 📺 Control Chromecasts from Linux
 `cast_control` is [a daemon](https://en.wikipedia.org/wiki/Daemon_(computing)) utility that allows you to control media playback on casting devices from the Linux desktop.
 
-While this service runs, it will collect data about the media and apps playing on your casting devices and display it on your computer.
+While this service runs, it collects data about the media and apps playing on your casting devices and displays it on your computer.
 
 ### Integrations
 `cast_control` controls Chromecasts and casting devices via D-Bus and [MPRIS media player controls](https://specifications.freedesktop.org/mpris-spec/2.2/). 
