@@ -9,3 +9,6 @@ SHORT_NAME: str = 'castctl'
 DESCRIPTION: str = '📺 Control Chromecasts from Linux and D-Bus'
 
 ENTRYPOINT_NAME: str = 'cli'
+CLI_MODULE_NAME: str = f'{NAME}.cli'
+
+CMD_PT: str = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
