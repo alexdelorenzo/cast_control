@@ -87,7 +87,7 @@ class DeviceEventListener(
     self._update_metadata(status)
 
 
-def register_mpris_adapter(
+def register_event_listener(
   device: Chromecast,
   server: Server,
   adapter: MprisAdapter

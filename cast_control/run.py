@@ -12,7 +12,7 @@ from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
   RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, find_device, \
   DEFAULT_ICON, DEFAULT_SET_LOG, set_log_level
 from .adapter import CastAdapter
-from .listeners import register_mpris_adapter
+from .listeners import register_event_listener
 from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
   get_daemon_from_args
 
@@ -32,7 +32,7 @@ def create_adapters_and_server(
   mpris = Server(name=device.name, adapter=adapter)
   mpris.publish()
 
-  register_mpris_adapter(device, mpris, adapter)
+  register_event_listener(device, mpris, adapter)
 
   return mpris
 
