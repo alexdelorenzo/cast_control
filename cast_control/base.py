@@ -67,8 +67,8 @@ async def get_user_dirs() -> Tuple[Path, Path, Path]:
   dirs = data_dir, log_dir, state_dir
 
   coros = (
-    dir.mkdir(parents=True, exist_ok=True)
-    for dir in dirs
+    path.mkdir(parents=True, exist_ok=True)
+    for path in dirs
   )
 
   await gather(*coros)
@@ -86,7 +86,7 @@ LOG: Path = LOG_DIR / f'{NAME}.log'
 
 SRC_DIR = Path(__file__).parent
 ASSETS_DIR: Path = SRC_DIR / 'assets'
-DESKTOP_TEMPLATE: Path = ASSETS_DIR / f'{NAME}{DESKTOP_SUFFIX}'
+DESKTOP_TEMPLATE: Path = ASSETS_DIR / f'template{DESKTOP_SUFFIX}'
 
 ICON_DIR: Path = ASSETS_DIR / 'icon'
 LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
@@ -260,8 +260,8 @@ def new_file_from_template(file: Path, icon_path: Path) -> Path:
 def create_desktop_file(light_icon: bool = True) -> Path:
   icon_path = LIGHT_ICON if light_icon else DARK_ICON
   name_suffix = '-light' if light_icon else '-dark'
-
-  file = DATA_DIR / f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
+  new_name = f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
+  file = DATA_DIR / new_name
 
   if file.exists() and not is_older_than_module(file):
     return file
