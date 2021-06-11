@@ -11,7 +11,6 @@ from pychromecast.controllers.media import MediaStatus, \
 from pychromecast.controllers.youtube import YouTubeController
 from pychromecast.controllers.spotify import SpotifyController
 from pychromecast.controllers.dashcast import DashCastController
-from pychromecast.controllers.bbc import DashCastController
 from pychromecast.controllers.bbciplayer import BbcIplayerController
 from pychromecast.controllers.bbcsounds import BbcSoundsController
 # from pychromecast.controllers.homeassistant import HomeAssistantController
@@ -42,7 +41,6 @@ YT_VID_URL: str = f'https://{YT_LONG}watch?v='
 
 RESOLUTION: int = 1
 NO_SUFFIX: str = ''
-# NO_DURATION = None
 
 
 class Titles(NamedTuple):
