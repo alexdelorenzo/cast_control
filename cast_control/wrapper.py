@@ -13,8 +13,8 @@ from pychromecast.controllers.spotify import SpotifyController
 from pychromecast.controllers.dashcast import DashCastController
 from pychromecast.controllers.bbciplayer import BbcIplayerController
 from pychromecast.controllers.bbcsounds import BbcSoundsController
-# from pychromecast.controllers.homeassistant import HomeAssistantController
-# from pychromecast.controllers.plex import PlexApiController, PlexController
+from pychromecast.controllers.homeassistant import HomeAssistantController
+from pychromecast.controllers.plex import PlexApiController, PlexController
 from pychromecast import Chromecast
 
 from mpris_server.adapters import Metadata, PlayState, \
@@ -55,6 +55,9 @@ class Controllers(NamedTuple):
   dash: DashCastController
   bbc_ip: BbcIplayerController
   bbc_sound: BbcSoundsController
+  ha: HomeAssistantController
+  plex: PlexController
+  plex_api: PlexApiController
 
 
 @runtime_checkable
@@ -119,6 +122,9 @@ class ControllersMixin(Wrapper):
       DashCastController(),
       BbcIplayerController(),
       BbcSoundsController(),
+      HomeAssistantController(),
+      PlexController(),
+      PlexApiController(),
     )
 
     for ctl in self.ctls:
