@@ -4,7 +4,7 @@ from pathlib import Path
 
 from cast_control import HOMEPAGE, LICENSE, NAME, \
   SHORT_NAME, DESCRIPTION, __version__, __author__, \
-  ENTRYPOINT_NAME, CMD_PT
+  ENTRYPOINT_NAME, CMD_PT, ASSET_DIRS
 
 
 PY_VERSION: str = '>=3.7'
@@ -22,11 +22,6 @@ REQS: List[str] = Path('requirements.txt') \
 
 README: str = Path('README.md').read_text()
 CONTENT_TYPE: str = 'text/markdown'
-
-ASSET_DIRS: List[str] = [
-  'assets/*.desktop',
-  'assets/icon/cc-*.png',
-]
 
 PKG_DATA: Dict[str, List[str]] = {
   NAME: ASSET_DIRS

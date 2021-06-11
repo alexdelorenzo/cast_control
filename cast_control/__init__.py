@@ -1,5 +1,6 @@
 __version__ = '0.10.8'
 __author__ = 'Alex DeLorenzo <alex@alexdelorenzo.dev>'
+from typing import List
 
 
 HOMEPAGE: str = "https://github.com/alexdelorenzo/cast_control"
@@ -12,3 +13,8 @@ ENTRYPOINT_NAME: str = 'cli'
 CLI_MODULE_NAME: str = f'{NAME}.cli'
 
 CMD_PT: str = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
+
+ASSET_DIRS: List[str] = [
+  'assets/*.desktop',
+  'assets/icon/cc-*.png',
+]
