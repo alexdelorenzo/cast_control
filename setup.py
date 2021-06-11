@@ -24,7 +24,7 @@ README: str = Path('README.md').read_text()
 CONTENT_TYPE: str = 'text/markdown'
 
 ASSET_DIRS: List[str] = [
-  'assets/cast_control.desktop',
+  'assets/*.desktop',
   'assets/icon/cc-*.png',
 ]
 
