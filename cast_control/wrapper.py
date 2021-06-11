@@ -11,6 +11,9 @@ from pychromecast.controllers.media import MediaStatus, \
 from pychromecast.controllers.youtube import YouTubeController
 from pychromecast.controllers.spotify import SpotifyController
 from pychromecast.controllers.dashcast import DashCastController
+from pychromecast.controllers.bbc import DashCastController
+from pychromecast.controllers.bbciplayer import BbcIplayerController
+from pychromecast.controllers.bbcsounds import BbcSoundsController
 # from pychromecast.controllers.homeassistant import HomeAssistantController
 # from pychromecast.controllers.plex import PlexApiController, PlexController
 from pychromecast import Chromecast
@@ -48,9 +51,18 @@ class Titles(NamedTuple):
   album: Optional[str] = None
 
 
+class Controllers(NamedTuple):
+  yt: YouTubeController
+  spotify: SpotifyController
+  dash: DashCastController
+  bbc_ip: BbcIplayerController
+  bbc_sound: BbcSoundsController
+
+
 @runtime_checkable
 class Wrapper(Protocol):
   dev: Chromecast
+  ctls: Controllers
   light_icon: bool = DEFAULT_ICON
 
   @property
@@ -99,31 +111,35 @@ class StatusMixin(Wrapper):
 
 class ControllersMixin(Wrapper):
   def __init__(self):
-    self.yt_ctl, self.spotify_ctl, self.dash_ctl = ctls = [
+    self._setup_controllers()
+    super().__init__()
+
+  def _setup_controllers(self):
+    self.ctls = Controllers(
       YouTubeController(),
       SpotifyController(),
       DashCastController(),
-    ]
+      BbcIplayerController(),
+      BbcSoundsController(),
+    )
 
-    for ctl in ctls:
+    for ctl in self.ctls:
       self._register(ctl)
-
-    super().__init__()
 
   def _register(self, controller: BaseController):
     self.dev.register_handler(controller)
 
   def _launch_youtube(self):
-    self.yt_ctl.launch()
+    self.ctls.yt.launch()
 
   def _play_youtube(self, video_id: str):
-    if not self.yt_ctl.is_active:
+    if not self.ctls.yt.is_active:
       self._launch_youtube()
 
-    self.yt_ctl.play_video(video_id)
+    self.ctls.yt.play_video(video_id)
 
   def _is_youtube_vid(self, content_id: str) -> bool:
-    if not content_id or not self.yt_ctl.is_active:
+    if not content_id or not self.ctls.yt.is_active:
       return False
 
     return not content_id.startswith('http')
@@ -158,10 +174,10 @@ class ControllersMixin(Wrapper):
     video_id = get_video_id(uri)
 
     if video_id:
-      self.yt_ctl.add_to_queue(video_id)
+      self.ctls.yt.add_to_queue(video_id)
 
     if video_id and set_as_current:
-      self.yt_ctl.play_video(video_id)
+      self.ctls.yt.play_video(video_id)
 
     elif set_as_current:
       self.open_uri(uri)
@@ -313,7 +329,7 @@ class IconsMixin(Wrapper):
 
   @lru_cache
   def get_desktop_entry(self) -> str:
-    path = create_desktop_file(light_icon=self.light_icon)
+    path = create_desktop_file(self.light_icon)
 
     if not path:
       return NO_DESKTOP_FILE
