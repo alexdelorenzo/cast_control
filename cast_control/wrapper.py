@@ -13,14 +13,15 @@ from pychromecast.controllers.spotify import SpotifyController
 from pychromecast.controllers.dashcast import DashCastController
 from pychromecast.controllers.bbciplayer import BbcIplayerController
 from pychromecast.controllers.bbcsounds import BbcSoundsController
-from pychromecast.controllers.homeassistant import HomeAssistantController
+# from pychromecast.controllers.homeassistant import HomeAssistantController
 from pychromecast.controllers.plex import PlexApiController, PlexController
 from pychromecast import Chromecast
 
-from mpris_server.adapters import Metadata, PlayState, \
-  Microseconds, VolumeDecimal, RateDecimal
+from mpris_server.adapters import PlayState, Microseconds, \
+  VolumeDecimal, RateDecimal
 from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
+from mpris_server.metadata import Metadata, MetadataObj
 
 from .types import Protocol, runtime_checkable
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
@@ -55,9 +56,9 @@ class Controllers(NamedTuple):
   dash: DashCastController
   bbc_ip: BbcIplayerController
   bbc_sound: BbcSoundsController
-  ha: HomeAssistantController
   plex: PlexController
-  plex_api: PlexApiController
+  # plex_api: PlexApiController
+  # ha: HomeAssistantController
 
 
 @runtime_checkable
@@ -84,6 +85,10 @@ class Wrapper(Protocol):
 
   @property
   def titles(self) -> Titles:
+    pass
+
+  def on_new_status(self, *args, **kwargs):
+    '''Callback for event listener'''
     pass
 
 
@@ -122,9 +127,9 @@ class ControllersMixin(Wrapper):
       DashCastController(),
       BbcIplayerController(),
       BbcSoundsController(),
-      HomeAssistantController(),
       PlexController(),
-      PlexApiController(),
+      # PlexApiController(),
+      # HomeAssistantController(),
     )
 
     for ctl in self.ctls:
@@ -235,7 +240,7 @@ class TitlesMixin(Wrapper):
 
 
 class TimeMixin(Wrapper):
-  def __init__(self,):
+  def __init__(self):
     self._longest_duration: float = NO_DURATION
     super().__init__()
 
@@ -356,21 +361,21 @@ class MetadataMixin(Wrapper):
     if self.media_status:
       track_no = self.media_status.track
 
-    metadata = {
-      'mpris:trackid': dbus_name,
-      'mpris:length': self.get_duration(),
-      'mpris:artUrl': self.get_art_url(),
-      'xesam:url': self._get_url(),
-      'xesam:title': title,
-      'xesam:artist': artists,
-      'xesam:album': album,
-      'xesam:albumArtist': artists,
-      'xesam:discNumber': DEFAULT_DISC_NO,
-      'xesam:trackNumber': track_no,
-      'xesam:comment': comments,
-    }
+    metadata = MetadataObj(
+      track_id=dbus_name,
+      length=self.get_duration(),
+      art_url=self.get_art_url(),
+      url=self._get_url(),
+      title=title,
+      artist=artists,
+      album=album,
+      album_artist=artists,
+      disc_no=DEFAULT_DISC_NO,
+      track_no=track_no,
+      comment=comments
+    )
 
-    return metadata
+    return metadata.to_dict()
 
 
 class PlaybackMixin(Wrapper):

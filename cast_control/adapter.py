@@ -3,7 +3,7 @@ from typing import List
 from pychromecast import Chromecast
 
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
-  Microseconds, VolumeDecimal, RateDecimal
+  Microseconds, VolumeDecimal, RateDecimal, PlayerAdapter, RootAdapter
 from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
   Track
 
@@ -20,20 +20,24 @@ class WrapperIntegration:
     self.wrapper.on_new_status(*args, **kwargs)
 
 
-class CastAdapter(WrapperIntegration, MprisAdapter):
-  def __init__(self, device: Chromecast):
-    self.wrapper = DeviceWrapper(device)
-    super().__init__(self.wrapper.name)
-
+class DeviceRootAdapter(WrapperIntegration, RootAdapter):
   def get_uri_schemes(self) -> List[str]:
     return URI
 
   def get_mime_types(self) -> List[str]:
     return MIME_TYPES
 
+  def get_desktop_entry(self) -> str:
+    return self.wrapper.get_desktop_entry()
+
   def can_quit(self) -> bool:
     return self.wrapper.can_quit()
 
+  def quit(self):
+    self.wrapper.quit()
+
+
+class DevicePlayerAdapter(WrapperIntegration, PlayerAdapter):
   def can_go_next(self) -> bool:
     return self.wrapper.can_play_next()
 
@@ -51,9 +55,6 @@ class CastAdapter(WrapperIntegration, MprisAdapter):
 
   def can_control(self) -> bool:
     return self.wrapper.can_control()
-
-  def quit(self):
-    self.wrapper.quit()
 
   def get_current_position(self) -> Microseconds:
     return self.wrapper.get_current_position()
@@ -91,12 +92,6 @@ class CastAdapter(WrapperIntegration, MprisAdapter):
   def is_playlist(self) -> bool:
     return self.wrapper.is_playlist()
 
-  def set_repeating(self, val: bool):
-    pass
-
-  def set_loop_status(self, val: str):
-    pass
-
   def get_rate(self) -> RateDecimal:
     return self.wrapper.get_rate()
 
@@ -127,12 +122,6 @@ class CastAdapter(WrapperIntegration, MprisAdapter):
   def get_stream_title(self) -> str:
     return self.wrapper.get_stream_title()
 
-  def get_previous_track(self) -> Track:
-    pass
-
-  def get_next_track(self) -> Track:
-    pass
-
   def get_duration(self) -> Microseconds:
     return self.wrapper.get_duration()
 
@@ -141,9 +130,6 @@ class CastAdapter(WrapperIntegration, MprisAdapter):
 
   def get_current_track(self) -> Track:
     return self.wrapper.get_current_track()
-
-  def get_desktop_entry(self) -> str:
-    return self.wrapper.get_desktop_entry()
 
   def add_track(
     self,
@@ -155,3 +141,25 @@ class CastAdapter(WrapperIntegration, MprisAdapter):
 
   def can_edit_track(self) -> bool:
     return self.wrapper.can_edit_track()
+
+  def set_repeating(self, val: bool):
+    pass
+
+  def set_loop_status(self, val: str):
+    pass
+
+  def get_previous_track(self) -> Track:
+    pass
+
+  def get_next_track(self) -> Track:
+    pass
+
+
+class DeviceAdapter(
+  DevicePlayerAdapter,
+  DeviceRootAdapter,
+  MprisAdapter
+):
+  def __init__(self, device: Chromecast):
+    self.wrapper = DeviceWrapper(device)
+    super().__init__(self.wrapper.name)

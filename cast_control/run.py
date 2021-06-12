@@ -11,7 +11,7 @@ from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
   DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, NAME, \
   RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, find_device, \
   DEFAULT_ICON, DEFAULT_SET_LOG, set_log_level
-from .adapter import CastAdapter
+from .adapter import DeviceAdapter
 from .listeners import register_event_listener
 from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
   get_daemon_from_args
@@ -28,7 +28,7 @@ def create_adapters_and_server(
   if not device:
     return None
 
-  adapter = CastAdapter(device)
+  adapter = DeviceAdapter(device)
   mpris = Server(name=device.name, adapter=adapter)
   mpris.publish()
 
@@ -57,7 +57,7 @@ def retry_until_found(
       return mpris
 
     device = name or host or uuid or NO_DEVICE
-    logging.info(f"{device} not found. Waiting {wait} seconds before retrying.")
+    logging.info(f'{device} not found. Waiting {wait} seconds before retrying.')
     sleep(wait)
 
 
@@ -93,5 +93,5 @@ def run_safe(
     run_server(*args)
 
   except NoDevicesFound as e:
-    logging.warning(f"{e} not found")
+    logging.warning(f'{e} not found')
     sys.exit(RC_NO_CHROMECAST)
