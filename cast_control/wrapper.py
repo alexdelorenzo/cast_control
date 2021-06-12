@@ -250,13 +250,13 @@ class TimeMixin(Wrapper):
     if self.media_status:
       duration = self.media_status.duration
 
-    current = self.get_current_position()
-    longest = self._longest_duration
-
-    if duration:
+    if duration is not None:
       return duration * US_IN_SEC
 
-    elif longest and longest > current:
+    longest = self._longest_duration
+    current = self.get_current_position()
+
+    if longest and longest > current:
       return longest
 
     elif current:
