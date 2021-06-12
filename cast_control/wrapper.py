@@ -13,8 +13,12 @@ from pychromecast.controllers.spotify import SpotifyController
 from pychromecast.controllers.dashcast import DashCastController
 from pychromecast.controllers.bbciplayer import BbcIplayerController
 from pychromecast.controllers.bbcsounds import BbcSoundsController
+from pychromecast.controllers.bubbleupnp import BubbleUPNPController
+from pychromecast.controllers.supla import SuplaController
+from pychromecast.controllers.yleareena import YleAreenaController
 # from pychromecast.controllers.homeassistant import HomeAssistantController
-from pychromecast.controllers.plex import PlexApiController, PlexController
+# from pychromecast.controllers.plex import PlexApiController
+from pychromecast.controllers.plex import PlexController
 from pychromecast import Chromecast
 
 from mpris_server.adapters import PlayState, Microseconds, \
@@ -53,13 +57,15 @@ class Titles(NamedTuple):
 class Controllers(NamedTuple):
   yt: YouTubeController
   spotify: SpotifyController
-  dash: DashCastController
-  bbc_ip: BbcIplayerController
-  bbc_sound: BbcSoundsController
-  plex: PlexController
-  # plex_api: PlexApiController
-  # ha: HomeAssistantController
-
+  #dash: DashCastController
+  #bbc_ip: BbcIplayerController
+  #bbc_sound: BbcSoundsController
+  #plex: PlexController
+  #bubble: BubbleUPNPController
+  #supla: SuplaController
+  #yle: YleAreenaController
+  #plex_api: PlexApiController
+  #ha: HomeAssistantController
 
 @runtime_checkable
 class Wrapper(Protocol):
@@ -124,10 +130,13 @@ class ControllersMixin(Wrapper):
     self.ctls = Controllers(
       YouTubeController(),
       SpotifyController(),
-      DashCastController(),
-      BbcIplayerController(),
-      BbcSoundsController(),
-      PlexController(),
+      #DashCastController(),
+      #BbcIplayerController(),
+      #BbcSoundsController(),
+      #PlexController(),
+      #BubbleUPNPController(),
+      #SuplaController(),
+      #YleAreenaController(),
       # PlexApiController(),
       # HomeAssistantController(),
     )

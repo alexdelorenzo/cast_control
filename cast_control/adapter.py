@@ -102,7 +102,7 @@ class DevicePlayerAdapter(WrapperIntegration, PlayerAdapter):
     return False
 
   def set_shuffle(self, val: bool):
-    return False
+    pass
 
   def get_art_url(self, track: int = None) -> str:
     return self.wrapper.get_art_url(track)
