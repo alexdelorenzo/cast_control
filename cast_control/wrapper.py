@@ -52,9 +52,9 @@ class Titles(NamedTuple):
 class Controllers(NamedTuple):
   yt: YouTubeController
   spotify: SpotifyController
-  dash: DashCastController
-  bbc_ip: BbcIplayerController
-  bbc_sound: BbcSoundsController
+  #dash: DashCastController
+  #bbc_ip: BbcIplayerController
+  #bbc_sound: BbcSoundsController
 
 
 @runtime_checkable
@@ -116,9 +116,9 @@ class ControllersMixin(Wrapper):
     self.ctls = Controllers(
       YouTubeController(),
       SpotifyController(),
-      DashCastController(),
-      BbcIplayerController(),
-      BbcSoundsController(),
+      #DashCastController(),
+      #BbcIplayerController(),
+      #BbcSoundsController(),
     )
 
     for ctl in self.ctls:
