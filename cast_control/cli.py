@@ -38,7 +38,7 @@ See {HOMEPAGE} for more information.
 class OrderCommands(click.Group):
   '''List `click` commands in the order they're declared.'''
 
-  def list_commands(self, ctx: click.Command) -> List[str]:
+  def list_commands(self, ctx: click.Context) -> List[str]:
     return list(self.commands)
 
 
