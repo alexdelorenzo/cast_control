@@ -18,46 +18,47 @@ from mpris_server.base import AutoName
 from aiopath import AsyncPath
 
 from . import NAME
+from .types import Final
 
 
 Seconds = int
 
 
-DESKTOP_NAME: str = 'Cast Control'
-LOG_LEVEL: str = 'WARN'
+DESKTOP_NAME: Final[str] = 'Cast Control'
+LOG_LEVEL: Final[str] = 'WARN'
 
-RC_OK: int = 0
-RC_NO_CHROMECAST: int = 1
-RC_NOT_RUNNING: int = 2
+RC_OK: Final[int] = 0
+RC_NO_CHROMECAST: Final[int] = 1
+RC_NOT_RUNNING: Final[int] = 2
 
-NO_DURATION: float = 0.0
-NO_DELTA: int = 0
-NO_CHROMECAST_NAME: str = 'NO_NAME'
-NO_STR: str = ''
-NO_PORT: Optional[int] = None
-NO_DEVICE: str = 'Device'
+NO_DURATION: Final[float] = 0.0
+NO_DELTA: Final[int] = 0
+NO_CHROMECAST_NAME: Final[str] = 'NO_NAME'
+NO_STR: Final[str] = ''
+NO_PORT: Final[Optional[int]] = None
+NO_DEVICE: Final[str] = 'Device'
 
-YOUTUBE: str = 'YouTube'
+YOUTUBE: Final[str] = 'YouTube'
 
-US_IN_SEC: int = 1_000_000  # seconds to microseconds
-DEFAULT_TRACK: str = '/track/1'
-DEFAULT_DISC_NO: int = 1
+US_IN_SEC: Final[int] = 1_000_000  # seconds to microseconds
+DEFAULT_TRACK: Final[str] = '/track/1'
+DEFAULT_DISC_NO: Final[int] = 1
 
-DEFAULT_RETRY_WAIT: float = 5.0
-DEFAULT_WAIT: Seconds = 30
+DEFAULT_RETRY_WAIT: Final[float] = 5.0
+DEFAULT_WAIT: Final[Seconds] = 30
 
-LOG_FILE_MODE: str = 'w'  # create a new log on service start
-DEFAULT_ICON: bool = False
-DEFAULT_SET_LOG: bool = False
+LOG_FILE_MODE: Final[str] = 'w'  # create a new log on service start
+DEFAULT_ICON: Final[bool] = False
+DEFAULT_SET_LOG: Final[bool] = False
 
 # STAT_CACHE_SIZE: int = 2
 
-DESKTOP_SUFFIX: str = '.desktop'
-NO_DESKTOP_FILE: str = ''
+DESKTOP_SUFFIX: Final[str] = '.desktop'
+NO_DESKTOP_FILE: Final[str] = ''
 
-ARGS_STEM: str = '-args'
+ARGS_STEM: Final[str] = '-args'
 
-APP_DIRS = AppDirs(NAME)
+APP_DIRS: Final[AppDirs] = AppDirs(NAME)
 
 
 async def get_user_dirs() -> Tuple[Path, Path, Path]:
@@ -80,17 +81,24 @@ DATA_DIR, LOG_DIR, STATE_DIR = run(
   get_user_dirs()
 )
 
-PID: Path = STATE_DIR / f'{NAME}.pid'
-ARGS: Path = STATE_DIR / f'service{ARGS_STEM}.tmp'
-LOG: Path = LOG_DIR / f'{NAME}.log'
+PID: Final[Path] = STATE_DIR / f'{NAME}.pid'
+ARGS: Final[Path] = STATE_DIR / f'service{ARGS_STEM}.tmp'
+LOG: Final[Path] = LOG_DIR / f'{NAME}.log'
 
 SRC_DIR = Path(__file__).parent
-ASSETS_DIR: Path = SRC_DIR / 'assets'
-DESKTOP_TEMPLATE: Path = ASSETS_DIR / f'template{DESKTOP_SUFFIX}'
+ASSETS_DIR: Final[Path] = SRC_DIR / 'assets'
+DESKTOP_TEMPLATE: Final[Path] = \
+  ASSETS_DIR / f'template{DESKTOP_SUFFIX}'
 
-ICON_DIR: Path = ASSETS_DIR / 'icon'
-LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
-DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
+ICON_DIR: Final[Path] = ASSETS_DIR / 'icon'
+# LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
+# DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
+
+DARK_SVG: Final[Path] = ICON_DIR / 'cc-black.svg'
+LIGHT_SVG: Final[Path] = ICON_DIR / 'cc-white.svg'
+
+LIGHT_ICON = LIGHT_THUMB = LIGHT_SVG
+DEFAULT_THUMB = DARK_ICON = DARK_SVG
 
 
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]
