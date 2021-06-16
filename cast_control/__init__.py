@@ -1,20 +1,24 @@
-__version__ = '0.10.9'
-__author__ = 'Alex DeLorenzo <alex@alexdelorenzo.dev>'
 from typing import List
+from .types import Final
 
 
-HOMEPAGE: str = "https://github.com/alexdelorenzo/cast_control"
-LICENSE: str = 'AGPL-3.0'
-NAME: str = 'cast_control'
-SHORT_NAME: str = 'castctl'
-DESCRIPTION: str = '📺 Control Chromecasts from Linux and D-Bus'
+__author__: Final[str] = 'Alex DeLorenzo <alex@alexdelorenzo.dev>'
+__copyright__: Final[str] = \
+  f'Copyright 2021 {__author__}. Licensed under terms of the {__license__}.'
+__license__: Final[str] = 'AGPL-3.0'
+__version__: Final[str] = '0.10.9'
 
-ENTRYPOINT_NAME: str = 'cli'
-CLI_MODULE_NAME: str = f'{NAME}.cli'
+HOMEPAGE: Final[str] = "https://github.com/alexdelorenzo/cast_control"
+NAME: Final[str] = 'cast_control'
+SHORT_NAME: Final[str] = 'castctl'
+DESCRIPTION: Final[str] = '📺 Control Chromecasts from Linux and D-Bus'
 
-CMD_PT: str = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
+ENTRYPOINT_NAME: Final[str] = 'cli'
+CLI_MODULE_NAME: Final[str] = f'{NAME}.cli'
 
-ASSET_DIRS: List[str] = [
+CMD_PT: Final[str] = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
+
+ASSET_DIRS: Final[List[str]] = [
   'assets/*.desktop',
-  'assets/icon/cc-*.png',
+  'assets/icon/cc-*.svg',
 ]
