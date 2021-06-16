@@ -156,9 +156,9 @@ class DevicePlayerAdapter(WrapperIntegration, PlayerAdapter):
 
 
 class DeviceAdapter(
+  MprisAdapter,
   DevicePlayerAdapter,
   DeviceRootAdapter,
-  MprisAdapter
 ):
   def __init__(self, device: Chromecast):
     self.wrapper = DeviceWrapper(device)
