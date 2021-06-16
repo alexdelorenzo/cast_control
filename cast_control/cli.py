@@ -5,8 +5,8 @@ import sys
 
 import click
 
-from . import __version__, __author__, LICENSE, HOMEPAGE, \
-  ENTRYPOINT_NAME, CLI_MODULE_NAME
+from . import __version__, __author__, __copyright__,\
+  __license__, HOMEPAGE, ENTRYPOINT_NAME, CLI_MODULE_NAME
 from .base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
 from .run import MprisDaemon, DaemonArgs, get_daemon, \
@@ -21,8 +21,6 @@ LOG_END: str = ''
 
 NOT_RUNNING_MSG: str = "Daemon isn't running."
 
-COPYRIGHT: str = \
-  f'Copyright 2021 {__author__}. Licensed under terms of the {LICENSE}.'
 VERSION_INFO: str = f'{NAME} v{__version__}'
 
 HELP: str = f'''
@@ -56,7 +54,7 @@ def cli(
   version: bool,
 ):
   if license:
-    click.echo(COPYRIGHT)
+    click.echo(__copyright__)
 
   if version:
     click.echo(VERSION_INFO)
