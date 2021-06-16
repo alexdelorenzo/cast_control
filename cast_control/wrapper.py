@@ -23,29 +23,29 @@ from pychromecast import Chromecast
 
 from mpris_server.adapters import PlayState, Microseconds, \
   VolumeDecimal, RateDecimal
-from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
+from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, Metadata
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
-from mpris_server.metadata import Metadata, MetadataObj
+# from mpris_server.metadata import Metadata, MetadataObj
 
-from .types import Protocol, runtime_checkable
+from .types import Protocol, runtime_checkable, Final
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, \
   NAME, create_desktop_file, DEFAULT_ICON
 
 
-NO_ARTIST: str = ''
-TITLE_SEP: str = ' - '
-MAX_TITLES: int = 3
+NO_ARTIST: Final[str] = ''
+TITLE_SEP: Final[str] = ' - '
+MAX_TITLES: Final[int] = 3
 
-YOUTUBE_URLS: Set[str] = {
+YOUTUBE_URLS: Final[Set[str]] = {
   'youtube.com/',
   'youtu.be/'
 }
 YT_LONG, YT_SHORT = YOUTUBE_URLS
-YT_VID_URL: str = f'https://{YT_LONG}watch?v='
+YT_VID_URL: Final[str] = f'https://{YT_LONG}watch?v='
 
-RESOLUTION: int = 1
-NO_SUFFIX: str = ''
+RESOLUTION: Final[int] = 1
+NO_SUFFIX: Final[str] = ''
 
 
 class Titles(NamedTuple):
@@ -57,15 +57,16 @@ class Titles(NamedTuple):
 class Controllers(NamedTuple):
   yt: YouTubeController
   spotify: SpotifyController
-  #dash: DashCastController
-  #bbc_ip: BbcIplayerController
-  #bbc_sound: BbcSoundsController
-  #plex: PlexController
-  #bubble: BubbleUPNPController
-  #supla: SuplaController
-  #yle: YleAreenaController
-  #plex_api: PlexApiController
-  #ha: HomeAssistantController
+  # dash: DashCastController
+  # bbc_ip: BbcIplayerController
+  # bbc_sound: BbcSoundsController
+  # plex: PlexController
+  # bubble: BubbleUPNPController
+  # supla: SuplaController
+  # yle: YleAreenaController
+  # plex_api: PlexApiController
+  # ha: HomeAssistantController
+
 
 @runtime_checkable
 class Wrapper(Protocol):
@@ -130,13 +131,13 @@ class ControllersMixin(Wrapper):
     self.ctls = Controllers(
       YouTubeController(),
       SpotifyController(),
-      #DashCastController(),
-      #BbcIplayerController(),
-      #BbcSoundsController(),
-      #PlexController(),
-      #BubbleUPNPController(),
-      #SuplaController(),
-      #YleAreenaController(),
+      # DashCastController(),
+      # BbcIplayerController(),
+      # BbcSoundsController(),
+      # PlexController(),
+      # BubbleUPNPController(),
+      # SuplaController(),
+      # YleAreenaController(),
       # PlexApiController(),
       # HomeAssistantController(),
     )
@@ -370,21 +371,50 @@ class MetadataMixin(Wrapper):
     if self.media_status:
       track_no = self.media_status.track
 
-    metadata = MetadataObj(
-      track_id=dbus_name,
-      length=self.get_duration(),
-      art_url=self.get_art_url(),
-      url=self._get_url(),
-      title=title,
-      artist=artists,
-      album=album,
-      album_artist=artists,
-      disc_no=DEFAULT_DISC_NO,
-      track_no=track_no,
-      comment=comments
-    )
+    metadata = {
+      'mpris:trackid': dbus_name,
+      'mpris:length': self.get_duration(),
+      'mpris:artUrl': self.get_art_url(),
+      'xesam:url': self._get_url(),
+      'xesam:title': title,
+      'xesam:artist': artists,
+      'xesam:album': album,
+      'xesam:albumArtist': artists,
+      'xesam:discNumber': DEFAULT_DISC_NO,
+      'xesam:trackNumber': track_no,
+      'xesam:comment': comments,
+    }
 
-    return metadata.to_dict()
+    return metadata
+
+
+#class MetadataMixin(Wrapper):
+  #def metadata(self) -> Metadata:
+    #title, artist, album = self.titles
+
+    #artists = [artist] if artist else []
+    #dbus_name: DbusObj = get_track_id(title)
+    #comments: List[str] = []
+    #track_no: Optional[int] = None
+
+    #if self.media_status:
+      #track_no = self.media_status.track
+
+    #metadata = MetadataObj(
+      #track_id=dbus_name,
+      #length=self.get_duration(),
+      #art_url=self.get_art_url(),
+      #url=self._get_url(),
+      #title=title,
+      #artist=artists,
+      #album=album,
+      #album_artist=artists,
+      #disc_no=DEFAULT_DISC_NO,
+      #track_no=track_no,
+      #comment=comments
+    #)
+
+    #return metadata.to_dict()
 
 
 class PlaybackMixin(Wrapper):
@@ -482,10 +512,7 @@ class AbilitiesMixin(Wrapper):
   def can_play(self) -> bool:
     state = self.get_playstate()
 
-    if state is not PlayState.PLAYING:
-      return True
-
-    return False
+    return state is not PlayState.PLAYING
 
   def can_control(self) -> bool:
     return True
