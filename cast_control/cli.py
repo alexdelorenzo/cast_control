@@ -11,19 +11,20 @@ from .base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
 from .run import MprisDaemon, DaemonArgs, get_daemon, \
   run_safe, get_daemon_from_args
+from .types import Final
 
 
 assert __name__ == CLI_MODULE_NAME
 
 
-LOG_MODE: str = 'r'
-LOG_END: str = ''
+LOG_MODE: Final[str] = 'r'
+LOG_END: Final[str] = ''
 
-NOT_RUNNING_MSG: str = "Daemon isn't running."
+NOT_RUNNING_MSG: Final[str] = "Daemon isn't running."
 
-VERSION_INFO: str = f'{NAME} v{__version__}'
+VERSION_INFO: Final[str] = f'{NAME} v{__version__}'
 
-HELP: str = f'''
+HELP: Final[str] = f'''
 Control casting devices via Linux media controls and desktops.
 
 This daemon connects your casting device to the D-Bus media player interface (MPRIS).
