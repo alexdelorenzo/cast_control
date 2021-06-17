@@ -57,6 +57,8 @@ DESKTOP_SUFFIX: Final[str] = '.desktop'
 NO_DESKTOP_FILE: Final[str] = ''
 
 ARGS_STEM: Final[str] = '-args'
+LIGHT_END: Final[str] = '-light'
+DARK_END: Final[str] = '-dark'
 
 APP_DIRS: Final[AppDirs] = AppDirs(NAME)
 
@@ -267,7 +269,7 @@ def new_file_from_template(file: Path, icon_path: Path) -> Path:
 @lru_cache
 def create_desktop_file(light_icon: bool = True) -> Path:
   icon_path = LIGHT_ICON if light_icon else DARK_ICON
-  name_suffix = '-light' if light_icon else '-dark'
+  name_suffix = LIGHT_END if light_icon else DARK_END
   new_name = f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
   file = DATA_DIR / new_name
 
