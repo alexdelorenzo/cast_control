@@ -3,7 +3,7 @@
 
 # Protocol, Final, etc are not available on Python 3.7
 try:
-  # Python 3.8+
+  # Python 3.8 - 3.9+
   from typing import Protocol, runtime_checkable, Final
 
 except ImportError:

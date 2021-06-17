@@ -2,7 +2,7 @@ from typing import Dict, List
 from setuptools import setup
 from pathlib import Path
 
-from cast_control import HOMEPAGE, LICENSE, NAME, \
+from cast_control import HOMEPAGE, __license__, NAME, \
   SHORT_NAME, DESCRIPTION, __version__, __author__, \
   ENTRYPOINT_NAME, CMD_PT, ASSET_DIRS
 
@@ -41,7 +41,7 @@ setup(
   url=HOMEPAGE,
   project_urls=PROJECT_URLS,
   author=__author__,
-  license=LICENSE,
+  license=__license__,
   packages=[NAME],
   zip_safe=True,
   install_requires=REQS,

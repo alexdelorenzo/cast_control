@@ -21,4 +21,5 @@ CMD_PT: Final[str] = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
 ASSET_DIRS: Final[List[str]] = [
   'assets/*.desktop',
   'assets/icon/cc-*.svg',
+  'assets/icon/*.yml',
 ]
