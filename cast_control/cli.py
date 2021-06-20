@@ -1,4 +1,5 @@
-from typing import Optional, List
+from typing import Optional, List, NamedTuple, \
+  Any, Tuple, Dict
 import collections
 import logging
 import sys
@@ -31,6 +32,100 @@ This daemon connects your casting device to the D-Bus media player interface (MP
 
 See {HOMEPAGE} for more information.
 '''
+
+
+class CliArgs(NamedTuple):
+  args: Tuple[Any]
+  kwargs: Dict[str, Any]
+
+
+NAME_ARGS: Final[CliArgs] = CliArgs(
+  args=('--name', '-n'),
+  kwargs=dict(
+    default=None,
+    show_default=True,
+    type=click.STRING,
+    help="Connect to a device via its name, otherwise control the first device found."
+  )
+)
+
+
+HOST_ARGS: Final[CliArgs] = CliArgs(
+  args=('--host', '-h'),
+  kwargs=dict(
+    default=None,
+    show_default=True,
+    type=click.STRING,
+    help="Connect to a device via its hostname or IP address, otherwise control the first device found."
+  )
+)
+
+
+UUID_ARGS: Final[CliArgs] = CliArgs(
+  args=('--uuid', '-u'),
+  kwargs=dict(
+    default=None,
+    show_default=True,
+    type=click.STRING,
+    help="Connect to a device via its UUID, otherwise control the first device found."
+  )
+)
+
+
+WAIT_ARGS: Final[CliArgs] = CliArgs(
+  args=('--wait', '-w'),
+  kwargs=dict(
+    default=None,
+    show_default=True,
+    type=click.FLOAT,
+    help="Seconds to wait between trying to make initial successful connections to a device."
+  )
+)
+
+
+RETRY_ARGS: Final[CliArgs] = CliArgs(
+  args=('--retry-wait', '-r'),
+  kwargs=dict(
+    default=DEFAULT_RETRY_WAIT,
+    show_default=True,
+    type=click.FLOAT,
+    help="Seconds to wait between reconnection attempts if a successful connection is interrupted."
+  )
+)
+
+
+RETRY_ARGS: Final[CliArgs] = CliArgs(
+  args=('--retry-wait', '-r'),
+  kwargs=dict(
+    default=DEFAULT_RETRY_WAIT,
+    show_default=True,
+    type=click.FLOAT,
+    help="Seconds to wait between reconnection attempts if a successful connection is interrupted."
+  )
+)
+
+
+ICON_ARGS: Final[CliArgs] = CliArgs(
+  args=('--icon', '-i'),
+  kwargs=dict(
+    is_flag=True,
+    default=False,
+    show_default=True,
+    type=click.BOOL,
+    help="Use a lighter icon instead of the dark icon. The lighter icon goes well with dark themes."
+  )
+)
+
+
+LOG_ARGS: Final[CliArgs] = CliArgs(
+  args=('--log-level', '-l'),
+  kwargs=dict(
+    default=LOG_LEVEL,
+    show_default=True,
+    type=click.STRING,
+    help='Set the debugging log level.'
+  )
+)
 
 
 # see https://alexdelorenzo.dev/notes/click
@@ -76,27 +171,13 @@ assert cli.name == ENTRYPOINT_NAME
 @cli.command(
   help='Connect to the device and run the service in the foreground.',
 )
-@click.option('--name', '-n',
-  default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its name, otherwise control the first device found.")
-@click.option('--host', '-h',
-  default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its hostname or IP address, otherwise control the first device found.")
-@click.option('--uuid', '-u',
-  default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its UUID, otherwise control the first device found.")
-@click.option('--wait', '-w',
-  default=None, show_default=True, type=click.FLOAT,
-  help="Seconds to wait between trying to make initial successful connections to a device.")
-@click.option('--retry-wait', '-r',
-  default=DEFAULT_RETRY_WAIT, show_default=True, type=click.FLOAT,
-  help="Seconds to wait between reconnection attempts if a successful connection is interrupted.")
-@click.option('--icon', '-i',
-  is_flag=True, default=False, show_default=True, type=click.BOOL,
-  help="Use a lighter icon instead of the dark icon. The lighter icon goes well with dark themes.")
-@click.option('--log-level', '-l',
-  default=LOG_LEVEL, show_default=True, type=click.STRING,
-  help='Set the debugging log level.')
+@click.option(*NAME_ARGS.args, **NAME_ARGS.kwargs)
+@click.option(*HOST_ARGS.args, **HOST_ARGS.kwargs)
+@click.option(*UUID_ARGS.args, **UUID_ARGS.kwargs)
+@click.option(*WAIT_ARGS.args, **WAIT_ARGS.kwargs)
+@click.option(*RETRY_ARGS.args, **RETRY_ARGS.kwargs)
+@click.option(*ICON_ARGS.args, **ICON_ARGS.kwargs)
+@click.option(*LOG_ARGS.args, **LOG_ARGS.kwargs)
 def connect(
   name: Optional[str],
   host: Optional[str],
@@ -131,27 +212,13 @@ def service():
 @service.command(
   help='Connect the background service to the device.'
 )
-@click.option('--name', '-n',
-  default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its name, otherwise control the first device found.")
-@click.option('--host', '-h',
-  default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its hostname or IP address, otherwise control the first device found.")
-@click.option('--uuid', '-u',
-  default=None, show_default=True, type=click.STRING,
-  help="Connect to a device via its UUID, otherwise control the first device found.")
-@click.option('--wait', '-w',
-  default=None, show_default=True, type=click.FLOAT,
-  help="Seconds to wait between trying to make initial successful connections to a device.")
-@click.option('--retry-wait', '-r',
-  default=DEFAULT_RETRY_WAIT, show_default=True, type=click.FLOAT,
-  help="Seconds to wait between reconnection attempts if a successful connection is interrupted.")
-@click.option('--icon', '-i',
-  is_flag=True, default=False, show_default=True, type=click.BOOL,
-  help="Use a lighter icon instead of the dark icon. The lighter icon goes well with dark themes.")
-@click.option('--log-level', '-l',
-  default=LOG_LEVEL, show_default=True, type=click.STRING,
-  help='Set the debugging log level.')
+@click.option(*NAME_ARGS.args, **NAME_ARGS.kwargs)
+@click.option(*HOST_ARGS.args, **HOST_ARGS.kwargs)
+@click.option(*UUID_ARGS.args, **UUID_ARGS.kwargs)
+@click.option(*WAIT_ARGS.args, **WAIT_ARGS.kwargs)
+@click.option(*RETRY_ARGS.args, **RETRY_ARGS.kwargs)
+@click.option(*ICON_ARGS.args, **ICON_ARGS.kwargs)
+@click.option(*LOG_ARGS.args, **LOG_ARGS.kwargs)
 def connect(
   name: Optional[str],
   host: Optional[str],
