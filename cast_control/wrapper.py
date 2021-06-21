@@ -23,9 +23,9 @@ from pychromecast import Chromecast
 
 from mpris_server.adapters import PlayState, Microseconds, \
   VolumeDecimal, RateDecimal
-from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, Metadata
+from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj#, Metadata
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
-# from mpris_server.metadata import Metadata, MetadataObj
+from mpris_server.metadata import Metadata, MetadataObj
 
 from .types import Protocol, runtime_checkable, Final
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \

@@ -35,7 +35,7 @@ See {HOMEPAGE} for more information.
 
 
 class CliArgs(NamedTuple):
-  args: Tuple[Any]
+  args: Tuple[str]
   kwargs: Dict[str, Any]
 
 
