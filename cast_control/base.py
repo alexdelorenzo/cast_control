@@ -109,6 +109,88 @@ class Host(NamedTuple):
   friendly_name: str = NO_STR
 
 
+def set_log_level(
+  level: str = LOG_LEVEL,
+  file: Optional[Path] = None,
+):
+  if file:
+    create_user_dirs()
+
+  level = level.upper()
+
+  logging.basicConfig(
+    level=level,
+    filename=file,
+    filemode=LOG_FILE_MODE
+  )
+
+
+def get_stat(file: Path) -> stat_result:
+  return file.stat()
+
+
+@lru_cache
+def get_src_stat() -> stat_result:
+  return get_stat(SRC_DIR)
+
+
+@lru_cache
+def get_template() -> List[str]:
+  return DESKTOP_TEMPLATE \
+    .read_text() \
+    .splitlines()
+
+
+def is_older_than_module(other: Path) -> bool:
+  src_stat = get_src_stat()
+  other_stat = get_stat(other)
+
+  return src_stat.st_ctime > other_stat.st_ctime
+
+
+@lru_cache
+def new_file_from_template(file: Path, icon_path: Path) -> Path:
+  *lines, name, icon = get_template()
+  name += DESKTOP_NAME
+  icon += str(icon_path)
+  lines = (*lines, name, icon)
+  text = '\n'.join(lines)
+
+  file.write_text(text)
+
+  return file
+
+
+@lru_cache
+def create_desktop_file(light_icon: bool = True) -> Path:
+  icon_path = LIGHT_ICON if light_icon else DARK_ICON
+  name_suffix = LIGHT_END if light_icon else DARK_END
+  new_name = f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
+  file = DATA_DIR / new_name
+
+  if file.exists() and not is_older_than_module(file):
+    return file
+
+  return new_file_from_template(file, icon_path)
+
+
+async def _create_user_dirs():
+  paths = DATA_DIR, LOG_DIR, STATE_DIR
+  apaths = map(AsyncPath, dirs)
+
+  coros = (
+    path.mkdir(parents=True, exist_ok=True)
+    for path in apaths
+  )
+
+  await gather(*coros)
+
+
+@lru_cache
+async def create_user_dirs():
+  run(_create_user_dirs())
+
+
 def get_device_via_host(
   host: str,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
@@ -200,84 +282,3 @@ def find_device(
     device = get_device(retry_wait=retry_wait)
 
   return device
-
-
-def set_log_level(
-  level: str = LOG_LEVEL,
-  file: Optional[Path] = None,
-):
-  if file is not None:
-    create_user_dirs()
-
-  level = level.upper()
-
-  logging.basicConfig(
-    level=level,
-    filename=file,
-    filemode=LOG_FILE_MODE
-  )
-
-
-def get_stat(file: Path) -> stat_result:
-  return file.stat()
-
-
-@lru_cache
-def get_src_stat() -> stat_result:
-  return get_stat(SRC_DIR)
-
-
-@lru_cache
-def get_template() -> List[str]:
-  return DESKTOP_TEMPLATE \
-    .read_text() \
-    .splitlines()
-
-
-def is_older_than_module(other: Path) -> bool:
-  src_stat = get_src_stat()
-  other_stat = get_stat(other)
-
-  return src_stat.st_ctime > other_stat.st_ctime
-
-
-@lru_cache
-def new_file_from_template(file: Path, icon_path: Path) -> Path:
-  *lines, name, icon = get_template()
-  name += DESKTOP_NAME
-  icon += str(icon_path)
-  lines = (*lines, name, icon)
-  text = '\n'.join(lines)
-
-  file.write_text(text)
-
-  return file
-
-
-@lru_cache
-def create_desktop_file(light_icon: bool = True) -> Path:
-  icon_path = LIGHT_ICON if light_icon else DARK_ICON
-  name_suffix = LIGHT_END if light_icon else DARK_END
-  new_name = f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
-  file = DATA_DIR / new_name
-
-  if file.exists() and not is_older_than_module(file):
-    return file
-
-  return new_file_from_template(file, icon_path)
-
-
-async def _create_user_dirs():
-  dirs = DATA_DIR, LOG_DIR, STATE_DIR
-
-  coros = (
-    path.mkdir(parents=True, exist_ok=True)
-    for path in dirs
-  )
-
-  await gather(*coros)
-
-
-@lru_cache
-async def create_user_dirs():
-  run(_create_user_dirs())
