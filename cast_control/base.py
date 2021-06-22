@@ -214,6 +214,13 @@ def get_devices(
   return devices
 
 
+def get_first(devices: List[Chromecast]) -> Chromecast:
+  first, *_ = devices
+  first.wait()
+
+  return first
+
+
 def get_device_via_uuid(
   uuid: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
@@ -224,10 +231,7 @@ def get_device_via_uuid(
     return None
 
   elif not uuid:
-    first, *_ = devices
-    first.wait()
-
-    return first
+    return get_first(devices)
 
   uuid = UUID(uuid)
 
@@ -250,10 +254,7 @@ def get_device(
     return None
 
   elif not name:
-    first, *_ = devices
-    first.wait()
-
-    return first
+    return get_first(devices)
 
   name = name.casefold()
 
