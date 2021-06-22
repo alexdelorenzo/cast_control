@@ -2,12 +2,13 @@ from typing import List, Dict
 
 from .types import Final
 
+
 # module metadata
 __author__: Final[str] = 'Alex DeLorenzo <alex@alexdelorenzo.dev>'
 __license__: Final[str] = 'AGPL-3.0'
 __copyright__: Final[str] = \
   f'Copyright 2021 {__author__}. Licensed under terms of the {__license__}.'
-__version__: Final[str] = '0.10.13'
+__version__: Final[str] = '0.11.1'
 
 NAME: Final[str] = 'cast_control'
 SHORT_NAME: Final[str] = 'castctl'
@@ -21,6 +22,12 @@ CLI_MODULE_NAME: Final[str] = f'{NAME}.cli'
 # packaging metadata
 CMD_PT: Final[str] = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
 PY_VERSION: Final[str] = '>=3.7'
+PKGS: Final[List[str]] = [NAME]
+
+PROJECT_URLS: Final[Dict[str, str]] = {
+  'Homepage': 'https://alexdelorenzo.dev/',
+  'Source': HOMEPAGE
+}
 
 ASSET_DIRS: Final[List[str]] = [
   'assets/*.desktop',
@@ -35,11 +42,6 @@ CONSOLE_SCRIPTS: Final[List[str]] = [
 
 PKG_DATA: Final[Dict[str, List[str]]] = {
   NAME: ASSET_DIRS
-}
-
-PROJECT_URLS: Final[Dict[str, str]] = {
-  'Homepage': 'https://alexdelorenzo.dev/',
-  'Source': HOMEPAGE
 }
 
 ENTRY_POINTS: Final[Dict[str, List[str]]] = {

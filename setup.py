@@ -2,18 +2,18 @@ from typing import Dict, List
 from setuptools import setup
 from pathlib import Path
 
-from cast_control import HOMEPAGE, __license__, NAME, \
-  SHORT_NAME, DESCRIPTION, __author__, PROJECT_URLS, \
-  PKG_DATA, ENTRY_POINTS, PY_VERSION
+from cast_control import Final, HOMEPAGE, NAME, \
+  DESCRIPTION, PROJECT_URLS, PKG_DATA, ENTRY_POINTS, \
+  PY_VERSION, PKGS, __license__
 
 
-REQS: List[str] = Path('requirements.txt') \
+REQS: Final[List[str]] = Path('requirements.txt') \
   .read_text() \
   .splitlines()
 
 setup(
   name=NAME,
-  packages=[NAME],
+  packages=PKGS,
   install_requires=REQS,
   python_requires=PY_VERSION,
   entry_points=ENTRY_POINTS,
