@@ -176,7 +176,7 @@ def create_desktop_file(light_icon: bool = True) -> Path:
 
 async def _create_user_dirs():
   paths = DATA_DIR, LOG_DIR, STATE_DIR
-  apaths = map(AsyncPath, dirs)
+  apaths = map(AsyncPath, paths)
 
   coros = (
     path.mkdir(parents=True, exist_ok=True)
