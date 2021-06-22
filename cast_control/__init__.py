@@ -1,4 +1,4 @@
-from typing import List, Dict
+from __future__ import annotations
 
 from .types import Final
 
@@ -22,28 +22,28 @@ CLI_MODULE_NAME: Final[str] = f'{NAME}.cli'
 # packaging metadata
 CMD_PT: Final[str] = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
 PY_VERSION: Final[str] = '>=3.7'
-PKGS: Final[List[str]] = [NAME]
+PKGS: Final[list[str]] = [NAME]
 
-PROJECT_URLS: Final[Dict[str, str]] = {
+PROJECT_URLS: Final[dict[str, str]] = {
   'Homepage': 'https://alexdelorenzo.dev/',
   'Source': HOMEPAGE
 }
 
-ASSET_DIRS: Final[List[str]] = [
+ASSET_DIRS: Final[list[str]] = [
   'assets/*.desktop',
   'assets/icon/cc-*.svg',
   'assets/icon/*.yml',
 ]
 
-CONSOLE_SCRIPTS: Final[List[str]] = [
+CONSOLE_SCRIPTS: Final[list[str]] = [
   f'{NAME} = {CMD_PT}',
   f'{SHORT_NAME} = {CMD_PT}',
 ]
 
-PKG_DATA: Final[Dict[str, List[str]]] = {
+PKG_DATA: Final[dict[str, list[str]]] = {
   NAME: ASSET_DIRS
 }
 
-ENTRY_POINTS: Final[Dict[str, List[str]]] = {
+ENTRY_POINTS: Final[dict[str, list[str]]] = {
   'console_scripts': CONSOLE_SCRIPTS
 }

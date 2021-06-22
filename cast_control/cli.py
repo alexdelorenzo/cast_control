@@ -1,5 +1,5 @@
-from typing import Optional, List, NamedTuple, \
-  Any, Tuple, Dict
+from __future__ import annotations
+from typing import Optional, NamedTuple, Any
 import collections
 import logging
 import sys
@@ -34,8 +34,8 @@ See {HOMEPAGE} for more information.
 
 
 class CliArgs(NamedTuple):
-  args: Tuple[str]
-  kwargs: Dict[str, Any]
+  args: tuple[str]
+  kwargs: dict[str, Any]
 
 
 NAME_ARGS: Final[CliArgs] = CliArgs(
@@ -124,7 +124,7 @@ LOG_ARGS: Final[CliArgs] = CliArgs(
 class OrderCommands(click.Group):
   '''List `click` commands in the order they're declared.'''
 
-  def list_commands(self, ctx: click.Context) -> List[str]:
+  def list_commands(self, ctx: click.Context) -> list[str]:
     return list(self.commands)
 
 

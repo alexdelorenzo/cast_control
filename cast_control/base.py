@@ -1,5 +1,5 @@
-from typing import Optional, Union, NamedTuple, \
-  Tuple, List
+from __future__ import annotations
+from typing import Optional, Union, NamedTuple
 from pathlib import Path
 from uuid import UUID
 from enum import auto
@@ -68,7 +68,7 @@ STATE_DIR: Final[Path] = Path(APP_DIRS.user_state_dir)
 
 # use explicit parens for tuple assignment on Python <= 3.7.x
 # see https://bugs.python.org/issue35814
-USER_DIRS: Final[Tuple[Path]] = (DATA_DIR, LOG_DIR, STATE_DIR)
+USER_DIRS: Final[tuple[Path]] = (DATA_DIR, LOG_DIR, STATE_DIR)
 
 PID: Final[Path] = STATE_DIR / f'{NAME}.pid'
 ARGS: Final[Path] = STATE_DIR / f'service{ARGS_STEM}.tmp'
@@ -136,7 +136,7 @@ def get_src_stat() -> stat_result:
 
 
 @lru_cache(LRU_MAX_SIZE)
-def get_template() -> List[str]:
+def get_template() -> list[str]:
   return DESKTOP_TEMPLATE \
     .read_text() \
     .splitlines()
@@ -207,14 +207,14 @@ def get_device_via_host(
 
 def get_devices(
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT
-) -> List[Chromecast]:
+) -> list[Chromecast]:
   devices, service_browser = get_chromecasts(retry_wait=retry_wait)
   service_browser.stop_discovery()
 
   return devices
 
 
-def get_first(devices: List[Chromecast]) -> Chromecast:
+def get_first(devices: list[Chromecast]) -> Chromecast:
   first, *_ = devices
   first.wait()
 

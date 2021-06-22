@@ -1,6 +1,6 @@
 from __future__ import annotations
-from typing import Optional, Any, List, Union, Tuple, \
-  NamedTuple, Callable, Set
+from typing import Optional, Any, Union, \
+  NamedTuple, Callable
 from pathlib import Path
 from mimetypes import guess_type
 from functools import lru_cache
@@ -38,7 +38,7 @@ MAX_TITLES: Final[int] = 3
 
 TITLE_SEP: Final[str] = ' - '
 
-YOUTUBE_URLS: Final[Set[str]] = {
+YOUTUBE_URLS: Final[set[str]] = {
   'youtube.com/',
   'youtu.be/'
 }
@@ -206,7 +206,7 @@ class ControllersMixin(Wrapper):
 class TitlesMixin(Wrapper):
   @property
   def titles(self) -> Titles:
-    titles: List[str] = list()
+    titles: list[str] = list()
 
     title = self.media_controller.title
 
@@ -368,7 +368,7 @@ class MetadataMixin(Wrapper):
 
     artists = [artist] if artist else []
     dbus_name: DbusObj = get_track_id(title)
-    comments: List[str] = []
+    comments: list[str] = []
     track_no: Optional[int] = None
 
     if self.media_status:

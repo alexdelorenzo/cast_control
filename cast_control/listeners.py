@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Union, Optional
 from abc import ABC, abstractmethod
 import logging

@@ -1,7 +1,6 @@
-from typing import List
+from __future__ import annotations
 
 from pychromecast import Chromecast
-
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   Microseconds, VolumeDecimal, RateDecimal, PlayerAdapter, RootAdapter
 from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
@@ -21,10 +20,10 @@ class WrapperIntegration:
 
 
 class DeviceRootAdapter(WrapperIntegration, RootAdapter):
-  def get_uri_schemes(self) -> List[str]:
+  def get_uri_schemes(self) -> list[str]:
     return URI
 
-  def get_mime_types(self) -> List[str]:
+  def get_mime_types(self) -> list[str]:
     return MIME_TYPES
 
   def get_desktop_entry(self) -> str:

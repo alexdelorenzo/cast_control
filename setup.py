@@ -1,4 +1,4 @@
-from typing import Dict, List
+from __future__ import annotations
 from setuptools import setup
 from pathlib import Path
 
@@ -7,7 +7,7 @@ from cast_control import Final, HOMEPAGE, NAME, \
   PY_VERSION, PKGS, __license__
 
 
-REQS: Final[List[str]] = Path('requirements.txt') \
+REQS: Final[list[str]] = Path('requirements.txt') \
   .read_text() \
   .splitlines()
 
