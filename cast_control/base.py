@@ -52,8 +52,6 @@ LOG_FILE_MODE: Final[str] = 'w'  # create a new log on service start
 DEFAULT_ICON: Final[bool] = False
 DEFAULT_SET_LOG: Final[bool] = False
 
-# STAT_CACHE_SIZE: int = 2
-
 DESKTOP_SUFFIX: Final[str] = '.desktop'
 NO_DESKTOP_FILE: Final[str] = ''
 
@@ -65,6 +63,7 @@ APP_DIRS: Final[AppDirs] = AppDirs(NAME)
 DATA_DIR: Final[Path] = Path(APP_DIRS.user_data_dir)
 LOG_DIR: Final[Path] = Path(APP_DIRS.user_log_dir)
 STATE_DIR: Final[Path] = Path(APP_DIRS.user_state_dir)
+USER_DIRS: Final[List[Path]] = DATA_DIR, LOG_DIR, STATE_DIR
 
 PID: Final[Path] = STATE_DIR / f'{NAME}.pid'
 ARGS: Final[Path] = STATE_DIR / f'service{ARGS_STEM}.tmp'
@@ -76,9 +75,6 @@ DESKTOP_TEMPLATE: Final[Path] = \
   ASSETS_DIR / f'template{DESKTOP_SUFFIX}'
 
 ICON_DIR: Final[Path] = ASSETS_DIR / 'icon'
-# LIGHT_THUMB = LIGHT_ICON = ICON_DIR / 'cc-white.png'
-# DEFAULT_THUMB = DARK_ICON = ICON_DIR / 'cc-black.png'
-
 DARK_SVG: Final[Path] = ICON_DIR / 'cc-black.svg'
 LIGHT_SVG: Final[Path] = ICON_DIR / 'cc-white.svg'
 
@@ -175,12 +171,11 @@ def create_desktop_file(light_icon: bool = True) -> Path:
 
 
 async def _create_user_dirs():
-  paths = DATA_DIR, LOG_DIR, STATE_DIR
-  apaths = map(AsyncPath, paths)
+  paths = map(AsyncPath, USER_DIRS)
 
   coros = (
     path.mkdir(parents=True, exist_ok=True)
-    for path in apaths
+    for path in paths
   )
 
   await gather(*coros)
