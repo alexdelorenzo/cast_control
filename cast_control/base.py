@@ -187,7 +187,7 @@ async def _create_user_dirs():
 
 
 @lru_cache
-async def create_user_dirs():
+def create_user_dirs():
   run(_create_user_dirs())
 
 
