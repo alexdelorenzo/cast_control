@@ -30,7 +30,7 @@ from mpris_server.metadata import Metadata, MetadataObj, ValidMetadata
 from .types import Protocol, runtime_checkable, Final
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, \
-  NAME, create_desktop_file, DEFAULT_ICON
+  NAME, create_desktop_file, DEFAULT_ICON, create_user_dirs
 
 
 RESOLUTION: Final[int] = 1

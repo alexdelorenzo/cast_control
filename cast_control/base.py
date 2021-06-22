@@ -62,15 +62,15 @@ LIGHT_END: Final[str] = '-light'
 DARK_END: Final[str] = '-dark'
 
 APP_DIRS: Final[AppDirs] = AppDirs(NAME)
-DATA_DIR =Path(APP_DIRS.user_data_dir)
-LOG_DIR = Path(APP_DIRS.user_log_dir)
-STATE_DIR = Path(APP_DIRS.user_state_dir)
+DATA_DIR: Final[Path] = Path(APP_DIRS.user_data_dir)
+LOG_DIR: Final[Path] = Path(APP_DIRS.user_log_dir)
+STATE_DIR: Final[Path] = Path(APP_DIRS.user_state_dir)
 
 PID: Final[Path] = STATE_DIR / f'{NAME}.pid'
 ARGS: Final[Path] = STATE_DIR / f'service{ARGS_STEM}.tmp'
 LOG: Final[Path] = LOG_DIR / f'{NAME}.log'
 
-SRC_DIR = Path(__file__).parent
+SRC_DIR: Final[Path] = Path(__file__).parent
 ASSETS_DIR: Final[Path] = SRC_DIR / 'assets'
 DESKTOP_TEMPLATE: Final[Path] = \
   ASSETS_DIR / f'template{DESKTOP_SUFFIX}'
