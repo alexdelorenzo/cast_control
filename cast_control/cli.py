@@ -88,16 +88,6 @@ RETRY_ARGS: Final[CliArgs] = CliArgs(
   )
 )
 
-RETRY_ARGS: Final[CliArgs] = CliArgs(
-  args=('--retry-wait', '-r'),
-  kwargs=dict(
-    default=DEFAULT_RETRY_WAIT,
-    show_default=True,
-    type=click.FLOAT,
-    help="Seconds to wait between reconnection attempts if a successful connection is interrupted."
-  )
-)
-
 ICON_ARGS: Final[CliArgs] = CliArgs(
   args=('--icon', '-i'),
   kwargs=dict(
