@@ -39,6 +39,8 @@ NO_STR: Final[str] = ''
 NO_PORT: Final[Optional[int]] = None
 NO_DEVICE: Final[str] = 'Device'
 
+# older Python requires an explicit
+# maxsize param for lru_cache()
 LRU_MAX_SIZE: Final[Optional[int]] = None
 
 YOUTUBE: Final[str] = 'YouTube'
@@ -149,30 +151,35 @@ def is_older_than_module(other: Path) -> bool:
   return src_stat.st_ctime > other_stat.st_ctime
 
 
+def get_paths(light_icon: bool = True) -> tuple[Path, Path]:
+  icon_path = LIGHT_ICON if light_icon else DARK_ICON
+
+  name_suffix = LIGHT_END if light_icon else DARK_END
+  new_name = f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
+  desktop_path = DATA_DIR / new_name
+
+  return icon_path, desktop_path
+
+
 @lru_cache(LRU_MAX_SIZE)
-def new_file_from_template(file: Path, icon_path: Path) -> Path:
+def new_file_from_template(file: Path, icon_path: Path):
   *lines, name, icon = get_template()
   name += DESKTOP_NAME
   icon += str(icon_path)
   lines = (*lines, name, icon)
+
   text = '\n'.join(lines)
-
   file.write_text(text)
-
-  return file
 
 
 @lru_cache(LRU_MAX_SIZE)
 def create_desktop_file(light_icon: bool = True) -> Path:
-  icon_path = LIGHT_ICON if light_icon else DARK_ICON
-  name_suffix = LIGHT_END if light_icon else DARK_END
-  new_name = f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
-  file = DATA_DIR / new_name
+  icon, file = get_paths(light_icon)
 
-  if file.exists() and not is_older_than_module(file):
-    return file
+  if not file.exists() or is_older_than_module(file):
+    new_file_from_template(file, icon)
 
-  return new_file_from_template(file, icon_path)
+  return file
 
 
 async def _create_user_dirs():
