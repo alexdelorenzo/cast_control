@@ -39,6 +39,8 @@ NO_STR: Final[str] = ''
 NO_PORT: Final[Optional[int]] = None
 NO_DEVICE: Final[str] = 'Device'
 
+LRU_MAX_SIZE: Final[Optional[int]] = None
+
 YOUTUBE: Final[str] = 'YouTube'
 
 US_IN_SEC: Final[int] = 1_000_000  # seconds to microseconds
@@ -125,12 +127,12 @@ def get_stat(file: Path) -> stat_result:
   return file.stat()
 
 
-@lru_cache
+@lru_cache(LRU_MAX_SIZE)
 def get_src_stat() -> stat_result:
   return get_stat(SRC_DIR)
 
 
-@lru_cache
+@lru_cache(LRU_MAX_SIZE)
 def get_template() -> List[str]:
   return DESKTOP_TEMPLATE \
     .read_text() \
@@ -144,7 +146,7 @@ def is_older_than_module(other: Path) -> bool:
   return src_stat.st_ctime > other_stat.st_ctime
 
 
-@lru_cache
+@lru_cache(LRU_MAX_SIZE)
 def new_file_from_template(file: Path, icon_path: Path) -> Path:
   *lines, name, icon = get_template()
   name += DESKTOP_NAME
@@ -157,7 +159,7 @@ def new_file_from_template(file: Path, icon_path: Path) -> Path:
   return file
 
 
-@lru_cache
+@lru_cache(LRU_MAX_SIZE)
 def create_desktop_file(light_icon: bool = True) -> Path:
   icon_path = LIGHT_ICON if light_icon else DARK_ICON
   name_suffix = LIGHT_END if light_icon else DARK_END
@@ -181,7 +183,7 @@ async def _create_user_dirs():
   await gather(*coros)
 
 
-@lru_cache
+@lru_cache(LRU_MAX_SIZE)
 def create_user_dirs():
   run(_create_user_dirs())
 

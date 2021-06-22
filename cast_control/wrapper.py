@@ -29,7 +29,7 @@ from mpris_server.metadata import Metadata, MetadataObj, ValidMetadata
 
 from .types import Protocol, runtime_checkable, Final
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
-  US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, \
+  US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, LRU_MAX_SIZE, \
   NAME, create_desktop_file, DEFAULT_ICON, create_user_dirs
 
 
@@ -349,7 +349,7 @@ class IconsMixin(Wrapper):
 
     return str(DEFAULT_THUMB)
 
-  @lru_cache
+  @lru_cache(LRU_MAX_SIZE)
   def get_desktop_entry(self) -> str:
     path = create_desktop_file(self.light_icon)
 
