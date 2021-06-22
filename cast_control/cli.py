@@ -48,7 +48,6 @@ NAME_ARGS: Final[CliArgs] = CliArgs(
   )
 )
 
-
 HOST_ARGS: Final[CliArgs] = CliArgs(
   args=('--host', '-h'),
   kwargs=dict(
@@ -58,7 +57,6 @@ HOST_ARGS: Final[CliArgs] = CliArgs(
     help="Connect to a device via its hostname or IP address, otherwise control the first device found."
   )
 )
-
 
 UUID_ARGS: Final[CliArgs] = CliArgs(
   args=('--uuid', '-u'),
@@ -70,7 +68,6 @@ UUID_ARGS: Final[CliArgs] = CliArgs(
   )
 )
 
-
 WAIT_ARGS: Final[CliArgs] = CliArgs(
   args=('--wait', '-w'),
   kwargs=dict(
@@ -81,7 +78,6 @@ WAIT_ARGS: Final[CliArgs] = CliArgs(
   )
 )
 
-
 RETRY_ARGS: Final[CliArgs] = CliArgs(
   args=('--retry-wait', '-r'),
   kwargs=dict(
@@ -92,7 +88,6 @@ RETRY_ARGS: Final[CliArgs] = CliArgs(
   )
 )
 
-
 RETRY_ARGS: Final[CliArgs] = CliArgs(
   args=('--retry-wait', '-r'),
   kwargs=dict(
@@ -102,7 +97,6 @@ RETRY_ARGS: Final[CliArgs] = CliArgs(
     help="Seconds to wait between reconnection attempts if a successful connection is interrupted."
   )
 )
-
 
 ICON_ARGS: Final[CliArgs] = CliArgs(
   args=('--icon', '-i'),
@@ -114,7 +108,6 @@ ICON_ARGS: Final[CliArgs] = CliArgs(
     help="Use a lighter icon instead of the dark icon. The lighter icon goes well with dark themes."
   )
 )
-
 
 LOG_ARGS: Final[CliArgs] = CliArgs(
   args=('--log-level', '-l'),
