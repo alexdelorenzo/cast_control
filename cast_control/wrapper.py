@@ -25,7 +25,7 @@ from mpris_server.adapters import PlayState, Microseconds, \
   VolumeDecimal, RateDecimal
 from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj#, Metadata
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
-from mpris_server.metadata import Metadata, MetadataObj
+from mpris_server.metadata import Metadata, MetadataObj, ValidMetadata
 
 from .types import Protocol, runtime_checkable, Final
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
@@ -33,9 +33,10 @@ from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   NAME, create_desktop_file, DEFAULT_ICON
 
 
-NO_ARTIST: Final[str] = ''
-TITLE_SEP: Final[str] = ' - '
+RESOLUTION: Final[int] = 1
 MAX_TITLES: Final[int] = 3
+
+TITLE_SEP: Final[str] = ' - '
 
 YOUTUBE_URLS: Final[Set[str]] = {
   'youtube.com/',
@@ -44,7 +45,7 @@ YOUTUBE_URLS: Final[Set[str]] = {
 YT_LONG, YT_SHORT = YOUTUBE_URLS
 YT_VID_URL: Final[str] = f'https://{YT_LONG}watch?v='
 
-RESOLUTION: Final[int] = 1
+NO_ARTIST: Final[str] = ''
 NO_SUFFIX: Final[str] = ''
 
 
@@ -360,7 +361,7 @@ class IconsMixin(Wrapper):
 
 
 class MetadataMixin(Wrapper):
-  def metadata(self) -> Metadata:
+  def metadata(self) -> ValidMetadata:
     title, artist, album = self.titles
 
     artists = [artist] if artist else []
@@ -371,59 +372,28 @@ class MetadataMixin(Wrapper):
     if self.media_status:
       track_no = self.media_status.track
 
-    metadata = {
-      'mpris:trackid': dbus_name,
-      'mpris:length': self.get_duration(),
-      'mpris:artUrl': self.get_art_url(),
-      'xesam:url': self._get_url(),
-      'xesam:title': title,
-      'xesam:artist': artists,
-      'xesam:album': album,
-      'xesam:albumArtist': artists,
-      'xesam:discNumber': DEFAULT_DISC_NO,
-      'xesam:trackNumber': track_no,
-      'xesam:comment': comments,
-    }
-
-    return metadata
-
-
-#class MetadataMixin(Wrapper):
-  #def metadata(self) -> Metadata:
-    #title, artist, album = self.titles
-
-    #artists = [artist] if artist else []
-    #dbus_name: DbusObj = get_track_id(title)
-    #comments: List[str] = []
-    #track_no: Optional[int] = None
-
-    #if self.media_status:
-      #track_no = self.media_status.track
-
-    #metadata = MetadataObj(
-      #track_id=dbus_name,
-      #length=self.get_duration(),
-      #art_url=self.get_art_url(),
-      #url=self._get_url(),
-      #title=title,
-      #artist=artists,
-      #album=album,
-      #album_artist=artists,
-      #disc_no=DEFAULT_DISC_NO,
-      #track_no=track_no,
-      #comment=comments
-    #)
-
-    #return metadata.to_dict()
+    return MetadataObj(
+      track_id=dbus_name,
+      length=self.get_duration(),
+      art_url=self.get_art_url(),
+      url=self._get_url(),
+      title=title,
+      artists=artists,
+      album=album,
+      album_artists=artists,
+      disc_no=DEFAULT_DISC_NO,
+      track_no=track_no,
+      comment=comments
+    )
 
 
 class PlaybackMixin(Wrapper):
   def get_playstate(self) -> PlayState:
-    if self.media_controller.is_paused:
-      return PlayState.PAUSED
-
-    elif self.media_controller.is_playing:
+    if self.media_controller.is_playing:
       return PlayState.PLAYING
+
+    elif self.media_controller.is_paused:
+      return PlayState.PAUSED
 
     return PlayState.STOPPED
 
