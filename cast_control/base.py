@@ -205,12 +205,20 @@ def get_device_via_host(
   return None  # explicit
 
 
+def get_devices(
+  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT
+) -> List[Chromecast]:
+  devices, service_browser = get_chromecasts(retry_wait=retry_wait)
+  service_browser.stop_discovery()
+
+  return devices
+
+
 def get_device_via_uuid(
   uuid: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
-  devices, service_browser = get_chromecasts(retry_wait=retry_wait)
-  service_browser.stop_discovery()
+  devices = get_devices(retry_wait)
 
   if not uuid and not devices:
     return None
@@ -236,8 +244,7 @@ def get_device(
   name: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
-  devices, service_browser = get_chromecasts(retry_wait=retry_wait)
-  service_browser.stop_discovery()
+  devices = get_devices(retry_wait)
 
   if not name and not devices:
     return None
