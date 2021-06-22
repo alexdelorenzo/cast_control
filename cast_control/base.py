@@ -65,6 +65,9 @@ APP_DIRS: Final[AppDirs] = AppDirs(NAME)
 DATA_DIR: Final[Path] = Path(APP_DIRS.user_data_dir)
 LOG_DIR: Final[Path] = Path(APP_DIRS.user_log_dir)
 STATE_DIR: Final[Path] = Path(APP_DIRS.user_state_dir)
+
+# use explicit parens for tuple assignment on Python <= 3.7.x
+# see https://bugs.python.org/issue35814
 USER_DIRS: Final[Tuple[Path]] = (DATA_DIR, LOG_DIR, STATE_DIR)
 
 PID: Final[Path] = STATE_DIR / f'{NAME}.pid'
