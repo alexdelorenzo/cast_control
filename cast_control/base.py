@@ -62,27 +62,9 @@ LIGHT_END: Final[str] = '-light'
 DARK_END: Final[str] = '-dark'
 
 APP_DIRS: Final[AppDirs] = AppDirs(NAME)
-
-
-async def get_user_dirs() -> Tuple[Path, Path, Path]:
-  data_dir = AsyncPath(APP_DIRS.user_data_dir)
-  log_dir = AsyncPath(APP_DIRS.user_log_dir)
-  state_dir = AsyncPath(APP_DIRS.user_state_dir)
-  dirs = data_dir, log_dir, state_dir
-
-  coros = (
-    path.mkdir(parents=True, exist_ok=True)
-    for path in dirs
-  )
-
-  await gather(*coros)
-
-  return tuple(map(Path, dirs))
-
-
-DATA_DIR, LOG_DIR, STATE_DIR = run(
-  get_user_dirs()
-)
+DATA_DIR =Path(APP_DIRS.user_data_dir)
+LOG_DIR = Path(APP_DIRS.user_log_dir)
+STATE_DIR = Path(APP_DIRS.user_state_dir)
 
 PID: Final[Path] = STATE_DIR / f'{NAME}.pid'
 ARGS: Final[Path] = STATE_DIR / f'service{ARGS_STEM}.tmp'
@@ -224,6 +206,9 @@ def set_log_level(
   level: str = LOG_LEVEL,
   file: Optional[Path] = None,
 ):
+  if file is not None:
+    create_user_dirs()
+
   level = level.upper()
 
   logging.basicConfig(
@@ -282,13 +267,17 @@ def create_desktop_file(light_icon: bool = True) -> Path:
   return new_file_from_template(file, icon_path)
 
 
-def _get_user_dirs() -> Tuple[Path, Path, Path]:
-  data_dir = Path(APP_DIRS.user_data_dir)
-  log_dir = Path(APP_DIRS.user_log_dir)
-  state_dir = Path(APP_DIRS.user_state_dir)
-  dirs = data_dir, log_dir, state_dir
+async def _create_user_dirs():
+  dirs = DATA_DIR, LOG_DIR, STATE_DIR
 
-  for dir in dirs:
-    dir.mkdir(parents=True, exist_ok=True)
+  coros = (
+    path.mkdir(parents=True, exist_ok=True)
+    for path in dirs
+  )
 
-  return data_dir, log_dir, state_dir
+  await gather(*coros)
+
+
+@lru_cache
+async def create_user_dirs():
+  run(_create_user_dirs())

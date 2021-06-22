@@ -342,6 +342,8 @@ class IconsMixin(Wrapper):
     if icon:
       return icon
 
+    create_user_dirs()
+
     if self.light_icon:
       return str(LIGHT_THUMB)
 
