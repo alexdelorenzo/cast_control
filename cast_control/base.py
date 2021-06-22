@@ -63,7 +63,7 @@ APP_DIRS: Final[AppDirs] = AppDirs(NAME)
 DATA_DIR: Final[Path] = Path(APP_DIRS.user_data_dir)
 LOG_DIR: Final[Path] = Path(APP_DIRS.user_log_dir)
 STATE_DIR: Final[Path] = Path(APP_DIRS.user_state_dir)
-USER_DIRS: Final[List[Path]] = DATA_DIR, LOG_DIR, STATE_DIR
+USER_DIRS: Final[Tuple[Path]] = (DATA_DIR, LOG_DIR, STATE_DIR)
 
 PID: Final[Path] = STATE_DIR / f'{NAME}.pid'
 ARGS: Final[Path] = STATE_DIR / f'service{ARGS_STEM}.tmp'
