@@ -21,10 +21,9 @@ assert __name__ == CLI_MODULE_NAME
 LOG_MODE: Final[str] = 'r'
 LOG_END: Final[str] = ''
 
-NOT_RUNNING_MSG: Final[str] = "Daemon isn't running."
-
 VERSION_INFO: Final[str] = f'{NAME} v{__version__}'
 
+NOT_RUNNING_MSG: Final[str] = "Daemon isn't running."
 HELP: Final[str] = f'''
 Control casting devices via Linux media controls and desktops.
 
