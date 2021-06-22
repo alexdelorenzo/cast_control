@@ -6,6 +6,7 @@ from enum import auto
 from os import stat_result
 from functools import lru_cache
 from asyncio import gather, run
+from weakref import finalize
 import logging
 
 from appdirs import AppDirs
@@ -145,6 +146,7 @@ def get_device_via_uuid(
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
   devices, service_browser = get_chromecasts(retry_wait=retry_wait)
+  service_browser.stop_discovery()
 
   if not uuid and not devices:
     return None
@@ -171,6 +173,7 @@ def get_device(
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Chromecast]:
   devices, service_browser = get_chromecasts(retry_wait=retry_wait)
+  service_browser.stop_discovery()
 
   if not name and not devices:
     return None
