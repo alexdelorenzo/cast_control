@@ -10,8 +10,9 @@ from . import __version__, __author__, __copyright__,\
   __license__, HOMEPAGE, ENTRYPOINT_NAME, CLI_MODULE_NAME
 from .base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
-from .run import MprisDaemon, DaemonArgs, get_daemon, \
-  run_safe, get_daemon_from_args
+from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
+  get_daemon_from_args
+from .run import run_safe
 from .types import Final
 
 
@@ -111,7 +112,7 @@ LOG_ARGS: Final[CliArgs] = CliArgs(
 
 
 # see https://alexdelorenzo.dev/notes/click
-class OrderCommands(click.Group):
+class OrderAsCreated(click.Group):
   '''List `click` commands in the order they're declared.'''
 
   def list_commands(self, ctx: click.Context) -> list[str]:
@@ -184,7 +185,7 @@ def connect(
 
 
 @cli.group(
-  cls=OrderCommands,
+  cls=OrderAsCreated,
   help='Connect, disconnect or reconnect the background service to or from your device.',
 )
 def service():

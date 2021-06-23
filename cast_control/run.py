@@ -13,8 +13,7 @@ from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
   DEFAULT_ICON, DEFAULT_SET_LOG, set_log_level
 from .adapter import DeviceAdapter
 from .listeners import register_event_listener
-from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
-  get_daemon_from_args
+from .daemon import DaemonArgs
 
 
 def create_adapters_and_server(
