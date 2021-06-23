@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from pychromecast import Chromecast
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
   Microseconds, VolumeDecimal, RateDecimal, PlayerAdapter, RootAdapter
 from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
   Track
 
+from .base import Device
 from .wrapper import DeviceWrapper
 
 
@@ -159,6 +159,6 @@ class DeviceAdapter(
   DevicePlayerAdapter,
   DeviceRootAdapter,
 ):
-  def __init__(self, device: Chromecast):
+  def __init__(self, device: Device):
     self.wrapper = DeviceWrapper(device)
     super().__init__(self.wrapper.name)

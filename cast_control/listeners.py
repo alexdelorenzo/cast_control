@@ -13,9 +13,8 @@ from pychromecast.controllers.receiver import CastStatus, \
   CastStatusListener
 from pychromecast.socket_client import ConnectionStatus, \
   ConnectionStatusListener
-from pychromecast import Chromecast
 
-from .base import Status
+from .base import Status, Device
 
 
 # status with volume attributes
@@ -47,7 +46,7 @@ class DeviceEventAdapter(EventAdapter):
   def __init__(
     self,
     name: str,
-    device: Chromecast,
+    device: Device,
     server: Server,
     adapter: Optional[MprisAdapter] = None
   ):
@@ -89,7 +88,7 @@ class DeviceEventListener(
 
 
 def register_event_listener(
-  device: Chromecast,
+  device: Device,
   server: Server,
   adapter: MprisAdapter
 ):

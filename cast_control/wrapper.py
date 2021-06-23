@@ -19,7 +19,6 @@ from pychromecast.controllers.yleareena import YleAreenaController
 # from pychromecast.controllers.homeassistant import HomeAssistantController
 # from pychromecast.controllers.plex import PlexApiController
 from pychromecast.controllers.plex import PlexController
-from pychromecast import Chromecast
 
 from mpris_server.adapters import PlayState, Microseconds, \
   VolumeDecimal, RateDecimal
@@ -30,7 +29,8 @@ from mpris_server.metadata import Metadata, MetadataObj, ValidMetadata
 from .types import Protocol, runtime_checkable, Final
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, LRU_MAX_SIZE, \
-  NAME, create_desktop_file, DEFAULT_ICON, create_user_dirs
+  NAME, create_desktop_file, DEFAULT_ICON, create_user_dirs, \
+  Device
 
 
 RESOLUTION: Final[int] = 1
@@ -71,7 +71,7 @@ class Controllers(NamedTuple):
 
 @runtime_checkable
 class Wrapper(Protocol):
-  dev: Chromecast
+  dev: Device
   ctls: Controllers
   light_icon: bool = DEFAULT_ICON
 
@@ -533,7 +533,7 @@ class DeviceWrapper(
 ):
   '''Wraps implementation details for device API'''
 
-  def __init__(self, dev: Chromecast):
+  def __init__(self, dev: Device):
     self.dev = dev
     super().__init__()
 

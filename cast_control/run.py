@@ -4,11 +4,10 @@ from time import sleep
 import logging
 import sys
 
-from pychromecast import Chromecast
 from mpris_server.server import Server
 
 from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
-  DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, NAME, \
+  DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, NAME, Device, \
   RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, find_device, \
   DEFAULT_ICON, DEFAULT_SET_LOG, set_log_level
 from .adapter import DeviceAdapter
@@ -44,7 +43,7 @@ def retry_until_found(
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Server]:
   """
-    If the Chromecast isn't found, keep trying to find it.
+    If the device isn't found, keep trying to find it.
 
     If `wait` is None, then retrying is disabled.
   """

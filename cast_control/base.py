@@ -89,6 +89,7 @@ LIGHT_ICON = LIGHT_THUMB = LIGHT_SVG
 DEFAULT_THUMB = DARK_ICON = DARK_SVG
 
 
+Device = Chromecast
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]
 
 
@@ -201,7 +202,7 @@ def create_user_dirs():
 def get_device_via_host(
   host: str,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Chromecast]:
+) -> Optional[Device]:
   info = Host(host)
   device = get_chromecast_from_host(info, retry_wait=retry_wait)
 
@@ -214,14 +215,14 @@ def get_device_via_host(
 
 def get_devices(
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT
-) -> list[Chromecast]:
+) -> list[Device]:
   devices, service_browser = get_chromecasts(retry_wait=retry_wait)
   service_browser.stop_discovery()
 
   return devices
 
 
-def get_first(devices: list[Chromecast]) -> Chromecast:
+def get_first(devices: list[Device]) -> Device:
   first, *_ = devices
   first.wait()
 
@@ -231,7 +232,7 @@ def get_first(devices: list[Chromecast]) -> Chromecast:
 def get_device_via_uuid(
   uuid: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Chromecast]:
+) -> Optional[Device]:
   devices = get_devices(retry_wait)
 
   if not uuid and not devices:
@@ -254,7 +255,7 @@ def get_device_via_uuid(
 def get_device(
   name: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Chromecast]:
+) -> Optional[Device]:
   devices = get_devices(retry_wait)
 
   if not name and not devices:
@@ -279,8 +280,8 @@ def find_device(
   host: Optional[str] = None,
   uuid: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Chromecast]:
-  device: Optional[Chromecast] = None
+) -> Optional[Device]:
+  device: Optional[Device] = None
 
   if host:
     device = get_device_via_host(host, retry_wait)
