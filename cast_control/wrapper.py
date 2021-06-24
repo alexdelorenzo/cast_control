@@ -62,7 +62,7 @@ class CachedIcon(NamedTuple):
 
 class Controllers(NamedTuple):
   yt: YouTubeController
-  spotify: SpotifyController = None
+  spotify: SpotifyController
   # dash: DashCastController
   # bbc_ip: BbcIplayerController
   # bbc_sound: BbcSoundsController
@@ -137,7 +137,7 @@ class ControllersMixin(Wrapper):
   def _setup_controllers(self):
     self.ctls = Controllers(
       YouTubeController(),
-      # SpotifyController(),
+      SpotifyController(),
       # DashCastController(),
       # BbcIplayerController(),
       # BbcSoundsController(),
@@ -201,12 +201,13 @@ class ControllersMixin(Wrapper):
     set_as_current: bool
   ):
     video_id = get_video_id(uri)
+    yt = self.ctls.yt
 
     if video_id:
-      self.ctls.yt.add_to_queue(video_id)
+      yt.add_to_queue(video_id)
 
     if video_id and set_as_current:
-      self.ctls.yt.play_video(video_id)
+      yt.play_video(video_id)
 
     elif set_as_current:
       self.open_uri(uri)
