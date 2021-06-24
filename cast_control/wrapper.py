@@ -4,6 +4,7 @@ from typing import Optional, Any, Union, \
 from pathlib import Path
 from mimetypes import guess_type
 from functools import lru_cache
+import logging
 
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.controllers.media import MediaStatus, \
@@ -36,8 +37,6 @@ from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
 RESOLUTION: Final[int] = 1
 MAX_TITLES: Final[int] = 3
 
-TITLE_SEP: Final[str] = ' - '
-
 YOUTUBE_URLS: Final[set[str]] = {
   'youtube.com/',
   'youtu.be/'
@@ -55,8 +54,14 @@ class Titles(NamedTuple):
   album: Optional[str] = None
 
 
+class CachedIcon(NamedTuple):
+  url: str
+  app_id: str
+  title: str
+
+
 class Controllers(NamedTuple):
-  yt: YouTubeController = None
+  yt: YouTubeController
   spotify: SpotifyController = None
   # dash: DashCastController
   # bbc_ip: BbcIplayerController
@@ -75,6 +80,9 @@ class Wrapper(Protocol):
   ctls: Controllers
   cached_icon: Optional[CachedIcon] = None
   light_icon: bool = DEFAULT_ICON
+
+  def __getattr__(self, name: str) -> Any:
+    return getattr(self.dev, name)
 
   @property
   def name(self) -> str:
@@ -102,9 +110,6 @@ class Wrapper(Protocol):
 
 
 class StatusMixin(Wrapper):
-  def __getattr__(self, name: str) -> Any:
-    return getattr(self.dev, name)
-
   @property
   def cast_status(self) -> Optional[CastStatus]:
     if self.dev.status:
@@ -145,10 +150,8 @@ class ControllersMixin(Wrapper):
     )
 
     for ctl in self.ctls:
-      if not ctl:
-        continue
-
-      self._register(ctl)
+      if ctl:
+        self._register(ctl)
 
   def _register(self, controller: BaseController):
     self.dev.register_handler(controller)
@@ -157,10 +160,12 @@ class ControllersMixin(Wrapper):
     self.ctls.yt.launch()
 
   def _play_youtube(self, video_id: str):
-    if not self.ctls.yt.is_active:
+    yt = self.ctls.yt
+
+    if not yt.is_active:
       self._launch_youtube()
 
-    self.ctls.yt.play_video(video_id)
+    yt.play_video(video_id)
 
   def _is_youtube_vid(self, content_id: str) -> bool:
     if not content_id or not self.ctls.yt.is_active:
@@ -332,12 +337,6 @@ class TimeMixin(Wrapper):
 
   def set_rate(self, val: RateDecimal):
     pass
-
-
-class CachedIcon(NamedTuple):
-  url: str
-  app_id: str
-  title: str
 
 
 class IconsMixin(Wrapper):
