@@ -1,10 +1,10 @@
 from __future__ import annotations
-from typing import Optional, Union, NamedTuple
+from typing import Optional, Union, NamedTuple, Callable
 from pathlib import Path
 from uuid import UUID
 from enum import auto
 from os import stat_result
-from functools import lru_cache
+from functools import lru_cache, wraps
 from asyncio import gather, run
 from weakref import finalize
 import logging
@@ -129,6 +129,31 @@ def set_log_level(
   )
 
 
+async def _create_user_dirs():
+  paths = map(AsyncPath, USER_DIRS)
+
+  coros = (
+    path.mkdir(parents=True, exist_ok=True)
+    for path in paths
+  )
+
+  await gather(*coros)
+
+
+@lru_cache(LRU_MAX_SIZE)
+def create_user_dirs():
+  run(_create_user_dirs())
+
+
+def ensure_user_dirs_exist(func: Callable) -> Callable:
+  @wraps(func)
+  def new_func(*args, **kwargs):
+    create_user_dirs()
+    return func(*args, **kwargs)
+
+  return new_func
+
+
 def get_stat(file: Path) -> stat_result:
   return file.stat()
 
@@ -174,6 +199,7 @@ def new_file_from_template(file: Path, icon_path: Path):
 
 
 @lru_cache(LRU_MAX_SIZE)
+@ensure_user_dirs_exist
 def create_desktop_file(light_icon: bool = True) -> Path:
   icon, file = get_paths(light_icon)
 
@@ -181,22 +207,6 @@ def create_desktop_file(light_icon: bool = True) -> Path:
     new_file_from_template(file, icon)
 
   return file
-
-
-async def _create_user_dirs():
-  paths = map(AsyncPath, USER_DIRS)
-
-  coros = (
-    path.mkdir(parents=True, exist_ok=True)
-    for path in paths
-  )
-
-  await gather(*coros)
-
-
-@lru_cache(LRU_MAX_SIZE)
-def create_user_dirs():
-  run(_create_user_dirs())
 
 
 def get_device_via_host(

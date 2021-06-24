@@ -30,7 +30,7 @@ from .types import Protocol, runtime_checkable, Final
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, LRU_MAX_SIZE, \
   NAME, create_desktop_file, DEFAULT_ICON, create_user_dirs, \
-  Device
+  Device, ensure_user_dirs_exist
 
 
 RESOLUTION: Final[int] = 1
@@ -56,8 +56,8 @@ class Titles(NamedTuple):
 
 
 class Controllers(NamedTuple):
-  yt: YouTubeController
-  spotify: SpotifyController
+  yt: YouTubeController = None
+  spotify: SpotifyController = None
   # dash: DashCastController
   # bbc_ip: BbcIplayerController
   # bbc_sound: BbcSoundsController
@@ -73,6 +73,7 @@ class Controllers(NamedTuple):
 class Wrapper(Protocol):
   dev: Device
   ctls: Controllers
+  cached_icon: Optional[CachedIcon] = None
   light_icon: bool = DEFAULT_ICON
 
   @property
@@ -131,7 +132,7 @@ class ControllersMixin(Wrapper):
   def _setup_controllers(self):
     self.ctls = Controllers(
       YouTubeController(),
-      SpotifyController(),
+      # SpotifyController(),
       # DashCastController(),
       # BbcIplayerController(),
       # BbcSoundsController(),
@@ -144,6 +145,9 @@ class ControllersMixin(Wrapper):
     )
 
     for ctl in self.ctls:
+      if not ctl:
+        continue
+
       self._register(ctl)
 
   def _register(self, controller: BaseController):
@@ -212,6 +216,12 @@ class TitlesMixin(Wrapper):
 
     if title:
       titles.append(title)
+
+    if self.media_status:
+      series_title = self.media_status.series_title
+
+      if series_title:
+        titles.append(series_title)
 
     subtitle = self.get_subtitle()
 
@@ -324,24 +334,70 @@ class TimeMixin(Wrapper):
     pass
 
 
+class CachedIcon(NamedTuple):
+  url: str
+  app_id: str
+  title: str
+
+
 class IconsMixin(Wrapper):
   def set_icon(self, lighter: bool = False):
     self.light_icon: bool = lighter
 
-  def get_art_url(self, track: Optional[int] = None) -> str:
-    thumb = self.media_controller.thumbnail
+  def _set_cached_icon(self, url: Optional[str] = None):
+    if not url:
+      self.cached_icon = None
+      return
 
-    if thumb:
-      return thumb
+    app_id = self.dev.app_id
+    title, *_ = self.titles
+    self.cached_icon = CachedIcon(url, app_id, title)
 
-    icon: Optional[str] = None
+  def _can_use_cache(self) -> bool:
+    cache = self.cached_icon
+
+    if not cache or not cache.url:
+      return False
+
+    app_id = self.dev.app_id
+    title, *_ = self.titles
+
+    if cache.app_id != app_id or cache.title != title:
+      return False
+
+    return True
+
+  def _get_icon_from_device(self) -> Optional[str]:
+    images = self.media_status.images
+
+    if images:
+      first, *_ = images
+      url, *_ = first
+
+      self._set_cached_icon(url)
+      return url
+
+    url: Optional[str] = None
 
     if self.cast_status:
-      icon = self.cast_status.icon_url
+      url = self.cast_status.icon_url
+
+    if url:
+      self._set_cached_icon(url)
+      return url
+
+    if not self._can_use_cache():
+      return None
+
+    return self.cached_icon.url
+
+  def get_art_url(self, track: Optional[int] = None) -> str:
+    icon = self._get_icon_from_device()
 
     if icon:
       return icon
 
+    # use default icon files if there's no thumbnails
     create_user_dirs()
 
     if self.light_icon:
