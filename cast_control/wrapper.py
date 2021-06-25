@@ -17,16 +17,17 @@ from pychromecast.controllers.bbcsounds import BbcSoundsController
 from pychromecast.controllers.bubbleupnp import BubbleUPNPController
 from pychromecast.controllers.supla import SuplaController
 from pychromecast.controllers.yleareena import YleAreenaController
-# from pychromecast.controllers.homeassistant import HomeAssistantController
-# from pychromecast.controllers.plex import PlexApiController
+from pychromecast.controllers.homeassistant import HomeAssistantController
+from pychromecast.controllers.plex import PlexApiController
 from pychromecast.controllers.plex import PlexController
 
 from mpris_server.adapters import PlayState, Microseconds, \
   VolumeDecimal, RateDecimal
-from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj#, Metadata
+from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 from mpris_server.metadata import Metadata, MetadataObj, ValidMetadata
 
+from . import TITLE
 from .types import Protocol, runtime_checkable, Final
 from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, LRU_MAX_SIZE, \
@@ -62,16 +63,16 @@ class CachedIcon(NamedTuple):
 
 class Controllers(NamedTuple):
   yt: YouTubeController
-  spotify: SpotifyController
-  # dash: DashCastController
-  # bbc_ip: BbcIplayerController
-  # bbc_sound: BbcSoundsController
-  # plex: PlexController
-  # bubble: BubbleUPNPController
-  # supla: SuplaController
-  # yle: YleAreenaController
-  # plex_api: PlexApiController
-  # ha: HomeAssistantController
+  spotify: SpotifyController = None
+  dash: DashCastController = None
+  plex: PlexController = None
+  supla: SuplaController = None
+  # bbc_ip: BbcIplayerController = None
+  # bbc_sound: BbcSoundsController = None
+  # bubble: BubbleUPNPController = None
+  # yle: YleAreenaController = None
+  # plex_api: PlexApiController = None
+  # ha: HomeAssistantController = None
 
 
 @runtime_checkable
@@ -138,12 +139,12 @@ class ControllersMixin(Wrapper):
     self.ctls = Controllers(
       YouTubeController(),
       SpotifyController(),
-      # DashCastController(),
+      DashCastController(),
+      PlexController(),
+      SuplaController(),
       # BbcIplayerController(),
       # BbcSoundsController(),
-      # PlexController(),
       # BubbleUPNPController(),
-      # SuplaController(),
       # YleAreenaController(),
       # PlexApiController(),
       # HomeAssistantController(),
@@ -250,6 +251,9 @@ class TitlesMixin(Wrapper):
     if app_name:
       titles.append(app_name)
 
+    if not titles:
+      titles.append(TITLE)
+
     titles = titles[:MAX_TITLES]
 
     return Titles(*titles)
@@ -341,9 +345,6 @@ class TimeMixin(Wrapper):
 
 
 class IconsMixin(Wrapper):
-  def set_icon(self, lighter: bool = False):
-    self.light_icon: bool = lighter
-
   def _set_cached_icon(self, url: Optional[str] = None):
     if not url:
       self.cached_icon = None
@@ -391,19 +392,20 @@ class IconsMixin(Wrapper):
 
     return self.cached_icon.url
 
+  @ensure_user_dirs_exist
+  def _get_default_icon(self) -> str:
+    if self.light_icon:
+      return str(LIGHT_THUMB)
+
+    return str(DEFAULT_THUMB)
+
   def get_art_url(self, track: Optional[int] = None) -> str:
     icon = self._get_icon_from_device()
 
     if icon:
       return icon
 
-    # use default icon files if there's no thumbnails
-    create_user_dirs()
-
-    if self.light_icon:
-      return str(LIGHT_THUMB)
-
-    return str(DEFAULT_THUMB)
+    return self._get_default_icon()
 
   @lru_cache(LRU_MAX_SIZE)
   def get_desktop_entry(self) -> str:
@@ -416,6 +418,9 @@ class IconsMixin(Wrapper):
     path = path.with_suffix(NO_SUFFIX)
 
     return str(path)
+
+  def set_icon(self, lighter: bool = False):
+    self.light_icon: bool = lighter
 
 
 class MetadataMixin(Wrapper):
@@ -540,13 +545,13 @@ class AbilitiesMixin(Wrapper):
   def can_play(self) -> bool:
     state = self.get_playstate()
 
-    return state is not PlayState.PLAYING
+    return state is not PlayState.STOPPED
 
   def can_control(self) -> bool:
     return True
-    #return self.can_play() or self.can_pause() or \
-      #self.can_play_next() or self.can_play_prev() or \
-      #self.can_seek()
+    # return self.can_play() or self.can_pause() \
+    #   or self.can_play_next() or self.can_play_prev() \
+    #   or self.can_seek()
 
   def can_edit_track(self) -> bool:
     return False
