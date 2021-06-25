@@ -7,7 +7,7 @@ import pickle
 from daemons.prefab.run import RunDaemon
 
 from .base import LOG_LEVEL, PID, \
-  DEFAULT_RETRY_WAIT, DATA_DIR, NAME, LOG, \
+  DEFAULT_RETRY_WAIT, NAME, LOG, \
   NO_DEVICE, DEFAULT_WAIT, ARGS, \
   ARGS_STEM, DEFAULT_ICON, DEFAULT_SET_LOG, \
   set_log_level
