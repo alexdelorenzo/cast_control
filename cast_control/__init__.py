@@ -14,6 +14,7 @@ NAME: Final[str] = 'cast_control'
 SHORT_NAME: Final[str] = 'castctl'
 DESCRIPTION: Final[str] = '📺 Control Chromecasts from Linux and D-Bus'
 HOMEPAGE: Final[str] = "https://github.com/alexdelorenzo/cast_control"
+TITLE: Final[str] = 'Cast Control'
 
 ENTRYPOINT_NAME: Final[str] = 'cli'
 CLI_MODULE_NAME: Final[str] = f'{NAME}.cli'
