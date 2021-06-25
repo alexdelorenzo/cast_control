@@ -152,7 +152,7 @@ assert cli.name == ENTRYPOINT_NAME
 
 
 @cli.command(
-  help='Connect to the device and run the service in the foreground.',
+  help='Connect to a device and run the service in the foreground.',
 )
 @click.option(*NAME_ARGS.args, **NAME_ARGS.kwargs)
 @click.option(*HOST_ARGS.args, **HOST_ARGS.kwargs)
@@ -193,7 +193,7 @@ def service():
 
 
 @service.command(
-  help='Connect the background service to the device.'
+  help='Connect the background service to a device.'
 )
 @click.option(*NAME_ARGS.args, **NAME_ARGS.kwargs)
 @click.option(*HOST_ARGS.args, **HOST_ARGS.kwargs)
