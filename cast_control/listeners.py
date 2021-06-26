@@ -71,8 +71,9 @@ class DeviceEventListener(
     self._update_volume(status)
 
     # wire up mpris_server with cc events
-    self.on_playback()
-    self.on_options()
+    # self.on_playback()
+    # self.on_options()
+    self.on_player_all()
 
     # wire up local integration with mpris
     self.adapter.on_new_status()
