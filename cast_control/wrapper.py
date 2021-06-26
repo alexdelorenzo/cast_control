@@ -302,7 +302,7 @@ class TimeMixin(Wrapper):
     if not status:
       return BEGINNING
 
-    position_secs = status.adjusted_current_time
+    position_secs = status.adjusted_current_time or status.current_time
 
     if position_secs:
       position_us = position_secs * US_IN_SEC
