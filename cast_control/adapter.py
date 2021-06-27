@@ -79,7 +79,11 @@ class DevicePlayerAdapter(WrapperIntegration, PlayerAdapter):
   def get_playstate(self) -> PlayState:
     return self.wrapper.get_playstate()
 
-  def seek(self, time: Microseconds):
+  def seek(
+    self,
+    time: Microseconds,
+    track_id: Optional[DbusObj] = None
+  ):
     self.wrapper.seek(time)
 
   def open_uri(self, uri: str):
