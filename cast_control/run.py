@@ -8,11 +8,13 @@ from mpris_server.server import Server
 
 from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
   DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, NAME, Device, \
-  RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, find_device, \
-  DEFAULT_ICON, DEFAULT_SET_LOG, set_log_level
+  RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, \
+  DEFAULT_ICON, DEFAULT_SET_LOG
 from .adapter import DeviceAdapter
 from .listeners import register_event_listener
 from .daemon import DaemonArgs
+from .device import find_device
+from .state import set_log_level
 
 
 def create_adapters_and_server(
