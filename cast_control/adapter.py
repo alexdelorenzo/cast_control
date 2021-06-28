@@ -9,7 +9,7 @@ from .base import Device
 from .device.wrapper import DeviceWrapper
 
 
-class WrapperIntegration:
+class DeviceIntegration:
   wrapper: DeviceWrapper
 
   def set_icon(self, light_icon: bool):
@@ -19,7 +19,7 @@ class WrapperIntegration:
     self.wrapper.on_new_status(*args, **kwargs)
 
 
-class DeviceRootAdapter(WrapperIntegration, RootAdapter):
+class DeviceRootAdapter(DeviceIntegration, RootAdapter):
   def get_uri_schemes(self) -> list[str]:
     return URI
 
@@ -36,7 +36,7 @@ class DeviceRootAdapter(WrapperIntegration, RootAdapter):
     self.wrapper.quit()
 
 
-class DevicePlayerAdapter(WrapperIntegration, PlayerAdapter):
+class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   def can_go_next(self) -> bool:
     return self.wrapper.can_play_next()
 
