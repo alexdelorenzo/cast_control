@@ -6,10 +6,12 @@ from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
   Track
 
 from .base import Device
+from .types import Protocol, runtime_checkable
 from .device.wrapper import DeviceWrapper
 
 
-class DeviceIntegration:
+@runtime_checkable
+class DeviceIntegration(Protocol):
   wrapper: DeviceWrapper
 
   def set_icon(self, light_icon: bool):

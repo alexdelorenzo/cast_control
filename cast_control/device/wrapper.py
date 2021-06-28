@@ -24,8 +24,8 @@ from pychromecast.controllers.plex import PlexController
 from mpris_server.adapters import PlayState, Microseconds, \
   VolumeDecimal, RateDecimal
 from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
-from mpris_server.compat import get_dbus_name, enforce_dbus_length
-from mpris_server.metadata import Metadata, MetadataObj, ValidMetadata
+from mpris_server.mpris.compat import get_dbus_name, enforce_dbus_length
+from mpris_server.mpris.metadata import Metadata, MetadataObj, ValidMetadata
 
 from .. import TITLE
 from ..types import Protocol, runtime_checkable, Final
