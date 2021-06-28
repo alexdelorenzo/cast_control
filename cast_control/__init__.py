@@ -23,7 +23,11 @@ CLI_MODULE_NAME: Final[str] = f'{NAME}.app.cli'
 # packaging metadata
 CMD_PT: Final[str] = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
 PY_VERSION: Final[str] = '>=3.7'
-PKGS: Final[list[str]] = [NAME]
+PKGS: Final[list[str]] = [
+  NAME,
+  f'{NAME}.app',
+  f'{NAME}.device',
+]
 
 PROJECT_URLS: Final[dict[str, str]] = {
   'Homepage': 'https://alexdelorenzo.dev/',
