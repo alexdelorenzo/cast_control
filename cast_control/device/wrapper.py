@@ -27,12 +27,12 @@ from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
 from mpris_server.compat import get_dbus_name, enforce_dbus_length
 from mpris_server.metadata import Metadata, MetadataObj, ValidMetadata
 
-from . import TITLE
-from .types import Protocol, runtime_checkable, Final
-from .base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
+from .. import TITLE
+from ..types import Protocol, runtime_checkable, Final
+from ..base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, LRU_MAX_SIZE, \
   NAME, DEFAULT_ICON, Device
-from .state import create_desktop_file, ensure_user_dirs_exist, \
+from ..state import create_desktop_file, ensure_user_dirs_exist, \
   create_user_dirs
 
 

@@ -14,7 +14,7 @@ from pychromecast.controllers.receiver import CastStatus, \
 from pychromecast.socket_client import ConnectionStatus, \
   ConnectionStatusListener
 
-from .base import Status, Device
+from ..base import Status, Device
 
 
 # status with volume attributes

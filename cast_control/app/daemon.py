@@ -6,11 +6,11 @@ import pickle
 
 from daemons.prefab.run import RunDaemon
 
-from .base import LOG_LEVEL, PID, \
+from ..base import LOG_LEVEL, PID, \
   DEFAULT_RETRY_WAIT, NAME, LOG, \
   NO_DEVICE, DEFAULT_WAIT, ARGS, \
   ARGS_STEM, DEFAULT_ICON, DEFAULT_SET_LOG
-from .state import set_log_level
+from ..state import setup_logging
 
 
 FuncMaybe = Optional[Callable]
@@ -61,7 +61,7 @@ class MprisDaemon(RunDaemon):
     else:
       level = self.logging
 
-    set_log_level(level, file=LOG)
+    setup_logging(level, file=LOG)
 
   def run(self):
     if not self.target:

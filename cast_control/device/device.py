@@ -9,9 +9,10 @@ from pychromecast.socket_client import ConnectionStatus
 from pychromecast import Chromecast, get_chromecasts, \
   get_chromecast_from_host
 
-from . import NAME
-from .types import Final
-from .base import DEFAULT_DISC_NO, DEFAULT_RETRY_WAIT, Device, Host
+from .. import NAME
+from ..types import Final
+from ..base import DEFAULT_DISC_NO, DEFAULT_RETRY_WAIT, \
+  Device, Host
 
 
 def get_device_via_host(

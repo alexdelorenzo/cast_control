@@ -14,7 +14,7 @@ from .base import USER_DIRS, LRU_MAX_SIZE, DESKTOP_NAME, \
   LOG_FILE_MODE, NAME
 
 
-def set_log_level(
+def setup_logging(
   level: str = LOG_LEVEL,
   file: Optional[Path] = None,
 ):
@@ -30,6 +30,7 @@ def set_log_level(
   )
 
 
+# check for user dirs and create them asynchronously
 async def _create_user_dirs():
   paths = map(AsyncPath, USER_DIRS)
 

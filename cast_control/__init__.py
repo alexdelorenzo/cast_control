@@ -17,7 +17,7 @@ HOMEPAGE: Final[str] = "https://github.com/alexdelorenzo/cast_control"
 TITLE: Final[str] = 'Cast Control'
 
 ENTRYPOINT_NAME: Final[str] = 'cli'
-CLI_MODULE_NAME: Final[str] = f'{NAME}.cli'
+CLI_MODULE_NAME: Final[str] = f'{NAME}.app.cli'
 
 
 # packaging metadata

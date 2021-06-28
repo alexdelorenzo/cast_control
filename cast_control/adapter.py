@@ -6,7 +6,7 @@ from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
   Track
 
 from .base import Device
-from .wrapper import DeviceWrapper
+from .device.wrapper import DeviceWrapper
 
 
 class WrapperIntegration:

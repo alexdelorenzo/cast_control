@@ -6,14 +6,14 @@ import sys
 
 import click
 
-from . import __version__, __author__, __copyright__,\
+from .. import __version__, __author__, __copyright__,\
   __license__, HOMEPAGE, ENTRYPOINT_NAME, CLI_MODULE_NAME
-from .base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
+from ..base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
+from ..types import Final
 from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
   get_daemon_from_args
 from .run import run_safe
-from .types import Final
 
 
 assert __name__ == CLI_MODULE_NAME

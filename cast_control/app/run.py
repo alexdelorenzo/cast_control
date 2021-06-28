@@ -6,15 +6,15 @@ import sys
 
 from mpris_server.server import Server
 
-from .base import Seconds, NoDevicesFound, LOG_LEVEL, \
+from ..base import Seconds, NoDevicesFound, LOG_LEVEL, \
   DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, NAME, Device, \
   RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, \
   DEFAULT_ICON, DEFAULT_SET_LOG
-from .adapter import DeviceAdapter
-from .listeners import register_event_listener
+from ..adapter import DeviceAdapter
+from ..state import setup_logging
+from ..device.listeners import register_event_listener
+from ..device.device import find_device
 from .daemon import DaemonArgs
-from .device import find_device
-from .state import set_log_level
 
 
 def create_adapters_and_server(
@@ -72,7 +72,7 @@ def run_server(
   set_logging: bool = DEFAULT_SET_LOG,
 ):
   if set_logging:
-    set_log_level(log_level)
+    setup_logging(log_level)
 
   mpris = retry_until_found(name, host, uuid, wait, retry_wait)
 
