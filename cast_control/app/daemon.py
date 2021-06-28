@@ -10,7 +10,7 @@ from ..base import LOG_LEVEL, PID, \
   DEFAULT_RETRY_WAIT, NAME, LOG, \
   NO_DEVICE, DEFAULT_WAIT, ARGS, \
   ARGS_STEM, DEFAULT_ICON, DEFAULT_SET_LOG
-from ..state import setup_logging
+from .state import setup_logging
 
 
 FuncMaybe = Optional[Callable]

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, NamedTuple
 from uuid import UUID
 import logging
 
@@ -12,7 +12,15 @@ from pychromecast import Chromecast, get_chromecasts, \
 from .. import NAME
 from ..types import Final
 from ..base import DEFAULT_DISC_NO, DEFAULT_RETRY_WAIT, \
-  Device, Host
+  Device, NO_STR, NO_PORT
+
+
+class Host(NamedTuple):
+  host: str
+  port: Optional[int] = NO_PORT
+  uuid: str = NO_STR
+  model_name: str = NO_STR
+  friendly_name: str = NO_STR
 
 
 def get_device_via_host(
@@ -38,7 +46,10 @@ def get_devices(
   return devices
 
 
-def get_first(devices: list[Device]) -> Device:
+def get_first(devices: list[Device]) -> Optional[Device]:
+  if not devices:
+    return None
+
   first, *_ = devices
   first.wait()
 
@@ -51,10 +62,7 @@ def get_device_via_uuid(
 ) -> Optional[Device]:
   devices = get_devices(retry_wait)
 
-  if not uuid and not devices:
-    return None
-
-  elif not uuid:
+  if not uuid:
     return get_first(devices)
 
   uuid = UUID(uuid)
@@ -74,10 +82,7 @@ def get_device(
 ) -> Optional[Device]:
   devices = get_devices(retry_wait)
 
-  if not name and not devices:
-    return None
-
-  elif not name:
+  if not name:
     return get_first(devices)
 
   name = name.casefold()

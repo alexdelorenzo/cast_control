@@ -1,22 +1,14 @@
 from __future__ import annotations
-from typing import Optional, Union, NamedTuple, Callable
+from typing import Optional, Union
 from pathlib import Path
-from uuid import UUID
 from enum import auto
-from os import stat_result
-from functools import lru_cache, wraps
-from asyncio import gather, run
-from weakref import finalize
-import logging
 
 from appdirs import AppDirs
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
-from pychromecast import Chromecast, get_chromecasts, \
-  get_chromecast_from_host
+from pychromecast import Chromecast
 from mpris_server.base import AutoName
-from aiopath import AsyncPath
 
 from . import NAME
 from .types import Final
@@ -105,11 +97,3 @@ class MediaType(AutoName):
   MUSICTRACK = auto()
   PHOTO = auto()
   TVSHOW = auto()
-
-
-class Host(NamedTuple):
-  host: str
-  port: Optional[int] = NO_PORT
-  uuid: str = NO_STR
-  model_name: str = NO_STR
-  friendly_name: str = NO_STR

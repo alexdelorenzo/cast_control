@@ -11,10 +11,10 @@ from ..base import Seconds, NoDevicesFound, LOG_LEVEL, \
   RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, \
   DEFAULT_ICON, DEFAULT_SET_LOG
 from ..adapter import DeviceAdapter
-from ..state import setup_logging
 from ..device.listeners import register_event_listener
 from ..device.device import find_device
 from .daemon import DaemonArgs
+from .state import setup_logging
 
 
 def create_adapters_and_server(

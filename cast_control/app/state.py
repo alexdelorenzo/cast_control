@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, Union, NamedTuple, Callable
+from typing import Optional, Callable
 from pathlib import Path
 from os import stat_result
 from functools import lru_cache, wraps
@@ -8,7 +8,7 @@ import logging
 
 from aiopath import AsyncPath
 
-from .base import USER_DIRS, LRU_MAX_SIZE, DESKTOP_NAME, \
+from ..base import USER_DIRS, LRU_MAX_SIZE, DESKTOP_NAME, \
   DESKTOP_TEMPLATE, DESKTOP_SUFFIX, SRC_DIR, LIGHT_END, \
   LIGHT_ICON, DARK_END, DARK_ICON, DATA_DIR, LOG_LEVEL, \
   LOG_FILE_MODE, NAME
