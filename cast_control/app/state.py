@@ -85,7 +85,7 @@ def get_paths(light_icon: bool = True) -> tuple[Path, Path]:
   new_name = f'{NAME}{name_suffix}{DESKTOP_SUFFIX}'
   desktop_path = DATA_DIR / new_name
 
-  return icon_path, desktop_path
+  return desktop_path, icon_path
 
 
 @lru_cache(LRU_MAX_SIZE)
@@ -102,7 +102,7 @@ def new_file_from_template(file: Path, icon_path: Path):
 @lru_cache(LRU_MAX_SIZE)
 @ensure_user_dirs_exist
 def create_desktop_file(light_icon: bool = True) -> Path:
-  icon, file = get_paths(light_icon)
+  file, icon = get_paths(light_icon)
 
   if not file.exists() or is_older_than_module(file):
     new_file_from_template(file, icon)

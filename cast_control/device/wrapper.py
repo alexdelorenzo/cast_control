@@ -24,7 +24,7 @@ from pychromecast.controllers.plex import PlexController
 from mpris_server.adapters import PlayState, Microseconds, \
   VolumeDecimal, RateDecimal
 from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
-from mpris_server.mpris.compat import get_dbus_name, enforce_dbus_length
+from mpris_server.mpris.compat import get_track_id
 from mpris_server.mpris.metadata import Metadata, MetadataObj, ValidMetadata
 
 from .. import TITLE
@@ -50,24 +50,24 @@ NO_ARTIST: Final[str] = ''
 NO_SUFFIX: Final[str] = ''
 
 
-class Titles(NamedTuple):
-  title: Optional[str] = None
-  artist: Optional[str] = None
-  album: Optional[str] = None
-
-
 class CachedIcon(NamedTuple):
   url: str
   app_id: str
   title: str
 
 
+class Titles(NamedTuple):
+  title: Optional[str] = None
+  artist: Optional[str] = None
+  album: Optional[str] = None
+
+
 class Controllers(NamedTuple):
   yt: YouTubeController
-  spotify: SpotifyController = None
-  dash: DashCastController = None
-  plex: PlexController = None
-  supla: SuplaController = None
+  spotify: Optional[SpotifyController] = None
+  dash: Optional[DashCastController] = None
+  plex: Optional[PlexController] = None
+  supla: Optional[SuplaController] = None
   # bbc_ip: BbcIplayerController = None
   # bbc_sound: BbcSoundsController = None
   # bubble: BubbleUPNPController = None
@@ -276,6 +276,15 @@ class TimeMixin(Wrapper):
     self._longest_duration: float = NO_DURATION
     super().__init__()
 
+  @property
+  def current_time(self) -> Optional[float]:
+    status = self.media_status
+
+    if not status:
+      return None
+
+    return status.adjusted_current_time or status.current_time
+
   def get_duration(self) -> Microseconds:
     duration: Optional[float] = None
 
@@ -298,18 +307,13 @@ class TimeMixin(Wrapper):
     return NO_DURATION
 
   def get_current_position(self) -> Microseconds:
-    status = self.media_status
+    position_secs = self.current_time
 
-    if not status:
+    if not position_secs:
       return BEGINNING
 
-    position_secs = status.adjusted_current_time or status.current_time
-
-    if position_secs:
-      position_us = position_secs * US_IN_SEC
-      return round(position_us)
-
-    return BEGINNING
+    position_us = position_secs * US_IN_SEC
+    return round(position_us)
 
   def on_new_status(self, *args, **kwargs):
     # super().on_new_status(*args, **kwargs)
@@ -317,12 +321,12 @@ class TimeMixin(Wrapper):
       self._longest_duration = None
 
   def has_current_time(self) -> bool:
-    status = self.media_status
+    current_time = self.current_time
 
-    if not status or not status.current_time:
+    if current_time is None:
       return False
 
-    current_time = round(status.current_time, RESOLUTION)
+    current_time = round(current_time, RESOLUTION)
 
     return current_time > BEGINNING
 
@@ -410,9 +414,12 @@ class IconsMixin(Wrapper):
 
   @lru_cache(LRU_MAX_SIZE)
   def get_desktop_entry(self) -> str:
-    path = create_desktop_file(self.light_icon)
+    try:
+      path = create_desktop_file(self.light_icon)
 
-    if not path:
+    except Exception as e:
+      logging.exception(e)
+      logging.error("Couldn't load desktop file.")
       return NO_DESKTOP_FILE
 
     # mpris requires stripped suffix
@@ -604,11 +611,6 @@ class DeviceWrapper(
     cls_name = cls.__name__
 
     return f'<{cls_name} for {self.dev}>'
-
-
-@enforce_dbus_length
-def get_track_id(name: str) -> DbusObj:
-  return f'/track/{get_dbus_name(name)}'
 
 
 def get_media_type(
