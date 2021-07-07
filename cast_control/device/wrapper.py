@@ -22,7 +22,7 @@ from pychromecast.controllers.plex import PlexApiController
 from pychromecast.controllers.plex import PlexController
 
 from mpris_server.adapters import PlayState, Microseconds, \
-  VolumeDecimal, RateDecimal
+  VolumeDecimal, RateDecimal, Paths
 from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
 from mpris_server.mpris.compat import get_track_id
 from mpris_server.mpris.metadata import Metadata, MetadataObj, ValidMetadata
@@ -413,7 +413,7 @@ class IconsMixin(Wrapper):
     return self._get_default_icon()
 
   @lru_cache(LRU_MAX_SIZE)
-  def get_desktop_entry(self) -> str:
+  def get_desktop_entry(self) -> Paths:
     try:
       path = create_desktop_file(self.light_icon)
 
@@ -422,10 +422,7 @@ class IconsMixin(Wrapper):
       logging.error("Couldn't load desktop file.")
       return NO_DESKTOP_FILE
 
-    # mpris requires stripped suffix
-    path = path.with_suffix(NO_SUFFIX)
-
-    return str(path)
+    return path
 
   def set_icon(self, lighter: bool = False):
     self.light_icon: bool = lighter
@@ -454,7 +451,7 @@ class MetadataMixin(Wrapper):
       album_artists=artists,
       disc_no=DEFAULT_DISC_NO,
       track_no=track_no,
-      comment=comments
+      comments=comments
     )
 
 
