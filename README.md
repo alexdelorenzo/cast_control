@@ -27,7 +27,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
   * [x] Play, pause, and stop playback
   * [x] Volume up and down
   * [x] Play next and previous
-  * [x] Quit casted app
+  * [x] Quit open app or media player
   * [x] Open media from D-Bus
   * [x] Play YouTube videos
   * [ ] Playlist integration
@@ -122,8 +122,8 @@ Usage: cast_control [OPTIONS] COMMAND [ARGS]...
 
   Control casting devices via Linux media controls and desktops.
 
-  This daemon connects your casting device directly to the D-Bus media player
-  interface.
+  This daemon connects your casting device to the D-Bus media player interface
+  (MPRIS).
 
   See https://github.com/alexdelorenzo/cast_control for more information.
 
@@ -133,7 +133,7 @@ Options:
   --help         Show this message and exit.
 
 Commands:
-  connect  Connect to the device and run the service in the foreground.
+  connect  Connect to a device and run the service in the foreground.
   service  Connect, disconnect or reconnect the background service to or...
 ```
 
@@ -142,7 +142,7 @@ Commands:
 $ cast_control connect --help
 Usage: cast_control connect [OPTIONS]
 
-  Connect to the device and run the service in the foreground.
+  Connect to a device and run the service in the foreground.
 
 Options:
   -n, --name TEXT         Connect to a device via its name, otherwise control
@@ -175,7 +175,7 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  connect     Connect the background service to the device.
+  connect     Connect the background service to a device.
   disconnect  Disconnect the background service from the device.
   reconnect   Reconnect the background service to the device.
   log         Show the service log.
@@ -186,7 +186,7 @@ Commands:
 $ cast_control service connect --help
 Usage: cast_control service connect [OPTIONS]
 
-  Connect the background service to the device.
+  Connect the background service to a device.
 
 Options:
   -n, --name TEXT         Connect to a device via its name, otherwise control
