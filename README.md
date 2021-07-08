@@ -21,7 +21,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
   * [x] Control music and video playback
   * [x] Control app playback
   * [x] View playback information in real-time
-  * [x] Display thumbnail and title
+  * [x] Display title, thumbnail and icon
   * [x] Display playback position and media length
   * [x] Seek forward and backward
   * [x] Play, pause, and stop playback
