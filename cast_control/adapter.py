@@ -39,6 +39,18 @@ class DeviceRootAdapter(DeviceIntegration, RootAdapter):
 
 
 class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
+  def metadata(self) -> Metadata:
+    return self.wrapper.metadata()
+
+  def is_repeating(self) -> bool:
+    return self.wrapper.is_repeating()
+
+  def is_playlist(self) -> bool:
+    return self.wrapper.is_playlist()
+
+  def is_mute(self) -> bool:
+    return self.wrapper.is_mute()
+
   def can_go_next(self) -> bool:
     return self.wrapper.can_play_next()
 
@@ -56,6 +68,12 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
 
   def can_control(self) -> bool:
     return self.wrapper.can_control()
+
+  def can_edit_track(self) -> bool:
+    return self.wrapper.can_edit_track()
+
+  def get_playstate(self) -> PlayState:
+    return self.wrapper.get_playstate()
 
   def get_current_position(self) -> Microseconds:
     return self.wrapper.get_current_position()
@@ -78,9 +96,6 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   def play(self):
     self.wrapper.play()
 
-  def get_playstate(self) -> PlayState:
-    return self.wrapper.get_playstate()
-
   def seek(
     self,
     time: Microseconds,
@@ -91,23 +106,8 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   def open_uri(self, uri: str):
     self.wrapper.open_uri(uri)
 
-  def is_repeating(self) -> bool:
-    return self.wrapper.is_repeating()
-
-  def is_playlist(self) -> bool:
-    return self.wrapper.is_playlist()
-
   def get_rate(self) -> RateDecimal:
     return self.wrapper.get_rate()
-
-  def set_rate(self, val: RateDecimal):
-    pass
-
-  def get_shuffle(self) -> bool:
-    return False
-
-  def set_shuffle(self, val: bool):
-    pass
 
   def get_art_url(self, track: int = None) -> str:
     return self.wrapper.get_art_url(track)
@@ -118,9 +118,6 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   def set_volume(self, val: VolumeDecimal):
     self.wrapper.set_volume(val)
 
-  def is_mute(self) -> bool:
-    return self.wrapper.is_mute()
-
   def set_mute(self, val: bool):
     self.wrapper.set_mute(val)
 
@@ -129,9 +126,6 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
 
   def get_duration(self) -> Microseconds:
     return self.wrapper.get_duration()
-
-  def metadata(self) -> Metadata:
-    return self.wrapper.metadata()
 
   def get_current_track(self) -> Track:
     return self.wrapper.get_current_track()
@@ -144,8 +138,14 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   ):
     self.wrapper.add_track(uri, after_track, set_as_current)
 
-  def can_edit_track(self) -> bool:
-    return self.wrapper.can_edit_track()
+  def get_shuffle(self) -> bool:
+    return False
+
+  def set_shuffle(self, val: bool):
+    pass
+
+  def set_rate(self, val: RateDecimal):
+    pass
 
   def set_repeating(self, val: bool):
     pass

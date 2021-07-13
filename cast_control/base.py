@@ -8,7 +8,7 @@ from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
 from pychromecast import Chromecast
-from mpris_server.base import AutoName
+from strenum import StrEnum
 
 from . import NAME
 from .types import Final
@@ -91,7 +91,7 @@ class NoDevicesFound(Exception):
   pass
 
 
-class MediaType(AutoName):
+class MediaType(StrEnum):
   GENERIC = auto()
   MOVIE = auto()
   MUSICTRACK = auto()
