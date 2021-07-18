@@ -11,7 +11,7 @@ from aiopath import AsyncPath
 from ..base import USER_DIRS, LRU_MAX_SIZE, DESKTOP_NAME, \
   DESKTOP_TEMPLATE, DESKTOP_SUFFIX, SRC_DIR, LIGHT_END, \
   LIGHT_ICON, DARK_END, DARK_ICON, DATA_DIR, LOG_LEVEL, \
-  LOG_FILE_MODE, NAME
+  LOG_FILE_MODE, NAME, APP_PATHS
 
 
 def setup_logging(
@@ -44,7 +44,7 @@ async def _create_user_dirs():
 
 @lru_cache(LRU_MAX_SIZE)
 def create_user_dirs():
-  run(_create_user_dirs())
+  APP_PATHS.create_user_dirs()
 
 
 def ensure_user_dirs_exist(func: Callable) -> Callable:
