@@ -3,7 +3,7 @@ from typing import Optional, Union
 from pathlib import Path
 from enum import auto
 
-from appdirs import AppDirs
+from app_paths import AppPaths
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
@@ -55,10 +55,10 @@ ARGS_STEM: Final[str] = '-args'
 LIGHT_END: Final[str] = '-light'
 DARK_END: Final[str] = '-dark'
 
-APP_DIRS: Final[AppDirs] = AppDirs(NAME)
-DATA_DIR: Final[Path] = Path(APP_DIRS.user_data_dir)
-LOG_DIR: Final[Path] = Path(APP_DIRS.user_log_dir)
-STATE_DIR: Final[Path] = Path(APP_DIRS.user_state_dir)
+APP_PATHS: Final[AppPaths] = AppPaths.get_paths(NAME)
+DATA_DIR: Final[Path] = APP_PATHS.user_data_path
+LOG_DIR: Final[Path] = APP_PATHS.user_log_path
+STATE_DIR: Final[Path] = APP_PATHS.user_state_path
 
 # use explicit parens for tuple assignment on Python <= 3.7.x
 # see https://bugs.python.org/issue35814
