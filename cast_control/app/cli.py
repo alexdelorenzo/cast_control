@@ -69,6 +69,17 @@ UUID_ARGS: Final[CliArgs] = CliArgs(
   )
 )
 
+OVERRIDE_ARGS: Final[CliArgs] = CliArgs(
+  args=('--override', '-o'),
+  kwargs=dict(
+    default=None,
+    multiple=True,
+    show_default=True,
+    type=click.STRING,
+    help="Override MPRIS properties"
+  )
+)
+
 WAIT_ARGS: Final[CliArgs] = CliArgs(
   args=('--wait', '-w'),
   kwargs=dict(
@@ -119,7 +130,11 @@ class OrderAsCreated(click.Group):
     return list(self.commands)
 
 
-@click.group(help=HELP, invoke_without_command=True)
+@click.group(
+  cls=OrderAsCreated,
+  help=HELP,
+  invoke_without_command=True
+)
 @click.option('--license', '-L',
   is_flag=True, default=False, type=click.BOOL,
   help="Show license and copyright information.")
@@ -159,6 +174,7 @@ assert cli.name == ENTRYPOINT_NAME
 @click.option(*UUID_ARGS.args, **UUID_ARGS.kwargs)
 @click.option(*WAIT_ARGS.args, **WAIT_ARGS.kwargs)
 @click.option(*RETRY_ARGS.args, **RETRY_ARGS.kwargs)
+@click.option(*OVERRIDE_ARGS.args, **OVERRIDE_ARGS.kwargs)
 @click.option(*ICON_ARGS.args, **ICON_ARGS.kwargs)
 @click.option(*LOG_ARGS.args, **LOG_ARGS.kwargs)
 def connect(
@@ -167,8 +183,9 @@ def connect(
   uuid: Optional[str],
   wait: Optional[float],
   retry_wait: Optional[float],
+  override: Optional[list[str]],
   icon: bool,
-  log_level: str
+  log_level: str,
 ):
   args = DaemonArgs(
     name,
@@ -200,6 +217,7 @@ def service():
 @click.option(*UUID_ARGS.args, **UUID_ARGS.kwargs)
 @click.option(*WAIT_ARGS.args, **WAIT_ARGS.kwargs)
 @click.option(*RETRY_ARGS.args, **RETRY_ARGS.kwargs)
+@click.option(*OVERRIDE_ARGS.args, **OVERRIDE_ARGS.kwargs)
 @click.option(*ICON_ARGS.args, **ICON_ARGS.kwargs)
 @click.option(*LOG_ARGS.args, **LOG_ARGS.kwargs)
 def connect(
@@ -208,8 +226,9 @@ def connect(
   uuid: Optional[str],
   wait: Optional[float],
   retry_wait: Optional[float],
+  override: Optional[list[str]],
   icon: bool,
-  log_level: str
+  log_level: str,
 ):
   args = DaemonArgs(
     name,
