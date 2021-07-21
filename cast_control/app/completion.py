@@ -28,7 +28,7 @@ class Shell(ABC):
   config: Optional[Path] = None
 
   @abstractmethod
-  def get_completion_path(self, app_name: str) -> Path:
+  def get_completion_path(self, name: str) -> Path:
     pass
 
   @abstractmethod
@@ -39,7 +39,7 @@ class Shell(ABC):
     caps = name.upper()
     return f'_{caps}_COMPLETE={self.src_cmd} {name}'
 
-  def run_cmd(self, name: str):
+  def run_cmd(self, name: str, file: Path):
     complete_cmd = self.get_cmd(name)
     shell_cmd = f'{complete_cmd} > {file}'
     run(shell_cmd, shell=True)
@@ -47,7 +47,9 @@ class Shell(ABC):
   def gen_completions(self) -> Iterable[Path]:
     for app_name in NAMES:
       file = self.get_completion_path(app_name)
-      self.run_cmd(app_name)
+      file.parent.mkdir(parents=True, exist_ok=True)
+
+      self.run_cmd(app_name, file)
       yield file
 
 
@@ -57,8 +59,8 @@ class Bash(Shell):
   extension: str = 'sh'
   config: str = Path('~/.bashrc')
 
-  def get_completion_path(self, app_name: str) -> Path:
-    path = f'~/.config/{app_name}-complete.{self.extension}'
+  def get_completion_path(self, name: str) -> Path:
+    path = f'~/.config/{name}-complete.{self.extension}'
     return Path(path)
 
   def create_completions(self):
@@ -72,8 +74,8 @@ class Fish(Shell):
   src_cmd: str = 'fish_source'
   extension: str = 'fish'
 
-  def get_completion_path(self, app_name: str) -> Path:
-    path = f'~/.config/fish/completions/{app_name}.{self.extension}'
+  def get_completion_path(self, name: str) -> Path:
+    path = f'~/.config/fish/completions/{name}.{self.extension}'
     return Path(path)
 
   def create_completions(self):
@@ -87,8 +89,8 @@ class Zsh(Shell):
   extension: str = 'zsh'
   config: str = Path('~/.zshrc')
 
-  def get_completion_path(self, app_name: str) -> Path:
-    path = f'~/.config/{app_name}-complete.{self.extension}'
+  def get_completion_path(self, name: str) -> Path:
+    path = f'~/.config/{name}-complete.{self.extension}'
     return Path(path)
 
   def create_completions(self):
