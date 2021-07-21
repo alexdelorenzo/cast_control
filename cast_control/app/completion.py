@@ -54,10 +54,10 @@ class Shell(ABC):
 
 
 class Bash(Shell):
-  name = ShellName.bash
+  name: ShellName = ShellName.bash
   src_cmd: str = 'bash_source'
   extension: str = 'sh'
-  config: str = Path('~/.bashrc')
+  config: Path = Path('~/.bashrc')
 
   def get_completion_path(self, name: str) -> Path:
     path = f'~/.config/{name}-complete.{self.extension}'
@@ -70,7 +70,7 @@ class Bash(Shell):
 
 
 class Fish(Shell):
-  name = ShellName.fish
+  name: ShellName = ShellName.fish
   src_cmd: str = 'fish_source'
   extension: str = 'fish'
 
@@ -84,10 +84,10 @@ class Fish(Shell):
 
 
 class Zsh(Shell):
-  name = ShellName.zsh
+  name: ShellName = ShellName.zsh
   src_cmd: str = 'zsh_source'
   extension: str = 'zsh'
-  config: str = Path('~/.zshrc')
+  config: Path = Path('~/.zshrc')
 
   def get_completion_path(self, name: str) -> Path:
     path = f'~/.config/{name}-complete.{self.extension}'
