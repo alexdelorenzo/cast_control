@@ -113,7 +113,7 @@ def get_shell(shell: ShellName) -> Shell:
 @cache
 def add_line_to_file(line: str, path: Path):
   if not line.endswith(NEW_LINE):
-    line = line + NEW_LINE
+    line += NEW_LINE
 
   path = path.expanduser()
 
