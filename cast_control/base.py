@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import Optional, Union
+from typing import Optional, Union, Callable
+from functools import lru_cache, partial
 from pathlib import Path
 from enum import auto
 
@@ -18,7 +19,6 @@ Seconds = int
 
 
 DESKTOP_NAME: Final[str] = 'Cast Control'
-LOG_LEVEL: Final[str] = 'WARN'
 
 RC_OK: Final[int] = 0
 RC_NO_CHROMECAST: Final[int] = 1
@@ -45,8 +45,9 @@ DEFAULT_RETRY_WAIT: Final[float] = 5.0
 DEFAULT_WAIT: Final[Seconds] = 30
 
 LOG_FILE_MODE: Final[str] = 'w'  # create a new log on service start
-DEFAULT_ICON: Final[bool] = False
 DEFAULT_SET_LOG: Final[bool] = False
+LOG_LEVEL: Final[str] = 'WARN'
+
 
 DESKTOP_SUFFIX: Final[str] = '.desktop'
 NO_DESKTOP_FILE: Final[str] = ''
@@ -81,7 +82,7 @@ LIGHT_SVG: Final[Path] = ICON_DIR / 'cc-white.svg'
 
 LIGHT_ICON = LIGHT_THUMB = LIGHT_SVG
 DEFAULT_THUMB = DARK_ICON = DARK_SVG
-
+DEFAULT_ICON: Final[bool] = False
 
 Device = Chromecast
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]
@@ -97,3 +98,9 @@ class MediaType(StrEnum):
   MUSICTRACK = auto()
   PHOTO = auto()
   TVSHOW = auto()
+
+
+Decorator = Callable[[Callable], Callable]
+
+
+cache: Final[Decorator] = lru_cache(maxsize=LRU_MAX_SIZE)

@@ -3,7 +3,6 @@ from typing import Optional, Any, Union, \
   NamedTuple, Callable
 from pathlib import Path
 from mimetypes import guess_type
-from functools import lru_cache
 import logging
 
 from pychromecast.controllers.receiver import CastStatus
@@ -31,7 +30,7 @@ from .. import TITLE
 from ..types import Protocol, runtime_checkable, Final
 from ..base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
   US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, LRU_MAX_SIZE, \
-  NAME, DEFAULT_ICON, Device
+  NAME, DEFAULT_ICON, Device, cache
 from ..app.state import create_desktop_file, ensure_user_dirs_exist, \
   create_user_dirs
 
@@ -397,6 +396,7 @@ class IconsMixin(Wrapper):
 
     return self.cached_icon.url
 
+  @cache
   @ensure_user_dirs_exist
   def _get_default_icon(self) -> str:
     if self.light_icon:
@@ -412,7 +412,7 @@ class IconsMixin(Wrapper):
 
     return self._get_default_icon()
 
-  @lru_cache(LRU_MAX_SIZE)
+  @cache
   def get_desktop_entry(self) -> Paths:
     try:
       path = create_desktop_file(self.light_icon)
