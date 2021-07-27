@@ -13,6 +13,7 @@ from .. import NAME, SHORT_NAME
 
 NAMES: tuple[str] = NAME, SHORT_NAME
 NEW_LINE: str = '\n'
+REPLACE: tuple[str, str] = ('-', '_')
 
 
 class ShellName(StrEnum):
@@ -35,21 +36,28 @@ class Shell(ABC):
   def create_completions(self):
     pass
 
+  def create_completion_path(self, name: str) -> Path:
+    file = self.get_completion_path(app_name)
+    file.parent.mkdir(parents=True, exist_ok=True)
+
+    return file
+
   def get_cmd(self, name: str) -> str:
     caps = name.upper()
+    caps = caps.replace(*REPLACE)
+
     return f'_{caps}_COMPLETE={self.src_cmd} {name}'
 
   def run_cmd(self, name: str, file: Path):
-    complete_cmd = self.get_cmd(name)
-    shell_cmd = f'{complete_cmd} > {file}'
+    completion_cmd = self.get_cmd(name)
+    shell_cmd = f'{completion_cmd} > {file}'
     run(shell_cmd, shell=True)
 
   def gen_completions(self) -> Iterable[Path]:
     for app_name in NAMES:
-      file = self.get_completion_path(app_name)
-      file.parent.mkdir(parents=True, exist_ok=True)
-
+      file = self.create_completion_path(app_name)
       self.run_cmd(app_name, file)
+
       yield file
 
 
