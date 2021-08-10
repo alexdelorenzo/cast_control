@@ -1,19 +1,19 @@
 from __future__ import annotations
 from typing import Iterable, Optional
+from abc import ABC, abstractmethod
+from functools import cache
+from pathlib import Path
 from subprocess import run
 from enum import auto
-from pathlib import Path
-from functools import cache
-from abc import ABC, abstractmethod
 
 from strenum import StrEnum
 
 from .. import NAME, SHORT_NAME
 
 
-NAMES: tuple[str] = NAME, SHORT_NAME
-NEW_LINE: str = '\n'
+NAMES: tuple[str, str] = (NAME, SHORT_NAME)
 REPLACE: tuple[str, str] = ('-', '_')
+NEW_LINE: str = '\n'
 
 
 class ShellName(StrEnum):
