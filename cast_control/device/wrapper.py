@@ -62,7 +62,7 @@ class Titles(NamedTuple):
 
 
 class Controllers(NamedTuple):
-  yt: YouTubeController
+  yt: Optional[YouTubeController] = None
   spotify: Optional[SpotifyController] = None
   dash: Optional[DashCastController] = None
   plex: Optional[PlexController] = None
@@ -204,10 +204,10 @@ class ControllersMixin(Wrapper):
     video_id = get_video_id(uri)
     yt = self.ctls.yt
 
-    if video_id:
+    if video_id and yt:
       yt.add_to_queue(video_id)
 
-    if video_id and set_as_current:
+    if video_id and set_as_current and yt:
       yt.play_video(video_id)
 
     elif set_as_current:
