@@ -6,8 +6,9 @@ import sys
 
 import click
 
-from .. import __version__, __author__, __copyright__,\
-  __license__, HOMEPAGE, ENTRYPOINT_NAME, CLI_MODULE_NAME
+from .. import __version__, __author__, __copyright__, \
+  __license__, HOMEPAGE, ENTRYPOINT_NAME, \
+  CLI_MODULE_NAME
 from ..base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
 from ..types import Final

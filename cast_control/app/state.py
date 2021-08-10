@@ -90,9 +90,9 @@ def new_file_from_template(file: Path, icon_path: Path):
   *lines, name, icon = get_template()
   name += DESKTOP_NAME
   icon += str(icon_path)
+
   lines = (*lines, name, icon)
   text = '\n'.join(lines)
-
   file.write_text(text)
 
 
