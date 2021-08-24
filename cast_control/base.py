@@ -23,6 +23,7 @@ DESKTOP_NAME: Final[str] = 'Cast Control'
 RC_OK: Final[int] = 0
 RC_NO_CHROMECAST: Final[int] = 1
 RC_NOT_RUNNING: Final[int] = 2
+RC_DAEMON_FAILED: Final[int] = 3
 
 NO_DURATION: Final[float] = 0.0
 NO_DELTA: Final[int] = 0

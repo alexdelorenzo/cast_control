@@ -10,7 +10,8 @@ from .. import __version__, __author__, __copyright__, \
   __license__, HOMEPAGE, ENTRYPOINT_NAME, \
   CLI_MODULE_NAME
 from ..base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
-  DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
+  DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, RC_DAEMON_FAILED, \
+  LOG, RC_OK
 from ..types import Final
 from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
   get_daemon_from_args
@@ -248,9 +249,10 @@ def connect(
 
   except Exception as e:
     logging.exception(e)
-    logging.warning("Error launching daemon.")
+    logging.error("Error launching daemon.")
 
     args.delete()
+    sys.exit(RC_DAEMON_FAILED)
 
 
 @service.command(
