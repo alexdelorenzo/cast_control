@@ -7,7 +7,7 @@ PyGObject>=3.34.0
 StrEnum>=0.4.6
 typing-extensions>=3.10.0.0; python_version < '3.10'
 
-app_paths
+app_paths>=0.0.7; <0.1.0
 aiopath>=0.5.11; python_version <= '3.9'
 aiopath>=0.6.9; python_version >= '3.10'
 mpris_server>=0.5.1, <0.6.0
