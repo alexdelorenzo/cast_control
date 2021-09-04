@@ -11,6 +11,7 @@ REQS: Final[list[str]] = Path('requirements.txt') \
   .read_text() \
   .splitlines()
 
+print('test')
 setup(
   name=NAME,
   packages=PKGS,
