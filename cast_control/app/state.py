@@ -5,6 +5,7 @@ from os import stat_result
 from functools import wraps
 from asyncio import gather, run
 import logging
+import logging.handlers
 
 from aiopath import AsyncPath
 
@@ -45,7 +46,7 @@ def setup_logging(
 
 @cache
 def create_user_dirs():
-  APP_PATHS.create_user_dirs()
+  APP_PATHS.create_user_paths()
 
 
 def ensure_user_dirs_exist(func: Callable) -> Callable:
