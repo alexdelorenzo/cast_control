@@ -7,7 +7,7 @@
 
 [project]
   name = "cast_control"
-  version = "0.11.4"
+  version = "0.12.0"
   description = "📺 Control Chromecasts from Linux and D-Bus"
   license = "AGPL-3.0"
   homepage = "https://github.com/alexdelorenzo/cast_control"
