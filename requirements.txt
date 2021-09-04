@@ -10,4 +10,4 @@ typing-extensions>=3.10.0.0; python_version < '3.10'
 app_paths
 aiopath>=0.5.11; python_version <= '3.9'
 aiopath>=0.6.9; python_version >= '3.10'
-mpris_server>=0.4.3, <0.5.0
+mpris_server>=0.5.1, <0.6.0
