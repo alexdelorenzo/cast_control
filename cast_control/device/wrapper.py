@@ -272,8 +272,10 @@ class TitlesMixin(Wrapper):
 
 
 class TimeMixin(Wrapper):
+  _longest_duration: float = NO_DURATION
+
   def __init__(self):
-    self._longest_duration: float = NO_DURATION
+    self._longest_duration = NO_DURATION
     super().__init__()
 
   @property

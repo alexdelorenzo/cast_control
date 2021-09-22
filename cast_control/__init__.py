@@ -8,7 +8,7 @@ __author__: Final[str] = 'Alex DeLorenzo <alex@alexdelorenzo.dev>'
 __license__: Final[str] = 'AGPL-3.0'
 __copyright__: Final[str] = \
   f'Copyright 2021 {__author__}. Licensed under terms of the {__license__}.'
-__version__: Final[str] = '0.11.4'
+__version__: Final[str] = '0.11.4.post1'
 
 NAME: Final[str] = 'cast_control'
 SHORT_NAME: Final[str] = 'castctl'
