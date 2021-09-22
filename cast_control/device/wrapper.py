@@ -136,7 +136,6 @@ class StatusMixin(Wrapper):
 
 class ControllersMixin(Wrapper):
   def __init__(self):
-    print('Called')
     self._setup_controllers()
     super().__init__()
 
