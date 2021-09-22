@@ -4,6 +4,7 @@ from typing import Optional, Any, Union, \
 from pathlib import Path
 from mimetypes import guess_type
 from functools import lru_cache
+from abc import ABC
 import logging
 
 from pychromecast.controllers.receiver import CastStatus
@@ -63,7 +64,7 @@ class Titles(NamedTuple):
 
 
 class Controllers(NamedTuple):
-  yt: YouTubeController
+  yt: Optional[YouTubeController] = None
   spotify: Optional[SpotifyController] = None
   dash: Optional[DashCastController] = None
   plex: Optional[PlexController] = None
@@ -76,8 +77,7 @@ class Controllers(NamedTuple):
   # ha: HomeAssistantController = None
 
 
-@runtime_checkable
-class Wrapper(Protocol):
+class Wrapper(ABC):
   dev: Device
   ctls: Controllers
   cached_icon: Optional[CachedIcon] = None
@@ -112,6 +112,9 @@ class Wrapper(Protocol):
 
 
 class StatusMixin(Wrapper):
+  def __init__(self):
+    super().__init__()
+
   @property
   def cast_status(self) -> Optional[CastStatus]:
     if self.dev.status:
@@ -133,6 +136,7 @@ class StatusMixin(Wrapper):
 
 class ControllersMixin(Wrapper):
   def __init__(self):
+    print('Called')
     self._setup_controllers()
     super().__init__()
 
@@ -216,6 +220,9 @@ class ControllersMixin(Wrapper):
 
 
 class TitlesMixin(Wrapper):
+  def __init__(self):
+    super().__init__()
+
   @property
   def titles(self) -> Titles:
     titles: list[str] = list()
@@ -352,6 +359,9 @@ class TimeMixin(Wrapper):
 
 
 class IconsMixin(Wrapper):
+  def __init__(self):
+    super().__init__()
+
   def _set_cached_icon(self, url: Optional[str] = None):
     if not url:
       self.cached_icon = None
@@ -431,6 +441,9 @@ class IconsMixin(Wrapper):
 
 
 class MetadataMixin(Wrapper):
+  def __init__(self):
+    super().__init__()
+
   def metadata(self) -> ValidMetadata:
     title, artist, album = self.titles
 
@@ -458,6 +471,9 @@ class MetadataMixin(Wrapper):
 
 
 class PlaybackMixin(Wrapper):
+  def __init__(self):
+    super().__init__()
+
   def get_playstate(self) -> PlayState:
     if self.media_controller.is_playing:
       return PlayState.PLAYING
@@ -514,6 +530,9 @@ class PlaybackMixin(Wrapper):
 
 
 class VolumeMixin(Wrapper):
+  def __init__(self):
+    super().__init__()
+
   def get_volume(self) -> Optional[VolumeDecimal]:
     if not self.cast_status:
       return None
@@ -546,6 +565,9 @@ class VolumeMixin(Wrapper):
 
 
 class AbilitiesMixin(Wrapper):
+  def __init__(self):
+    super().__init__()
+
   def can_quit(self) -> bool:
     return True
 
