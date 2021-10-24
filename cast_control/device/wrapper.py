@@ -77,7 +77,7 @@ class Controllers(NamedTuple):
   # ha: HomeAssistantController = None
 
 
-class Wrapper(ABC):
+class Wrapper(Protocol):
   dev: Device
   ctls: Controllers
   cached_icon: Optional[CachedIcon] = None
@@ -112,8 +112,8 @@ class Wrapper(ABC):
 
 
 class StatusMixin(Wrapper):
-  def __init__(self):
-    super().__init__()
+  #def __init__(self):
+    #super().__init__()
 
   @property
   def cast_status(self) -> Optional[CastStatus]:
@@ -219,8 +219,8 @@ class ControllersMixin(Wrapper):
 
 
 class TitlesMixin(Wrapper):
-  def __init__(self):
-    super().__init__()
+  #def __init__(self):
+    #super().__init__()
 
   @property
   def titles(self) -> Titles:
@@ -358,8 +358,8 @@ class TimeMixin(Wrapper):
 
 
 class IconsMixin(Wrapper):
-  def __init__(self):
-    super().__init__()
+  #def __init__(self):
+    #super().__init__()
 
   def _set_cached_icon(self, url: Optional[str] = None):
     if not url:
@@ -440,8 +440,8 @@ class IconsMixin(Wrapper):
 
 
 class MetadataMixin(Wrapper):
-  def __init__(self):
-    super().__init__()
+  #def __init__(self):
+    #super().__init__()
 
   def metadata(self) -> ValidMetadata:
     title, artist, album = self.titles
@@ -470,8 +470,8 @@ class MetadataMixin(Wrapper):
 
 
 class PlaybackMixin(Wrapper):
-  def __init__(self):
-    super().__init__()
+  #def __init__(self):
+    #super().__init__()
 
   def get_playstate(self) -> PlayState:
     if self.media_controller.is_playing:
@@ -529,8 +529,8 @@ class PlaybackMixin(Wrapper):
 
 
 class VolumeMixin(Wrapper):
-  def __init__(self):
-    super().__init__()
+  #def __init__(self):
+    #super().__init__()
 
   def get_volume(self) -> Optional[VolumeDecimal]:
     if not self.cast_status:
@@ -564,8 +564,8 @@ class VolumeMixin(Wrapper):
 
 
 class AbilitiesMixin(Wrapper):
-  def __init__(self):
-    super().__init__()
+  #def __init__(self):
+    #super().__init__()
 
   def can_quit(self) -> bool:
     return True
@@ -624,6 +624,7 @@ class DeviceWrapper(
 
   def __init__(self, dev: Device):
     self.dev = dev
+    breakpoint()
     super().__init__()
 
   def __repr__(self) -> str:
