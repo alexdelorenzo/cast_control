@@ -11,7 +11,6 @@ from pychromecast.controllers.receiver import CastStatus
 from pychromecast.controllers.media import MediaStatus, \
   BaseController, MediaController
 from pychromecast.controllers.youtube import YouTubeController
-from pychromecast.controllers.spotify import SpotifyController
 from pychromecast.controllers.dashcast import DashCastController
 from pychromecast.controllers.bbciplayer import BbcIplayerController
 from pychromecast.controllers.bbcsounds import BbcSoundsController
@@ -65,7 +64,6 @@ class Titles(NamedTuple):
 
 class Controllers(NamedTuple):
   yt: Optional[YouTubeController] = None
-  spotify: Optional[SpotifyController] = None
   dash: Optional[DashCastController] = None
   plex: Optional[PlexController] = None
   supla: Optional[SuplaController] = None
@@ -142,7 +140,6 @@ class ControllersMixin(Wrapper):
   def _setup_controllers(self):
     self.ctls = Controllers(
       YouTubeController(),
-      SpotifyController(),
       DashCastController(),
       PlexController(),
       SuplaController(),
