@@ -234,7 +234,7 @@ $ cast_control service connect --wait $SECONDS
 This is useful if you'd like to start `cast_control` at login, and there is a chance that your device isn't on, or you're on a different network. 
 
 ### Reconnect or disconnect the background service
-If the background service is running, you can force it to reconnect and restart, or to disconnect it entirely.
+If the background service is running, you can force it to reconnect and restart, or disconnect it entirely.
 ```bash
 $ cast_control service reconnect
 # or
