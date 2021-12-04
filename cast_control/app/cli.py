@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, NamedTuple, Any
+from typing import Optional, NamedTuple, Any, Union
 import collections
 import logging
 import sys
@@ -33,10 +33,13 @@ This daemon connects your casting device to the D-Bus media player interface (MP
 See {HOMEPAGE} for more information.
 '''
 
+  
+KwargsVal = Optional[Union[bool, str, int, float, click.ParamType]]
+
 
 class CliArgs(NamedTuple):
   args: tuple[str, ...]
-  kwargs: dict[str, Any]
+  kwargs: dict[str, KwargsVal]
 
 
 NAME_ARGS: Final[CliArgs] = CliArgs(
