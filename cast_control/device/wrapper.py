@@ -115,17 +115,11 @@ class StatusMixin(Wrapper):
 
   @property
   def cast_status(self) -> Optional[CastStatus]:
-    if self.dev.status:
-      return self.dev.status
-
-    return None
+    return self.dev.status or None
 
   @property
   def media_status(self) -> Optional[MediaStatus]:
-    if self.media_controller.status:
-      return self.media_controller.status
-
-    return None
+    return self.media_controller.status or None
 
   @property
   def media_controller(self) -> MediaController:
@@ -222,7 +216,6 @@ class TitlesMixin(Wrapper):
   @property
   def titles(self) -> Titles:
     titles: list[str] = list()
-
     title = self.media_controller.title
 
     if title:

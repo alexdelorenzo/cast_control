@@ -1,5 +1,5 @@
 from __future__ import annotations
-from setuptools import setup
+from setuptools import setup, find_packages
 from pathlib import Path
 
 from cast_control import Final, HOMEPAGE, NAME, \
@@ -11,9 +11,14 @@ REQS: Final[list[str]] = Path('requirements.txt') \
   .read_text() \
   .splitlines()
 
+ALL_PKGS: Final[list[str]] = list({
+  *PKGS,
+  *find_packages(),
+})
+
 setup(
   name=NAME,
-  packages=PKGS,
+  packages=ALL_PKGS,
   install_requires=REQS,
   python_requires=PY_VERSION,
   entry_points=ENTRY_POINTS,
