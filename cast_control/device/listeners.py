@@ -41,6 +41,9 @@ class DeviceEventListenerBase(
   def new_connection_status(self, status: ConnectionStatus):
     pass
 
+  def load_media_failed(self, *args, **kwargs):
+    pass
+
 
 class DeviceEventAdapter(EventAdapter):
   def __init__(
