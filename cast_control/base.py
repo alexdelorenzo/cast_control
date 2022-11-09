@@ -43,6 +43,7 @@ DEFAULT_DISC_NO: Final[int] = 1
 
 DEFAULT_RETRY_WAIT: Final[float] = 5.0
 DEFAULT_WAIT: Final[Seconds] = 30
+DEFAULT_NAME: Final[str] = DESKTOP_NAME
 
 LOG_FILE_MODE: Final[str] = 'w'  # create a new log on service start
 DEFAULT_ICON: Final[bool] = False

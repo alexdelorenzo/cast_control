@@ -11,7 +11,7 @@ from pychromecast import Chromecast, get_chromecasts, \
 
 from .. import NAME
 from ..types import Final
-from ..base import DEFAULT_DISC_NO, DEFAULT_RETRY_WAIT, \
+from ..base import DEFAULT_DISC_NO, DEFAULT_NAME, DEFAULT_RETRY_WAIT, \
   Device, NO_STR, NO_PORT
 
 
@@ -20,14 +20,15 @@ class Host(NamedTuple):
   port: Optional[int] = NO_PORT
   uuid: str = NO_STR
   model_name: str = NO_STR
-  friendly_name: str = NO_STR
+  friendly_name: str = DEFAULT_NAME
 
 
 def get_device_via_host(
   host: str,
+  name: str = DEFAULT_NAME,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Device]:
-  info = Host(host)
+  info = Host(host, friendly_name=name)
   device = get_chromecast_from_host(info, retry_wait=retry_wait)
 
   if device:
@@ -105,7 +106,7 @@ def find_device(
   device: Optional[Device] = None
 
   if host:
-    device = get_device_via_host(host, retry_wait)
+    device = get_device_via_host(host, name, retry_wait)
 
   if uuid and not device:
     device = get_device_via_uuid(uuid, retry_wait)
