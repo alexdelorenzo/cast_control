@@ -28,6 +28,9 @@ def get_device_via_host(
   name: str = DEFAULT_NAME,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
 ) -> Optional[Device]:
+  if not name:
+    name = DEFAULT_NAME
+
   info = Host(host, friendly_name=name)
   device = get_chromecast_from_host(info, retry_wait=retry_wait)
 
@@ -98,7 +101,7 @@ def get_device(
 
 
 def find_device(
-  name: Optional[str] = None,
+  name: Optional[str] = DEFAULT_NAME,
   host: Optional[str] = None,
   uuid: Optional[str] = None,
   retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,

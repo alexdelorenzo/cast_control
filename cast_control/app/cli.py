@@ -8,7 +8,7 @@ import click
 
 from .. import __version__, __author__, __copyright__,\
   __license__, HOMEPAGE, ENTRYPOINT_NAME, CLI_MODULE_NAME
-from ..base import RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
+from ..base import DEFAULT_NAME, RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
   DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
 from ..types import Final
 from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
@@ -45,7 +45,7 @@ class CliArgs(NamedTuple):
 NAME_ARGS: Final[CliArgs] = CliArgs(
   args=('--name', '-n'),
   kwargs=dict(
-    default=None,
+    default=DEFAULT_NAME,
     show_default=True,
     type=click.STRING,
     help="Connect to a device via its name, otherwise control the first device found."
