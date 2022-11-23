@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
-  Microseconds, VolumeDecimal, RateDecimal, PlayerAdapter, RootAdapter
+  Microseconds, Volume, Rate, PlayerAdapter, RootAdapter
 from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
   Track
 
@@ -97,10 +97,10 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   def is_playlist(self) -> bool:
     return self.wrapper.is_playlist()
 
-  def get_rate(self) -> RateDecimal:
+  def get_rate(self) -> Rate:
     return self.wrapper.get_rate()
 
-  def set_rate(self, val: RateDecimal):
+  def set_rate(self, val: Rate):
     pass
 
   def get_shuffle(self) -> bool:
@@ -112,10 +112,10 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   def get_art_url(self, track: int = None) -> str:
     return self.wrapper.get_art_url(track)
 
-  def get_volume(self) -> VolumeDecimal:
+  def get_volume(self) -> Volume:
     return self.wrapper.get_volume()
 
-  def set_volume(self, val: VolumeDecimal):
+  def set_volume(self, val: Volume):
     self.wrapper.set_volume(val)
 
   def is_mute(self) -> bool:
