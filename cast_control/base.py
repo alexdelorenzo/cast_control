@@ -1,14 +1,13 @@
 from __future__ import annotations
 from typing import Optional, Union
 from pathlib import Path
-from enum import auto
+from enum import StrEnum, auto
 
 from appdirs import AppDirs
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
 from pychromecast import Chromecast
-from mpris_server.base import AutoName
 
 from . import NAME
 from .types import Final
@@ -93,7 +92,7 @@ class NoDevicesFound(Exception):
   pass
 
 
-class MediaType(AutoName):
+class MediaType(StrEnum):
   GENERIC = auto()
   MOVIE = auto()
   MUSICTRACK = auto()
