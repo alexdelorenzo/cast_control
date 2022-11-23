@@ -77,6 +77,7 @@ def run_server(
   mpris = retry_until_found(name, host, uuid, wait, retry_wait)
 
   if mpris and icon:
+    mpris.adapter: DeviceAdapter
     mpris.adapter.set_icon(True)
 
   if not mpris:
