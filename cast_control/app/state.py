@@ -7,6 +7,7 @@ from asyncio import gather, run
 import logging
 
 from aiopath import AsyncPath
+from rich.logging import RichHandler
 
 from ..base import USER_DIRS, LRU_MAX_SIZE, DESKTOP_NAME, \
   DESKTOP_TEMPLATE, DESKTOP_SUFFIX, SRC_DIR, LIGHT_END, \
@@ -18,17 +19,19 @@ def setup_logging(
   level: str = LOG_LEVEL,
   file: Optional[Path] = None,
 ):
-  if file:
-    create_user_dirs()
-
   level = level.upper()
 
-  logging.basicConfig(
-    level=level,
-    filename=file,
-    filemode=LOG_FILE_MODE
-  )
+  if file:
+    create_user_dirs()
+    logging.basicConfig(
+      level=level,
+      filename=file,
+      filemode=LOG_FILE_MODE,
+    )
 
+  else:
+    handlers = [RichHandler(rich_tracebacks=True)]
+    logging.basicConfig(level=level, handlers=handlers)
 
 # check for user dirs and create them asynchronously
 async def _create_user_dirs():
