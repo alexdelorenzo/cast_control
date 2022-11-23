@@ -8,7 +8,7 @@ __author__: Final[str] = 'Alex DeLorenzo <alex@alexdelorenzo.dev>'
 __license__: Final[str] = 'AGPL-3.0'
 __copyright__: Final[str] = \
   f'Copyright 2021 {__author__}. Licensed under terms of the {__license__}.'
-__version__: Final[str] = '0.11.9'
+__version__: Final[str] = '0.12.0'
 
 NAME: Final[str] = 'cast_control'
 SHORT_NAME: Final[str] = 'castctl'
@@ -22,7 +22,7 @@ CLI_MODULE_NAME: Final[str] = f'{NAME}.app.cli'
 
 # packaging metadata
 CMD_PT: Final[str] = f'{CLI_MODULE_NAME}:{ENTRYPOINT_NAME}'
-PY_VERSION: Final[str] = '>=3.7'
+PY_VERSION: Final[str] = '>=3.11'
 PKGS: Final[list[str]] = [
   NAME,
   f'{NAME}.app',
