@@ -33,19 +33,36 @@ from ..base import DEFAULT_DISC_NO, DEFAULT_ICON, DEFAULT_THUMB, Device, \
 from ..types import Final, Protocol
 
 
+
 RESOLUTION: Final[int] = 1
 MAX_TITLES: Final[int] = 3
 
 NO_ARTIST: Final[str] = ''
 NO_SUFFIX: Final[str] = ''
 
+SKIP_FIRST: Final[slice] = slice(1, None)
+VIDEO_QS: Final[str] = 'v'
+
 
 class YoutubeUrl(StrEnum):
   long: Self = 'youtube.com'
   short: Self = 'youtu.be'
 
+  watch: Self = f'https://{long}/watch?v='
 
-YT_VID_URL: Final[str] = f'https://{YoutubeUrl.long}/watch?v='
+  @classmethod
+  def get_url(cls: type[Self], content_id: str | None) -> str | None:
+    if not content_id:
+      return None
+
+    return f"{cls.watch}{content_id}"
+
+  @classmethod
+  def is_valid_url(cls: type[Self], uri: str | None) -> bool:
+    if not uri:
+      return False
+
+    return is_youtube(uri)
 
 
 class CachedIcon(NamedTuple):
@@ -168,18 +185,18 @@ class ControllersMixin(Wrapper):
     return not content_id.startswith('http')
 
   def _get_url(self) -> Optional[str]:
-    content_id = None
+    content_id: str | None = None
 
     if self.media_status:
       content_id = self.media_status.content_id
 
     if self._is_youtube_vid(content_id):
-      return f'{YT_VID_URL}{content_id}'
+      return YoutubeUrl.get_url(content_id)
 
     return content_id
 
   def open_uri(self, uri: str):
-    video_id = get_video_id(uri)
+    video_id = get_content_id(uri)
 
     if video_id:
       self._play_youtube(video_id)
@@ -194,7 +211,7 @@ class ControllersMixin(Wrapper):
     after_track: DbusObj,
     set_as_current: bool
   ):
-    video_id = get_video_id(uri)
+    video_id = get_content_id(uri)
     yt = self.ctls.yt
 
     if video_id:
@@ -214,36 +231,24 @@ class TitlesMixin(Wrapper):
   @property
   def titles(self) -> Titles:
     titles: list[str] = list()
-    title = self.media_controller.title
 
-    if title:
+    if title := self.media_controller.title:
       titles.append(title)
 
-    if self.media_status:
-      series_title = self.media_status.series_title
-
-      if series_title:
+    if self.media_status and (series_title := self.media_status.series_title):
         titles.append(series_title)
 
-    subtitle = self.get_subtitle()
-
-    if subtitle:
+    if subtitle := self.get_subtitle():
       titles.append(subtitle)
 
     if self.media_status:
-      artist = self.media_status.artist
-
-      if artist:
+      if artist := self.media_status.artist:
         titles.append(artist)
 
-      album = self.media_status.album_name
-
-      if album:
+      if album := self.media_status.album_name:
         titles.append(album)
 
-    app_name = self.dev.app_display_name
-
-    if app_name:
+    if app_name := self.dev.app_display_name:
       titles.append(app_name)
 
     if not titles:
@@ -257,10 +262,11 @@ class TitlesMixin(Wrapper):
     if not self.media_status:
       return None
 
-    metadata = self.media_status.media_metadata
+    if not (metadata := self.media_status.media_metadata):
+      return None
 
-    if metadata and 'subtitle' in metadata:
-      return metadata['subtitle']
+    if subtitle := metadata.get('subtitle'):
+      return subtitle
 
     return None
 
@@ -649,24 +655,25 @@ def get_media_type(
 
 def is_youtube(uri: str) -> bool:
   uri = uri.casefold()
-  return any(yt in uri for yt in YoutubeUrl)
+  parsed = urlparse(uri)
+
+  return any(url in parsed.netloc for url in YoutubeUrl)
 
 
-def get_video_id(uri: str) -> Optional[str]:
-  if not is_youtube(uri):
+def get_content_id(uri: str) -> Optional[str]:
+  if not YoutubeUrl.is_valid_url(uri):
     return None
 
-  video_id: Optional[str] = None
+  content_id: Optional[str] = None
 
   parsed = urlparse(uri)
   qs = parse_qs(parsed.query)
 
   match parsed.netloc:
     case YoutubeUrl.long:
-      video_id = qs['v']
+      content_id, *_ = qs[VIDEO_QS]
 
     case YoutubeUrl.short:
-      video_id = parsed.path[1:]
+      content_id = parsed.path[SKIP_FIRST]
 
-  print(video_id)
-  return video_id
+  return content_id
