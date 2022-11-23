@@ -365,35 +365,27 @@ class IconsMixin(Wrapper):
     self.cached_icon = CachedIcon(url, app_id, title)
 
   def _can_use_cache(self) -> bool:
-    cache = self.cached_icon
+    icon = self.cached_icon
 
-    if not cache or not cache.url:
+    if not icon or not icon.url:
       return False
 
     app_id = self.dev.app_id
     title, *_ = self.titles
 
-    if cache.app_id != app_id or cache.title != title:
-      return False
-
-    return True
+    return icon.app_id == app_id and icon.title == title
 
   def _get_icon_from_device(self) -> Optional[str]:
-    images = self.media_status.images
+    url: str | None
 
-    if images:
+    if images := self.media_status.images:
       first, *_ = images
       url, *_ = first
 
       self._set_cached_icon(url)
       return url
 
-    url: Optional[str] = None
-
-    if self.cast_status:
-      url = self.cast_status.icon_url
-
-    if url:
+    if self.cast_status and (url := self.cast_status.icon_url):
       self._set_cached_icon(url)
       return url
 
@@ -410,9 +402,7 @@ class IconsMixin(Wrapper):
     return str(DEFAULT_THUMB)
 
   def get_art_url(self, track: Optional[int] = None) -> str:
-    icon = self._get_icon_from_device()
-
-    if icon:
+    if icon := self._get_icon_from_device():
       return icon
 
     return self._get_default_icon()
@@ -664,14 +654,14 @@ def get_content_id(uri: str) -> Optional[str]:
   if not YoutubeUrl.is_valid_url(uri):
     return None
 
-  content_id: Optional[str] = None
+  content_id: str | None = None
 
   parsed = urlparse(uri)
   qs = parse_qs(parsed.query)
 
   match parsed.netloc:
     case YoutubeUrl.long:
-      content_id, *_ = qs[VIDEO_QS]
+      [content_id] = qs[VIDEO_QS]
 
     case YoutubeUrl.short:
       content_id = parsed.path[SKIP_FIRST]

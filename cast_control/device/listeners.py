@@ -6,6 +6,7 @@ import logging
 from mpris_server.adapters import MprisAdapter
 from mpris_server.events import EventAdapter
 from mpris_server.server import Server
+from mpris_server.base import ON_PLAYBACK_PROPS
 
 from pychromecast.controllers.media import MediaStatus, \
   MediaStatusListener
@@ -77,6 +78,7 @@ class DeviceEventListener(
     # self.on_playback()
     # self.on_options()
     self.on_player_all()
+    self.on_playback()
 
     # wire up local integration with mpris
     self.adapter.on_new_status()
