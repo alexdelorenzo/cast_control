@@ -1,53 +1,51 @@
 from __future__ import annotations
-from typing import Optional, Any, Union, \
-  NamedTuple, Callable
-from pathlib import Path
-from mimetypes import guess_type
-from functools import lru_cache
-from abc import ABC
+
 import logging
+from enum import StrEnum
+from functools import lru_cache
+from mimetypes import guess_type
+from typing import Any, NamedTuple, Optional, Self
+from urllib.parse import parse_qs, urlparse
 
-from pychromecast.controllers.receiver import CastStatus
-from pychromecast.controllers.media import MediaStatus, \
-  BaseController, MediaController
-from pychromecast.controllers.youtube import YouTubeController
 from pychromecast.controllers.dashcast import DashCastController
-from pychromecast.controllers.bbciplayer import BbcIplayerController
-from pychromecast.controllers.bbcsounds import BbcSoundsController
-from pychromecast.controllers.bubbleupnp import BubbleUPNPController
-from pychromecast.controllers.supla import SuplaController
-from pychromecast.controllers.yleareena import YleAreenaController
-from pychromecast.controllers.homeassistant import HomeAssistantController
-from pychromecast.controllers.plex import PlexApiController
+from pychromecast.controllers.media import BaseController, MediaController, MediaStatus
+# from pychromecast.controllers.yleareena import YleAreenaController
+# from pychromecast.controllers.homeassistant import HomeAssistantController
+# from pychromecast.controllers.plex import PlexApiController
 from pychromecast.controllers.plex import PlexController
+from pychromecast.controllers.receiver import CastStatus
+# from pychromecast.controllers.bbciplayer import BbcIplayerController
+# from pychromecast.controllers.bbcsounds import BbcSoundsController
+# from pychromecast.controllers.bubbleupnp import BubbleUPNPController
+from pychromecast.controllers.supla import SuplaController
+from pychromecast.controllers.youtube import YouTubeController
 
-from mpris_server.adapters import PlayState, Microseconds, \
-  VolumeDecimal, RateDecimal, Paths
+from mpris_server.adapters import Microseconds, Paths, PlayState, RateDecimal, VolumeDecimal
 from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
 from mpris_server.mpris.compat import get_track_id
-from mpris_server.mpris.metadata import Metadata, MetadataObj, ValidMetadata
+from mpris_server.mpris.metadata import MetadataObj, ValidMetadata
 
 from .. import TITLE
-from ..types import Protocol, runtime_checkable, Final
-from ..base import DEFAULT_THUMB, LIGHT_THUMB, NO_DURATION, NO_DELTA, \
-  US_IN_SEC, DEFAULT_DISC_NO, MediaType, NO_DESKTOP_FILE, LRU_MAX_SIZE, \
-  NAME, DEFAULT_ICON, Device
-from ..app.state import create_desktop_file, ensure_user_dirs_exist, \
-  create_user_dirs
+from ..app.state import create_desktop_file, ensure_user_dirs_exist
+from ..base import DEFAULT_DISC_NO, DEFAULT_ICON, DEFAULT_THUMB, Device, \
+  LIGHT_THUMB, LRU_MAX_SIZE, MediaType, NAME, NO_DELTA, NO_DESKTOP_FILE, \
+  NO_DURATION, US_IN_SEC
+from ..types import Final, Protocol
 
 
 RESOLUTION: Final[int] = 1
 MAX_TITLES: Final[int] = 3
 
-YOUTUBE_URLS: Final[set[str]] = {
-  'youtube.com/',
-  'youtu.be/'
-}
-YT_LONG, YT_SHORT = YOUTUBE_URLS
-YT_VID_URL: Final[str] = f'https://{YT_LONG}watch?v='
-
 NO_ARTIST: Final[str] = ''
 NO_SUFFIX: Final[str] = ''
+
+
+class YoutubeUrl(StrEnum):
+  long: Self = 'youtube.com'
+  short: Self = 'youtu.be'
+
+
+YT_VID_URL: Final[str] = f'https://{YoutubeUrl.long}/watch?v='
 
 
 class CachedIcon(NamedTuple):
@@ -651,7 +649,7 @@ def get_media_type(
 
 def is_youtube(uri: str) -> bool:
   uri = uri.casefold()
-  return any(yt in uri for yt in YOUTUBE_URLS)
+  return any(yt in uri for yt in YoutubeUrl)
 
 
 def get_video_id(uri: str) -> Optional[str]:
@@ -660,13 +658,15 @@ def get_video_id(uri: str) -> Optional[str]:
 
   video_id: Optional[str] = None
 
-  if YT_LONG in uri:
-    *_, video_id = uri.split('v=')
+  parsed = urlparse(uri)
+  qs = parse_qs(parsed.query)
 
-  elif YT_SHORT in uri:
-    *_, video_id = uri.split('/')
+  match parsed.netloc:
+    case YoutubeUrl.long:
+      video_id = qs['v']
 
-  if video_id and '&' in video_id:
-    video_id, *_ = video_id.split('&')
+    case YoutubeUrl.short:
+      video_id = parsed.path[1:]
 
+  print(video_id)
   return video_id
