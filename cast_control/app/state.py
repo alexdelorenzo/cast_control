@@ -33,6 +33,7 @@ def setup_logging(
     handlers = [RichHandler(rich_tracebacks=True)]
     logging.basicConfig(level=level, handlers=handlers)
 
+
 # check for user dirs and create them asynchronously
 async def _create_user_dirs():
   paths = map(AsyncPath, USER_DIRS)
