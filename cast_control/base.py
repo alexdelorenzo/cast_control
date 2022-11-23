@@ -1,4 +1,6 @@
 from __future__ import annotations
+
+from decimal import Decimal
 from typing import Optional, Union
 from pathlib import Path
 from enum import StrEnum, auto
@@ -13,7 +15,7 @@ from . import NAME
 from .types import Final
 
 
-Seconds = int
+Seconds = Decimal
 
 
 DESKTOP_NAME: Final[str] = 'Cast Control'
@@ -40,8 +42,8 @@ US_IN_SEC: Final[int] = 1_000_000  # seconds to microseconds
 DEFAULT_TRACK: Final[str] = '/track/1'
 DEFAULT_DISC_NO: Final[int] = 1
 
-DEFAULT_RETRY_WAIT: Final[float] = 5.0
-DEFAULT_WAIT: Final[Seconds] = 30
+DEFAULT_RETRY_WAIT: Final[Seconds] = Seconds(5.0)
+DEFAULT_WAIT: Final[Seconds] = Seconds(30)
 DEFAULT_NAME: Final[str] = DESKTOP_NAME
 
 LOG_FILE_MODE: Final[str] = 'w'  # create a new log on service start

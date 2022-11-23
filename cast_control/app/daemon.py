@@ -9,7 +9,7 @@ from daemons.prefab.run import RunDaemon
 from ..base import LOG_LEVEL, PID, \
   DEFAULT_RETRY_WAIT, NAME, LOG, \
   NO_DEVICE, DEFAULT_WAIT, ARGS, \
-  ARGS_STEM, DEFAULT_ICON, DEFAULT_SET_LOG
+  ARGS_STEM, DEFAULT_ICON, DEFAULT_SET_LOG, Seconds
 from .state import setup_logging
 
 
@@ -75,8 +75,8 @@ class DaemonArgs(NamedTuple):
   name: Optional[str] = None
   host: Optional[str] = None
   uuid: Optional[str] = None
-  wait: Optional[float] = DEFAULT_WAIT
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT
+  wait: Optional[Seconds] = DEFAULT_WAIT
+  retry_wait: Optional[Seconds] = DEFAULT_RETRY_WAIT
   icon: bool = DEFAULT_ICON
   log_level: str = LOG_LEVEL
   set_logging: bool = DEFAULT_SET_LOG
