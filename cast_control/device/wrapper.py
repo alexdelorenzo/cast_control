@@ -20,8 +20,8 @@ from pychromecast.controllers.youtube import YouTubeController
 # from pychromecast.controllers.bbcsounds import BbcSoundsController
 # from pychromecast.controllers.bubbleupnp import BubbleUPNPController
 
-from mpris_server.adapters import Microseconds, Paths, PlayState, RateDecimal, VolumeDecimal
-from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj
+from mpris_server.adapters import Microseconds, Paths, PlayState
+from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, Rate, Volume
 from mpris_server.mpris.compat import get_track_id
 from mpris_server.mpris.metadata import MetadataObj, ValidMetadata
 
@@ -336,7 +336,7 @@ class TimeMixin(Wrapper):
     seconds = int(round(time / US_IN_SEC))
     self.media_controller.seek(seconds)
 
-  def get_rate(self) -> RateDecimal:
+  def get_rate(self) -> Rate:
     if not self.media_status:
       return DEFAULT_RATE
 
@@ -347,7 +347,7 @@ class TimeMixin(Wrapper):
 
     return DEFAULT_RATE
 
-  def set_rate(self, val: RateDecimal):
+  def set_rate(self, val: Rate):
     pass
 
 
@@ -516,13 +516,13 @@ class VolumeMixin(Wrapper):
   #def __init__(self):
     #super().__init__()
 
-  def get_volume(self) -> Optional[VolumeDecimal]:
+  def get_volume(self) -> Optional[Volume]:
     if not self.cast_status:
       return None
 
     return self.cast_status.volume_level
 
-  def set_volume(self, val: VolumeDecimal):
+  def set_volume(self, val: Volume):
     curr = self.get_volume()
 
     if curr is None:
