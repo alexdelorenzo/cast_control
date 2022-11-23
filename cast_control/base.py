@@ -79,6 +79,7 @@ DESKTOP_TEMPLATE: Final[Path] = \
 ICON_DIR: Final[Path] = ASSETS_DIR / 'icon'
 DARK_SVG: Final[Path] = ICON_DIR / 'cc-black.svg'
 LIGHT_SVG: Final[Path] = ICON_DIR / 'cc-white.svg'
+TEMPLATE_SVG: Final[Path] = ICON_DIR / 'cc-template.svg'
 
 LIGHT_ICON = LIGHT_THUMB = LIGHT_SVG
 DEFAULT_THUMB = DARK_ICON = DARK_SVG
