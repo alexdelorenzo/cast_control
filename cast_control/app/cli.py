@@ -1,19 +1,16 @@
 from __future__ import annotations
-from typing import Optional, NamedTuple, Any, Union
-import collections
+
 import logging
 import sys
+from typing import NamedTuple, Optional, Union
 
 import click
 
-from .. import __version__, __author__, __copyright__,\
-  __license__, HOMEPAGE, ENTRYPOINT_NAME, CLI_MODULE_NAME
-from ..base import DEFAULT_NAME, RC_NO_CHROMECAST, LOG_LEVEL, NAME, \
-  DEFAULT_RETRY_WAIT, RC_NOT_RUNNING, LOG, RC_OK
-from ..types import Final
-from .daemon import MprisDaemon, DaemonArgs, get_daemon, \
-  get_daemon_from_args
+from .daemon import DaemonArgs, MprisDaemon, get_daemon, get_daemon_from_args
 from .run import run_safe
+from .. import CLI_MODULE_NAME, ENTRYPOINT_NAME, HOMEPAGE, __copyright__, __version__
+from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, LOG, LOG_LEVEL, NAME, RC_NOT_RUNNING, RC_OK
+from ..types import Final
 
 
 assert __name__ == CLI_MODULE_NAME

@@ -1,13 +1,11 @@
 from __future__ import annotations
-from typing import Union, Optional
+
 from abc import ABC, abstractmethod
-import logging
+from typing import Optional, Union
 
 from mpris_server.adapters import MprisAdapter
 from mpris_server.events import EventAdapter
 from mpris_server.server import Server
-from mpris_server.base import ON_PLAYBACK_PROPS
-
 from pychromecast.controllers.media import MediaStatus, \
   MediaStatusListener
 from pychromecast.controllers.receiver import CastStatus, \
@@ -15,7 +13,7 @@ from pychromecast.controllers.receiver import CastStatus, \
 from pychromecast.socket_client import ConnectionStatus, \
   ConnectionStatusListener
 
-from ..base import Status, Device
+from ..base import Device, Status
 
 
 # status with volume attributes

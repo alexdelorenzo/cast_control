@@ -1,20 +1,19 @@
 from __future__ import annotations
-from typing import Optional, Callable
-from time import sleep
+
 import logging
 import sys
+from time import sleep
+from typing import Optional
 
 from mpris_server.server import Server
 
-from ..base import Seconds, NoDevicesFound, LOG_LEVEL, \
-  DEFAULT_RETRY_WAIT, RC_NO_CHROMECAST, NAME, Device, \
-  RC_NOT_RUNNING, NO_DEVICE, DEFAULT_WAIT, \
-  DEFAULT_ICON, DEFAULT_SET_LOG
-from ..adapter import DeviceAdapter
-from ..device.listeners import register_event_listener
-from ..device.device import find_device
 from .daemon import DaemonArgs
 from .state import setup_logging
+from ..adapter import DeviceAdapter
+from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG_LEVEL, NO_DEVICE, \
+  NoDevicesFound, RC_NO_CHROMECAST, Seconds
+from ..device.device import find_device
+from ..device.listeners import register_event_listener
 
 
 def create_adapters_and_server(

@@ -1,18 +1,11 @@
 from __future__ import annotations
-from typing import Optional, NamedTuple
+
+from typing import NamedTuple, Optional
 from uuid import UUID
-import logging
 
-from pychromecast.controllers.media import MediaStatus
-from pychromecast.controllers.receiver import CastStatus
-from pychromecast.socket_client import ConnectionStatus
-from pychromecast import Chromecast, get_chromecasts, \
-  get_chromecast_from_host
+from pychromecast import get_chromecast_from_host, get_chromecasts
 
-from .. import NAME
-from ..types import Final
-from ..base import DEFAULT_DISC_NO, DEFAULT_NAME, DEFAULT_RETRY_WAIT, \
-  Device, NO_STR, NO_PORT
+from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, Device, NO_PORT, NO_STR
 
 
 class Host(NamedTuple):

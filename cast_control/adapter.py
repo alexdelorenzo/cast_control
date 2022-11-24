@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from mpris_server.adapters import Metadata, PlayState, MprisAdapter, \
-  Microseconds, Volume, Rate, PlayerAdapter, RootAdapter
-from mpris_server.base import URI, MIME_TYPES, DEFAULT_RATE, DbusObj, \
-  Track
+from mpris_server.adapters import Metadata, Microseconds, MprisAdapter, PlayState, PlayerAdapter, Rate, RootAdapter, \
+  Volume
+from mpris_server.base import DbusObj, MIME_TYPES, Track, URI
 
 from .base import Device
-from .types import Protocol, runtime_checkable
 from .device.wrapper import DeviceWrapper
+from .types import Protocol, runtime_checkable
 
 
 @runtime_checkable

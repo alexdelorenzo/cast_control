@@ -1,16 +1,15 @@
 from __future__ import annotations
-from typing import Optional, Callable, NamedTuple
+
+import pickle
 from functools import partial
 from pathlib import Path
-import pickle
+from typing import Callable, NamedTuple, Optional
 
 from daemons.prefab.run import RunDaemon
 
-from ..base import LOG_LEVEL, PID, \
-  DEFAULT_RETRY_WAIT, NAME, LOG, \
-  NO_DEVICE, DEFAULT_WAIT, ARGS, \
-  ARGS_STEM, DEFAULT_ICON, DEFAULT_SET_LOG, Seconds
 from .state import setup_logging
+from ..base import ARGS, ARGS_STEM, DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG, LOG_LEVEL, \
+  NO_DEVICE, PID, Seconds
 
 
 FuncMaybe = Optional[Callable]
