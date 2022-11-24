@@ -58,7 +58,7 @@ class YoutubeUrl(StrEnum):
     return f"{cls.watch}{content_id}"
 
   @classmethod
-  def is_valid_url(cls: type[Self], uri: str | None) -> bool:
+  def is_youtube(cls: type[Self], uri: str | None) -> bool:
     if not uri:
       return False
 
@@ -651,16 +651,16 @@ def is_youtube(uri: str) -> bool:
 
 
 def get_content_id(uri: str) -> Optional[str]:
-  if not YoutubeUrl.is_valid_url(uri):
+  if not YoutubeUrl.is_youtube(uri):
     return None
 
   content_id: str | None = None
 
   parsed = urlparse(uri)
-  qs = parse_qs(parsed.query)
 
   match parsed.netloc:
     case YoutubeUrl.long:
+      qs = parse_qs(parsed.query)
       [content_id] = qs[VIDEO_QS]
 
     case YoutubeUrl.short:

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional, Callable
+from typing import Optional, Callable, ParamSpec, TypeVar
 from pathlib import Path
 from os import stat_result
 from functools import lru_cache, wraps
@@ -13,6 +13,13 @@ from ..base import USER_DIRS, LRU_MAX_SIZE, DESKTOP_NAME, \
   DESKTOP_TEMPLATE, DESKTOP_SUFFIX, SRC_DIR, LIGHT_END, \
   LIGHT_ICON, DARK_END, DARK_ICON, DATA_DIR, LOG_LEVEL, \
   LOG_FILE_MODE, NAME
+
+
+T = TypeVar('T')
+P = ParamSpec('P')
+
+Decoratable = Callable[P, T]
+Decorated = Callable[P, T]
 
 
 def setup_logging(
@@ -52,9 +59,9 @@ def create_user_dirs():
   run(_create_user_dirs())
 
 
-def ensure_user_dirs_exist(func: Callable) -> Callable:
+def ensure_user_dirs_exist(func: Decoratable) -> Decorated:
   @wraps(func)
-  def new_func(*args, **kwargs):
+  def new_func(*args: P.args, **kwargs: P.kwargs) -> T:
     create_user_dirs()
     return func(*args, **kwargs)
 

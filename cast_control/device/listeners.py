@@ -3,16 +3,15 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Optional, Union
 
+from pychromecast.controllers.media import MediaStatus, MediaStatusListener
+from pychromecast.controllers.receiver import CastStatus, CastStatusListener
+from pychromecast.socket_client import ConnectionStatus, ConnectionStatusListener
+
 from mpris_server.adapters import MprisAdapter
 from mpris_server.events import EventAdapter
 from mpris_server.server import Server
-from pychromecast.controllers.media import MediaStatus, \
-  MediaStatusListener
-from pychromecast.controllers.receiver import CastStatus, \
-  CastStatusListener
-from pychromecast.socket_client import ConnectionStatus, \
-  ConnectionStatusListener
 
+from ..adapter import DeviceAdapter
 from ..base import Device, Status
 
 
@@ -50,7 +49,7 @@ class DeviceEventAdapter(EventAdapter):
     name: str,
     device: Device,
     server: Server,
-    adapter: Optional[MprisAdapter] = None
+    adapter: Optional[DeviceAdapter] = None
   ):
     self.name = name
     self.dev = device
@@ -76,6 +75,7 @@ class DeviceEventListener(
     # self.on_playback()
     # self.on_options()
     self.on_player_all()
+    self.on_root_all()
 
     # wire up local integration with mpris
     self.adapter.on_new_status()
@@ -93,9 +93,8 @@ class DeviceEventListener(
 def register_event_listener(
   device: Device,
   server: Server,
-  adapter: MprisAdapter
+  adapter: DeviceAdapter
 ):
-  event_listener = \
-    DeviceEventListener(device.name, device, server, adapter)
+  event_listener = DeviceEventListener(device.name, device, server, adapter)
   device.media_controller.register_status_listener(event_listener)
   device.register_status_listener(event_listener)
