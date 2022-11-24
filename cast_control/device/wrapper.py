@@ -447,8 +447,8 @@ class MetadataMixin(Wrapper):
       artists=artists,
       album=album,
       album_artists=artists,
-      disc_no=DEFAULT_DISC_NO,
-      track_no=track_no,
+      disc_number=DEFAULT_DISC_NO,
+      track_number=track_no,
       comments=comments
     )
 

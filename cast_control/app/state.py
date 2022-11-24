@@ -23,6 +23,7 @@ def setup_logging(
 
   if file:
     create_user_dirs()
+
     logging.basicConfig(
       level=level,
       filename=file,
