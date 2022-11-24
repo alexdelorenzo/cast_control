@@ -78,7 +78,6 @@ class DeviceEventListener(
     # self.on_playback()
     # self.on_options()
     self.on_player_all()
-    self.on_playback()
 
     # wire up local integration with mpris
     self.adapter.on_new_status()

@@ -430,7 +430,7 @@ class MetadataMixin(Wrapper):
   def metadata(self) -> ValidMetadata:
     title, artist, album = self.titles
 
-    artists = [artist] if artist else []
+    artists: list[str] = [artist] if artist else []
     dbus_name: DbusObj = get_track_id(title)
     comments: list[str] = []
     track_no: Optional[int] = None
@@ -449,7 +449,7 @@ class MetadataMixin(Wrapper):
       album_artists=artists,
       disc_number=DEFAULT_DISC_NO,
       track_number=track_no,
-      comments=comments
+      comments=comments,
     )
 
 
