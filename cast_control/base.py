@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Optional, Union
-from pathlib import Path
 from enum import StrEnum, auto
+from functools import lru_cache
+from pathlib import Path
+from typing import Callable, Optional, ParamSpec, TypeVar, Union
 
-from appdirs import AppDirs
+from app_paths import AsyncAppPaths, get_paths
+from pychromecast import Chromecast
 from pychromecast.controllers.media import MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
-from pychromecast import Chromecast
 
-from . import NAME
+from . import NAME, __author__, __version__
 from .types import Final
 
 
@@ -34,7 +35,7 @@ NO_DEVICE: Final[str] = 'Device'
 
 # older Python requires an explicit
 # maxsize param for lru_cache()
-LRU_MAX_SIZE: Final[Optional[int]] = None
+SINGLETON: Final[int] = 1
 
 YOUTUBE: Final[str] = 'YouTube'
 
@@ -57,16 +58,18 @@ ARGS_STEM: Final[str] = '-args'
 LIGHT_END: Final[str] = '-light'
 DARK_END: Final[str] = '-dark'
 
-APP_DIRS: Final[AppDirs] = AppDirs(NAME)
-DATA_DIR: Final[Path] = Path(APP_DIRS.user_data_dir)
-LOG_DIR: Final[Path] = Path(APP_DIRS.user_log_dir)
-STATE_DIR: Final[Path] = Path(APP_DIRS.user_state_dir)
-
-# use explicit parens for tuple assignment on Python <= 3.7.x
-# see https://bugs.python.org/issue35814
-USER_DIRS: Final[tuple[Path, ...]] = (
-  DATA_DIR, LOG_DIR, STATE_DIR
+PATHS: Final[AsyncAppPaths] = get_paths(
+  NAME,
+  __author__,
+  __version__,
+  is_async=True
 )
+DATA_DIR: Final[Path] = PATHS.user_data_path
+LOG_DIR: Final[Path] = PATHS.user_log_path
+STATE_DIR: Final[Path] = PATHS.user_state_path
+
+
+USER_DIRS: Final[tuple[Path, ...]] = DATA_DIR, LOG_DIR, STATE_DIR
 
 PID: Final[Path] = STATE_DIR / f'{NAME}.pid'
 ARGS: Final[Path] = STATE_DIR / f'service{ARGS_STEM}.tmp'
@@ -89,6 +92,13 @@ DEFAULT_THUMB = DARK_ICON = DARK_SVG
 Device = Chromecast
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]
 
+T = TypeVar('T')
+P = ParamSpec('P')
+
+Decorated = Callable[P, T]
+Decoratable = Callable[P, T]
+Decorator = Callable[[Decoratable], Decorated]
+
 
 class NoDevicesFound(Exception):
   pass
@@ -100,3 +110,6 @@ class MediaType(StrEnum):
   MUSICTRACK = auto()
   PHOTO = auto()
   TVSHOW = auto()
+
+
+singleton: Final[Decorator] = lru_cache(SINGLETON)
