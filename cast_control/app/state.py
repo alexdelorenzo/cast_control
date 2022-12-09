@@ -1,18 +1,17 @@
 from __future__ import annotations
-from typing import Optional, Callable, ParamSpec, TypeVar
-from pathlib import Path
-from os import stat_result
-from functools import lru_cache, wraps
-from asyncio import gather, run
+
 import logging
+from asyncio import gather, run
+from functools import cache, wraps
+from os import stat_result
+from pathlib import Path
+from typing import Callable, Optional, ParamSpec, TypeVar
 
 from aiopath import AsyncPath
 from rich.logging import RichHandler
 
-from ..base import USER_DIRS, LRU_MAX_SIZE, DESKTOP_NAME, \
-  DESKTOP_TEMPLATE, DESKTOP_SUFFIX, SRC_DIR, LIGHT_END, \
-  LIGHT_ICON, DARK_END, DARK_ICON, DATA_DIR, LOG_LEVEL, \
-  LOG_FILE_MODE, NAME
+from ..base import DARK_END, DARK_ICON, DATA_DIR, DESKTOP_NAME, DESKTOP_SUFFIX, DESKTOP_TEMPLATE, LIGHT_END, \
+  LIGHT_ICON, LOG_FILE_MODE, LOG_LEVEL, NAME, PATHS, SRC_DIR, USER_DIRS, singleton
 
 
 T = TypeVar('T')
@@ -44,17 +43,15 @@ def setup_logging(
 
 # check for user dirs and create them asynchronously
 async def _create_user_dirs():
-  paths = map(AsyncPath, USER_DIRS)
+  PATHS.create_user_paths()
 
-  coros = (
-    path.mkdir(parents=True, exist_ok=True)
-    for path in paths
-  )
+  paths = map(AsyncPath, USER_DIRS)
+  coros = (path.mkdir(parents=True, exist_ok=True) for path in paths)
 
   await gather(*coros)
 
 
-@lru_cache(LRU_MAX_SIZE)
+@singleton
 def create_user_dirs():
   run(_create_user_dirs())
 
@@ -72,12 +69,12 @@ def get_stat(file: Path) -> stat_result:
   return file.stat()
 
 
-@lru_cache(LRU_MAX_SIZE)
+@singleton
 def get_src_stat() -> stat_result:
   return get_stat(SRC_DIR)
 
 
-@lru_cache(LRU_MAX_SIZE)
+@singleton
 def get_template() -> list[str]:
   return DESKTOP_TEMPLATE \
     .read_text() \
@@ -100,7 +97,7 @@ def get_paths(light_icon: bool = True) -> tuple[Path, Path]:
   return desktop_path, icon_path
 
 
-@lru_cache(LRU_MAX_SIZE)
+@cache
 def new_file_from_template(file: Path, icon_path: Path):
   *lines, name, icon = get_template()
   name += DESKTOP_NAME
@@ -111,7 +108,7 @@ def new_file_from_template(file: Path, icon_path: Path):
   file.write_text(text)
 
 
-@lru_cache(LRU_MAX_SIZE)
+@cache
 @ensure_user_dirs_exist
 def create_desktop_file(light_icon: bool = True) -> Path:
   file, icon = get_paths(light_icon)
