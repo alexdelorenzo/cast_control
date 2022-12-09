@@ -28,8 +28,8 @@ from mpris_server.mpris.metadata import MetadataObj, ValidMetadata
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
 from ..base import DEFAULT_DISC_NO, DEFAULT_ICON, DEFAULT_THUMB, Device, \
-  LIGHT_THUMB, LRU_MAX_SIZE, MediaType, NAME, NO_DELTA, NO_DESKTOP_FILE, \
-  NO_DURATION, US_IN_SEC
+  LIGHT_THUMB, MediaType, NAME, NO_DELTA, NO_DESKTOP_FILE, \
+  NO_DURATION, US_IN_SEC, singleton
 from ..types import Final, Protocol
 
 
@@ -178,7 +178,7 @@ class ControllersMixin(Wrapper):
 
     yt.play_video(video_id)
 
-  def _is_youtube_vid(self, content_id: str) -> bool:
+  def _is_youtube_vid(self, content_id: str | None) -> bool:
     if not content_id or not self.ctls.yt.is_active:
       return False
 
@@ -196,9 +196,7 @@ class ControllersMixin(Wrapper):
     return content_id
 
   def open_uri(self, uri: str):
-    video_id = get_content_id(uri)
-
-    if video_id:
+    if video_id := get_content_id(uri):
       self._play_youtube(video_id)
       return
 
@@ -211,10 +209,9 @@ class ControllersMixin(Wrapper):
     after_track: DbusObj,
     set_as_current: bool
   ):
-    video_id = get_content_id(uri)
     yt = self.ctls.yt
 
-    if video_id:
+    if video_id := get_content_id(uri):
       yt.add_to_queue(video_id)
 
     if video_id and set_as_current:
@@ -235,17 +232,17 @@ class TitlesMixin(Wrapper):
     if title := self.media_controller.title:
       titles.append(title)
 
-    if self.media_status and (series_title := self.media_status.series_title):
-        titles.append(series_title)
+    if (status := self.media_status) and (series_title := status.series_title):
+      titles.append(series_title)
 
     if subtitle := self.get_subtitle():
       titles.append(subtitle)
 
-    if self.media_status:
-      if artist := self.media_status.artist:
+    if status:
+      if artist := status.artist:
         titles.append(artist)
 
-      if album := self.media_status.album_name:
+      if album := status.album_name:
         titles.append(album)
 
     if app_name := self.dev.app_display_name:
@@ -288,7 +285,7 @@ class TimeMixin(Wrapper):
     return status.adjusted_current_time or status.current_time
 
   def get_duration(self) -> Microseconds:
-    duration: Optional[float] = None
+    duration: Optional[int] = None
 
     if self.media_status:
       duration = self.media_status.duration
@@ -296,7 +293,7 @@ class TimeMixin(Wrapper):
     if duration is not None:
       return duration * US_IN_SEC
 
-    longest = self._longest_duration
+    longest: int = self._longest_duration
     current = self.get_current_position()
 
     if longest and longest > current:
@@ -340,9 +337,7 @@ class TimeMixin(Wrapper):
     if not self.media_status:
       return DEFAULT_RATE
 
-    rate = self.media_status.playback_rate
-
-    if rate:
+    if rate := self.media_status.playback_rate:
       return rate
 
     return DEFAULT_RATE
@@ -365,9 +360,7 @@ class IconsMixin(Wrapper):
     self.cached_icon = CachedIcon(url, app_id, title)
 
   def _can_use_cache(self) -> bool:
-    icon = self.cached_icon
-
-    if not icon or not icon.url:
+    if not (icon := self.cached_icon) or not icon.url:
       return False
 
     app_id = self.dev.app_id
@@ -407,7 +400,7 @@ class IconsMixin(Wrapper):
 
     return self._get_default_icon()
 
-  @lru_cache(LRU_MAX_SIZE)
+  @singleton
   def get_desktop_entry(self) -> Paths:
     try:
       path = create_desktop_file(self.light_icon)
@@ -430,8 +423,8 @@ class MetadataMixin(Wrapper):
   def metadata(self) -> ValidMetadata:
     title, artist, album = self.titles
 
-    artists: list[str] = [artist] if artist else []
     dbus_name: DbusObj = get_track_id(title)
+    artists: list[str] = [artist] if artist else []
     comments: list[str] = []
     track_no: Optional[int] = None
 
@@ -476,7 +469,7 @@ class PlaybackMixin(Wrapper):
     return False
 
   def set_shuffle(self, val: bool):
-    return False
+    pass
 
   def play_next(self):
     self.media_controller.queue_next()
