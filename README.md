@@ -43,7 +43,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 #### Installing PyGObject
 On Debian-derived distributions like Ubuntu, install `python3-gi` with `apt`. 
 
-On Arch, you'll want to install `python-gobject`, or install `cast_control` [directly from the AUR](https://aur.archlinux.org/packages/cast_control/).
+On Arch, you'll want to install `python-gobject` and `gobject-introspection`, or install `cast_control` [directly from the AUR](https://aur.archlinux.org/packages/cast_control/).
 
 On macOS, install [`pygobject3`](https://formulae.brew.sh/formula/pygobject3) via `brew`.
 
