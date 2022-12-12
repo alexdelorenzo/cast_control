@@ -8,8 +8,8 @@ from typing import Callable, NamedTuple, Optional
 from daemons.prefab.run import RunDaemon
 
 from .state import setup_logging
-from ..base import ARGS, ARGS_STEM, DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG, LOG_LEVEL, \
-  NO_DEVICE, PID, Seconds
+from ..base import ARGS, ARGS_STEM, DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, \
+  DEFAULT_WAIT, LOG, LOG_LEVEL, NO_DEVICE, PID, Seconds
 
 
 FuncMaybe = Optional[Callable]
@@ -102,6 +102,8 @@ class DaemonArgs(NamedTuple):
   def save(self) -> Path:
     dump = pickle.dumps(self)
     ARGS.write_bytes(dump)
+
+    return ARGS
 
   @property
   def file(self) -> Path:
