@@ -64,9 +64,9 @@ PATHS: Final[AsyncAppPaths] = get_paths(
   __version__,
   is_async=True
 )
-DATA_DIR: Final[Path] = PATHS.user_data_path
-LOG_DIR: Final[Path] = PATHS.user_log_path
-STATE_DIR: Final[Path] = PATHS.user_state_path
+DATA_DIR: Final[Path] = Path(PATHS.user_data_path)
+LOG_DIR: Final[Path] = Path(PATHS.user_log_path)
+STATE_DIR: Final[Path] = Path(PATHS.user_state_path)
 
 
 USER_DIRS: Final[tuple[Path, ...]] = DATA_DIR, LOG_DIR, STATE_DIR

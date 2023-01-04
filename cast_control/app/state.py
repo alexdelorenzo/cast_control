@@ -43,7 +43,7 @@ def setup_logging(
 
 # check for user dirs and create them asynchronously
 async def _create_user_dirs():
-  PATHS.create_user_paths()
+  await PATHS.create_user_paths()
 
   paths = map(AsyncPath, USER_DIRS)
   coros = (path.mkdir(parents=True, exist_ok=True) for path in paths)
