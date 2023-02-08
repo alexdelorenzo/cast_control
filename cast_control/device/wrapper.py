@@ -1,30 +1,28 @@
 from __future__ import annotations
 
 import logging
-from enum import StrEnum
-from functools import lru_cache
-from mimetypes import guess_type
 from decimal import Decimal
+from enum import StrEnum
+from mimetypes import guess_type
 from typing import Any, NamedTuple, Optional, Self
 from urllib.parse import parse_qs, urlparse
 
-from pychromecast.controllers.dashcast import DashCastController
-from pychromecast.controllers.media import BaseController, MediaController, MediaStatus
-from pychromecast.controllers.plex import PlexController
-from pychromecast.controllers.receiver import CastStatus
-from pychromecast.controllers.supla import SuplaController
-from pychromecast.controllers.youtube import YouTubeController
 # from pychromecast.controllers.yleareena import YleAreenaController
 # from pychromecast.controllers.homeassistant import HomeAssistantController
 # from pychromecast.controllers.plex import PlexApiController
 # from pychromecast.controllers.bbciplayer import BbcIplayerController
 # from pychromecast.controllers.bbcsounds import BbcSoundsController
 # from pychromecast.controllers.bubbleupnp import BubbleUPNPController
-
-from mpris_server.adapters import Paths, PlayState
-from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, Rate, Volume, Microseconds
-from mpris_server.mpris.compat import get_track_id
-from mpris_server.mpris.metadata import MetadataObj, ValidMetadata
+from mpris_server import (
+  BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate,
+  ValidMetadata, Volume, get_track_id
+)
+from pychromecast.controllers.dashcast import DashCastController
+from pychromecast.controllers.media import BaseController, MediaController, MediaStatus
+from pychromecast.controllers.plex import PlexController
+from pychromecast.controllers.receiver import CastStatus
+from pychromecast.controllers.supla import SuplaController
+from pychromecast.controllers.youtube import YouTubeController
 
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
@@ -125,9 +123,6 @@ class Wrapper(Protocol):
 
 
 class StatusMixin(Wrapper):
-  #def __init__(self):
-    #super().__init__()
-
   @property
   def cast_status(self) -> Optional[CastStatus]:
     return self.dev.status or None
@@ -222,9 +217,6 @@ class ControllersMixin(Wrapper):
 
 
 class TitlesMixin(Wrapper):
-  #def __init__(self):
-    #super().__init__()
-
   @property
   def titles(self) -> Titles:
     titles: list[str] = list()
@@ -347,9 +339,6 @@ class TimeMixin(Wrapper):
 
 
 class IconsMixin(Wrapper):
-  #def __init__(self):
-    #super().__init__()
-
   def _set_cached_icon(self, url: Optional[str] = None):
     if not url:
       self.cached_icon = None
@@ -417,9 +406,6 @@ class IconsMixin(Wrapper):
 
 
 class MetadataMixin(Wrapper):
-  #def __init__(self):
-    #super().__init__()
-
   def metadata(self) -> ValidMetadata:
     title, artist, album = self.titles
 
@@ -447,9 +433,6 @@ class MetadataMixin(Wrapper):
 
 
 class PlaybackMixin(Wrapper):
-  #def __init__(self):
-    #super().__init__()
-
   def get_playstate(self) -> PlayState:
     if self.media_controller.is_playing:
       return PlayState.PLAYING
@@ -542,9 +525,6 @@ class VolumeMixin(Wrapper):
 
 
 class AbilitiesMixin(Wrapper):
-  #def __init__(self):
-    #super().__init__()
-
   def can_quit(self) -> bool:
     return True
 
@@ -563,26 +543,26 @@ class AbilitiesMixin(Wrapper):
     return False
 
   def can_play_next(self) -> bool:
-    if self.media_status:
-      return self.media_status.supports_queue_next
+    if status := self.media_status:
+      return status.supports_queue_next
 
     return False
 
   def can_play_prev(self) -> bool:
-    if self.media_status:
-      return self.media_status.supports_queue_prev
+    if status := self.media_status:
+      return status.supports_queue_prev
 
     return False
 
   def can_pause(self) -> bool:
-    if self.media_status:
-      return self.media_status.supports_pause
+    if status := self.media_status:
+      return status.supports_pause
 
     return False
 
   def can_seek(self) -> bool:
-    if self.media_status:
-      return self.media_status.supports_seek
+    if status := self.media_status:
+      return status.supports_seek
 
     return False
 

@@ -5,7 +5,7 @@ import sys
 from time import sleep
 from typing import Optional
 
-from mpris_server.server import Server
+from mpris_server import Server
 
 from .daemon import DaemonArgs
 from .state import setup_logging

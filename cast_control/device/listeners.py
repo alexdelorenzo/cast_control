@@ -7,9 +7,7 @@ from pychromecast.controllers.media import MediaStatus, MediaStatusListener
 from pychromecast.controllers.receiver import CastStatus, CastStatusListener
 from pychromecast.socket_client import ConnectionStatus, ConnectionStatusListener
 
-from mpris_server.adapters import MprisAdapter
-from mpris_server.events import EventAdapter
-from mpris_server.server import Server
+from mpris_server import MprisAdapter, EventAdapter, Server
 
 from ..adapter import DeviceAdapter
 from ..base import Device, Status
