@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from typing import Optional
 
-from mpris_server.adapters import Metadata, Microseconds, MprisAdapter, PlayState, PlayerAdapter, Rate, RootAdapter, \
+from mpris_server.adapters import Metadata, MprisAdapter, PlayState, PlayerAdapter, Rate, RootAdapter, \
   Volume
-from mpris_server.base import DbusObj, MIME_TYPES, Track, URI
+from mpris_server.base import DbusObj, MIME_TYPES, Track, URI, Microseconds
 
 from .base import Device
 from .device.wrapper import DeviceWrapper
