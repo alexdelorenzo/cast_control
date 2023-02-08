@@ -34,7 +34,6 @@ from ..base import DEFAULT_DISC_NO, DEFAULT_ICON, DEFAULT_THUMB, Device, \
 from ..types import Final, Protocol
 
 
-
 RESOLUTION: Final[int] = 1
 MAX_TITLES: Final[int] = 3
 
