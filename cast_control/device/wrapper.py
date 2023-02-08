@@ -4,6 +4,7 @@ import logging
 from enum import StrEnum
 from functools import lru_cache
 from mimetypes import guess_type
+from decimal import Decimal
 from typing import Any, NamedTuple, Optional, Self
 from urllib.parse import parse_qs, urlparse
 
@@ -20,8 +21,8 @@ from pychromecast.controllers.youtube import YouTubeController
 # from pychromecast.controllers.bbcsounds import BbcSoundsController
 # from pychromecast.controllers.bubbleupnp import BubbleUPNPController
 
-from mpris_server.adapters import Microseconds, Paths, PlayState
-from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, Rate, Volume
+from mpris_server.adapters import Paths, PlayState
+from mpris_server.base import BEGINNING, DEFAULT_RATE, DbusObj, Rate, Volume, Microseconds
 from mpris_server.mpris.compat import get_track_id
 from mpris_server.mpris.metadata import MetadataObj, ValidMetadata
 
@@ -513,15 +514,16 @@ class VolumeMixin(Wrapper):
     if not self.cast_status:
       return None
 
-    return self.cast_status.volume_level
+    return Decimal(self.cast_status.volume_level)
 
   def set_volume(self, val: Volume):
+    val = Decimal(val)
     curr = self.get_volume()
 
     if curr is None:
       return
 
-    delta: float = val - curr
+    delta: float = float(val - curr)
 
     # can't adjust vol by 0
     if delta > NO_DELTA:  # vol up
