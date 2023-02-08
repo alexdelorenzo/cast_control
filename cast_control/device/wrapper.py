@@ -649,7 +649,6 @@ def get_content_id(uri: str) -> Optional[str]:
     return None
 
   content_id: str | None = None
-
   parsed = urlparse(uri)
 
   match parsed.netloc:
