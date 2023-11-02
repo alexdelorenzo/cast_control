@@ -17,12 +17,18 @@ from mpris_server import (
   BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate,
   ValidMetadata, Volume, get_track_id
 )
+from pychromecast.controllers.bbciplayer import BbcIplayerController
+from pychromecast.controllers.bbcsounds import BbcSoundsController
+from pychromecast.controllers.bubbleupnp import BubbleUPNPController
 from pychromecast.controllers.dashcast import DashCastController
-from pychromecast.controllers.media import BaseController, MediaController, MediaStatus
+from pychromecast.controllers.media import BaseController, MediaController, MediaStatus, DefaultMediaReceiverController
 from pychromecast.controllers.plex import PlexController
-from pychromecast.controllers.receiver import CastStatus
+from pychromecast.controllers.receiver import CastStatus, ReceiverController
 from pychromecast.controllers.supla import SuplaController
+from pychromecast.controllers.yleareena import YleAreenaController
 from pychromecast.controllers.youtube import YouTubeController
+from pychromecast.controllers.multizone import MultizoneController
+from pychromecast.controllers.homeassistant_media import HomeAssistantMediaController
 
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
@@ -80,12 +86,16 @@ class Controllers(NamedTuple):
   dash: Optional[DashCastController] = None
   plex: Optional[PlexController] = None
   supla: Optional[SuplaController] = None
-  # bbc_ip: BbcIplayerController = None
-  # bbc_sound: BbcSoundsController = None
-  # bubble: BubbleUPNPController = None
-  # yle: YleAreenaController = None
+  default: DefaultMediaReceiverController | None = None
+  receiver: ReceiverController | None = None
+  multizone: MultizoneController | None = None
+  bbc_ip: BbcIplayerController | None = None
+  bbc_sound: BbcSoundsController | None = None
+  bubble: BubbleUPNPController | None = None
+  yle: YleAreenaController | None = None
   # plex_api: PlexApiController = None
   # ha: HomeAssistantController = None
+  ha_media: HomeAssistantMediaController | None = None
 
 
 class Wrapper(Protocol):
@@ -147,12 +157,15 @@ class ControllersMixin(Wrapper):
       DashCastController(),
       PlexController(),
       SuplaController(),
-      # BbcIplayerController(),
-      # BbcSoundsController(),
-      # BubbleUPNPController(),
-      # YleAreenaController(),
-      # PlexApiController(),
+      DefaultMediaReceiverController(),
+      ReceiverController(),
+      MultizoneController(self.dev.uuid),
+      BbcIplayerController(),
+      BbcSoundsController(),
+      BubbleUPNPController(),
+      YleAreenaController(),
       # HomeAssistantController(),
+      ha_media=HomeAssistantMediaController(),
     )
 
     for ctl in self.ctls:
