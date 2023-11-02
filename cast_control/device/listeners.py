@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union
+from typing import Optional, Union, override
 
 from pychromecast.controllers.media import MediaStatus, MediaStatusListener
 from pychromecast.controllers.receiver import CastStatus, CastStatusListener
@@ -78,12 +78,15 @@ class DeviceEventListener(
     # wire up local integration with mpris
     self.adapter.on_new_status()
 
+  @override
   def new_media_status(self, status: MediaStatus):
     self._update_metadata(status)
 
+  @override
   def new_cast_status(self, status: CastStatus):
     self._update_metadata(status)
 
+  @override
   def new_connection_status(self, status: ConnectionStatus):
     self._update_metadata(status)
 
