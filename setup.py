@@ -1,8 +1,9 @@
 from __future__ import annotations
+from typing import Final
 from setuptools import setup, find_packages
 from pathlib import Path
 
-from cast_control import Final, HOMEPAGE, NAME, \
+from cast_control import HOMEPAGE, NAME, \
   DESCRIPTION, PROJECT_URLS, PKG_DATA, ENTRY_POINTS, \
   PY_VERSION, PKGS, __license__
 
