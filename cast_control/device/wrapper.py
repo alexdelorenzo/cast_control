@@ -4,15 +4,9 @@ import logging
 from decimal import Decimal
 from enum import StrEnum
 from mimetypes import guess_type
-from typing import Any, NamedTuple, Optional, Self
+from typing import Any, NamedTuple, Optional, Self, override
 from urllib.parse import parse_qs, urlparse
 
-# from pychromecast.controllers.yleareena import YleAreenaController
-# from pychromecast.controllers.homeassistant import HomeAssistantController
-# from pychromecast.controllers.plex import PlexApiController
-# from pychromecast.controllers.bbciplayer import BbcIplayerController
-# from pychromecast.controllers.bbcsounds import BbcSoundsController
-# from pychromecast.controllers.bubbleupnp import BubbleUPNPController
 from mpris_server import (
   BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate,
   ValidMetadata, Volume, get_track_id
@@ -97,19 +91,37 @@ class Controllers(NamedTuple):
   # ha: HomeAssistantController = None
   ha_media: HomeAssistantMediaController | None = None
 
+  @classmethod
+  def new(cls: type[Self], device: Device | None) -> Self:
+    return cls(
+      YouTubeController(),
+      DashCastController(),
+      PlexController(),
+      SuplaController(),
+      DefaultMediaReceiverController(),
+      ReceiverController(),
+      MultizoneController(device.uuid) if device else None,
+      BbcIplayerController(),
+      BbcSoundsController(),
+      BubbleUPNPController(),
+      YleAreenaController(),
+      # HomeAssistantController(),
+      ha_media=HomeAssistantMediaController(),
+    )
+
 
 class Wrapper(Protocol):
-  dev: Device
-  ctls: Controllers
+  device: Device
+  controllers: Controllers
   cached_icon: Optional[CachedIcon] = None
   light_icon: bool = DEFAULT_ICON
 
   def __getattr__(self, name: str) -> Any:
-    return getattr(self.dev, name)
+    return getattr(self.device, name)
 
   @property
   def name(self) -> str:
-    return self.dev.name or NAME
+    return self.device.name or NAME
 
   @property
   def cast_status(self) -> Optional[CastStatus]:
@@ -133,53 +145,44 @@ class Wrapper(Protocol):
 
 
 class StatusMixin(Wrapper):
+  @override
   @property
   def cast_status(self) -> Optional[CastStatus]:
-    return self.dev.status or None
+    return self.device.status or None
 
+  @override
   @property
   def media_status(self) -> Optional[MediaStatus]:
     return self.media_controller.status or None
 
+  @override
   @property
   def media_controller(self) -> MediaController:
-    return self.dev.media_controller
+    return self.device.media_controller
 
 
 class ControllersMixin(Wrapper):
+  controllers: Controllers
+
   def __init__(self):
     self._setup_controllers()
     super().__init__()
 
   def _setup_controllers(self):
-    self.ctls = Controllers(
-      YouTubeController(),
-      DashCastController(),
-      PlexController(),
-      SuplaController(),
-      DefaultMediaReceiverController(),
-      ReceiverController(),
-      MultizoneController(self.dev.uuid),
-      BbcIplayerController(),
-      BbcSoundsController(),
-      BubbleUPNPController(),
-      YleAreenaController(),
-      # HomeAssistantController(),
-      ha_media=HomeAssistantMediaController(),
-    )
+    self.controllers = Controllers.new(self.device)
 
-    for ctl in self.ctls:
+    for ctl in self.controllers:
       if ctl:
         self._register(ctl)
 
   def _register(self, controller: BaseController):
-    self.dev.register_handler(controller)
+    self.device.register_handler(controller)
 
   def _launch_youtube(self):
-    self.ctls.yt.launch()
+    self.controllers.yt.launch()
 
   def _play_youtube(self, video_id: str):
-    yt = self.ctls.yt
+    yt = self.controllers.yt
 
     if not yt.is_active:
       self._launch_youtube()
@@ -187,7 +190,7 @@ class ControllersMixin(Wrapper):
     yt.play_video(video_id)
 
   def _is_youtube_vid(self, content_id: str | None) -> bool:
-    if not content_id or not self.ctls.yt.is_active:
+    if not content_id or not self.controllers.yt.is_active:
       return False
 
     return not content_id.startswith('http')
@@ -217,7 +220,7 @@ class ControllersMixin(Wrapper):
     after_track: DbusObj,
     set_as_current: bool
   ):
-    yt = self.ctls.yt
+    yt = self.controllers.yt
 
     if video_id := get_content_id(uri):
       yt.add_to_queue(video_id)
@@ -230,6 +233,7 @@ class ControllersMixin(Wrapper):
 
 
 class TitlesMixin(Wrapper):
+  @override
   @property
   def titles(self) -> Titles:
     titles: list[str] = list()
@@ -250,7 +254,7 @@ class TitlesMixin(Wrapper):
       if album := status.album_name:
         titles.append(album)
 
-    if app_name := self.dev.app_display_name:
+    if app_name := self.device.app_display_name:
       titles.append(app_name)
 
     if not titles:
@@ -274,7 +278,7 @@ class TitlesMixin(Wrapper):
 
 
 class TimeMixin(Wrapper):
-  _longest_duration: float = NO_DURATION
+  _longest_duration: float | None = NO_DURATION
 
   def __init__(self):
     self._longest_duration = NO_DURATION
@@ -289,6 +293,12 @@ class TimeMixin(Wrapper):
 
     return status.adjusted_current_time or status.current_time
 
+  @override
+  def on_new_status(self, *args, **kwargs):
+    # super().on_new_status(*args, **kwargs)
+    if not self.has_current_time():
+      self._longest_duration = None
+
   def get_duration(self) -> Microseconds:
     duration: Optional[int] = None
 
@@ -298,7 +308,7 @@ class TimeMixin(Wrapper):
     if duration is not None:
       return duration * US_IN_SEC
 
-    longest: int = self._longest_duration
+    longest: int | float = self._longest_duration
     current = self.get_current_position()
 
     if longest and longest > current:
@@ -318,11 +328,6 @@ class TimeMixin(Wrapper):
 
     position_us = position_secs * US_IN_SEC
     return round(position_us)
-
-  def on_new_status(self, *args, **kwargs):
-    # super().on_new_status(*args, **kwargs)
-    if not self.has_current_time():
-      self._longest_duration = None
 
   def has_current_time(self) -> bool:
     current_time = self.current_time
@@ -357,7 +362,7 @@ class IconsMixin(Wrapper):
       self.cached_icon = None
       return
 
-    app_id = self.dev.app_id
+    app_id = self.device.app_id
     title, *_ = self.titles
     self.cached_icon = CachedIcon(url, app_id, title)
 
@@ -365,7 +370,7 @@ class IconsMixin(Wrapper):
     if not (icon := self.cached_icon) or not icon.url:
       return False
 
-    app_id = self.dev.app_id
+    app_id = self.device.app_id
     title, *_ = self.titles
 
     return icon.app_id == app_id and icon.title == title
@@ -380,7 +385,7 @@ class IconsMixin(Wrapper):
       self._set_cached_icon(url)
       return url
 
-    if self.cast_status and (url := self.cast_status.icon_url):
+    if (status := self.cast_status) and (url := status.icon_url):
       self._set_cached_icon(url)
       return url
 
@@ -474,7 +479,7 @@ class PlaybackMixin(Wrapper):
     self.media_controller.queue_prev()
 
   def quit(self):
-    self.dev.quit_app()
+    self.device.quit_app()
 
   def next(self):
     self.play_next()
@@ -522,10 +527,10 @@ class VolumeMixin(Wrapper):
 
     # can't adjust vol by 0
     if delta > NO_DELTA:  # vol up
-      self.dev.volume_up(delta)
+      self.device.volume_up(delta)
 
     elif delta < NO_DELTA:
-      self.dev.volume_down(abs(delta))
+      self.device.volume_down(abs(delta))
 
   def is_mute(self) -> Optional[bool]:
     if self.cast_status:
@@ -534,7 +539,7 @@ class VolumeMixin(Wrapper):
     return False
 
   def set_mute(self, val: bool):
-    self.dev.set_volume_muted(val)
+    self.device.set_volume_muted(val)
 
 
 class AbilitiesMixin(Wrapper):
@@ -593,15 +598,15 @@ class DeviceWrapper(
 ):
   '''Wraps implementation details for device API'''
 
-  def __init__(self, dev: Device):
-    self.dev = dev
+  def __init__(self, device: Device):
+    self.device = device
     super().__init__()
 
   def __repr__(self) -> str:
     cls = type(self)
     cls_name = cls.__name__
 
-    return f'<{cls_name} for {self.dev}>'
+    return f'<{cls_name} for {self.device}>'
 
 
 def get_media_type(
