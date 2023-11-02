@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional, Union, override
+from typing import Optional, override
 
 from pychromecast.controllers.media import MediaStatus, MediaStatusListener
 from pychromecast.controllers.receiver import CastStatus, CastStatusListener
 from pychromecast.socket_client import ConnectionStatus, ConnectionStatusListener
-
-from mpris_server import MprisAdapter, EventAdapter, Server
+from mpris_server import EventAdapter, Server
 
 from ..adapter import DeviceAdapter
 from ..base import Device, Status
 
 
 # status with volume attributes
-VolumeStatus = Union[MediaStatus, CastStatus]
+VolumeStatus = MediaStatus | CastStatus
 
 
 class DeviceEventListenerBase(
@@ -42,12 +41,17 @@ class DeviceEventListenerBase(
 
 
 class DeviceEventAdapter(EventAdapter):
+  name: str
+  device: Device
+  server: Server
+  adapter: DeviceAdapter | None
+
   def __init__(
     self,
     name: str,
     device: Device,
     server: Server,
-    adapter: Optional[DeviceAdapter] = None
+    adapter: DeviceAdapter | None = None
   ):
     self.name = name
     self.dev = device
@@ -61,7 +65,7 @@ class DeviceEventListener(
   DeviceEventListenerBase
 ):
   def _update_volume(self, status: Status):
-    if not isinstance(status, VolumeStatus.__args__):
+    if not isinstance(status, VolumeStatus):
       return
 
     self.on_volume()
@@ -70,10 +74,10 @@ class DeviceEventListener(
     self._update_volume(status)
 
     # wire up mpris_server with cc events
-    # self.on_playback()
-    # self.on_options()
     self.on_player_all()
     self.on_root_all()
+    # self.on_playback()
+    # self.on_options()
 
     # wire up local integration with mpris
     self.adapter.on_new_status()

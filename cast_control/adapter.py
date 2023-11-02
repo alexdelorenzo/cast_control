@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import Optional, override
+from typing import override
 
 from mpris_server import (
-  Metadata, MprisAdapter, PlayState, PlayerAdapter, Rate, RootAdapter,
-  Volume, DbusObj, MIME_TYPES, Track, URI, Microseconds
+  DbusObj, MIME_TYPES, Metadata, Microseconds, MprisAdapter, PlayState,
+  PlayerAdapter, Rate, RootAdapter, Track, URI, Volume,
 )
+
 from .base import Device
 from .device.wrapper import DeviceWrapper
 from .types import Protocol, runtime_checkable
@@ -105,7 +106,7 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   def seek(
     self,
     time: Microseconds,
-    track_id: Optional[DbusObj] = None
+    track_id: DbusObj | None = None
   ):
     self.wrapper.seek(time)
 
