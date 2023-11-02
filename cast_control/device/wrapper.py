@@ -4,7 +4,7 @@ import logging
 from decimal import Decimal
 from enum import StrEnum
 from mimetypes import guess_type
-from typing import Any, NamedTuple, Optional, Self, override
+from typing import Any, NamedTuple, Optional, Self, override, Final, Protocol
 from urllib.parse import parse_qs, urlparse
 
 from mpris_server import (
@@ -29,7 +29,6 @@ from ..app.state import create_desktop_file, ensure_user_dirs_exist
 from ..base import DEFAULT_DISC_NO, DEFAULT_ICON, DEFAULT_THUMB, Device, \
   LIGHT_THUMB, MediaType, NAME, NO_DELTA, NO_DESKTOP_FILE, \
   NO_DURATION, US_IN_SEC, singleton
-from ..types import Final, Protocol
 
 
 RESOLUTION: Final[int] = 1

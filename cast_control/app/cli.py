@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import sys
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple, Optional, Union, Final
 
 import click
 
@@ -10,7 +10,6 @@ from .daemon import DaemonArgs, MprisDaemon, get_daemon, get_daemon_from_args
 from .run import run_safe
 from .. import CLI_MODULE_NAME, ENTRYPOINT_NAME, HOMEPAGE, __copyright__, __version__
 from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, LOG, LOG_LEVEL, NAME, RC_NOT_RUNNING, RC_OK
-from ..types import Final
 
 
 assert __name__ == CLI_MODULE_NAME
@@ -30,7 +29,7 @@ This daemon connects your casting device to the D-Bus media player interface (MP
 See {HOMEPAGE} for more information.
 '''
 
-  
+
 KwargsVal = Optional[Union[bool, str, int, float, click.ParamType]]
 
 

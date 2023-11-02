@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .types import Final
+from typing import Final
 
 
 # module metadata

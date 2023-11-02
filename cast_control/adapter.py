@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import override
+from typing import override, Protocol, runtime_checkable
 
 from mpris_server import (
   DbusObj, MIME_TYPES, Metadata, Microseconds, MprisAdapter, PlayState,
@@ -9,7 +9,6 @@ from mpris_server import (
 
 from .base import Device
 from .device.wrapper import DeviceWrapper
-from .types import Protocol, runtime_checkable
 
 
 @runtime_checkable

@@ -4,7 +4,7 @@ from decimal import Decimal, getcontext
 from enum import StrEnum, auto
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Optional, ParamSpec, TypeVar, Union
+from typing import Callable, Optional, ParamSpec, TypeVar, Union, Final
 
 from app_paths import AsyncAppPaths, get_paths
 from pychromecast import Chromecast
@@ -13,7 +13,6 @@ from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
 
 from . import NAME, __author__, __version__
-from .types import Final
 
 
 Seconds = Decimal
