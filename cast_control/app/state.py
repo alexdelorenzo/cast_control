@@ -14,11 +14,8 @@ from ..base import DARK_END, DARK_ICON, DATA_DIR, DESKTOP_NAME, DESKTOP_SUFFIX, 
   LIGHT_ICON, LOG_FILE_MODE, LOG_LEVEL, NAME, PATHS, SRC_DIR, USER_DIRS, singleton
 
 
-T = TypeVar('T')
-P = ParamSpec('P')
-
-Decoratable = Callable[P, T]
-Decorated = Callable[P, T]
+type Decoratable[**P, T] = Callable[P, T]
+type Decorated[**P, T] = Callable[P, T]
 
 
 def setup_logging(
@@ -56,7 +53,7 @@ def create_user_dirs():
   run(_create_user_dirs())
 
 
-def ensure_user_dirs_exist(func: Decoratable) -> Decorated:
+def ensure_user_dirs_exist[**P, T](func: Decoratable) -> Decorated:
   @wraps(func)
   def new_func(*args: P.args, **kwargs: P.kwargs) -> T:
     create_user_dirs()
