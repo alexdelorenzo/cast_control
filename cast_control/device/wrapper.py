@@ -6,7 +6,7 @@ from decimal import Decimal
 from enum import StrEnum
 from mimetypes import guess_type
 from typing import Any, Final, NamedTuple, Protocol, Self, override
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import ParseResult, parse_qs, urlparse
 
 from mpris_server import (
   BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate,
@@ -43,31 +43,57 @@ NO_ARTIST: Final[str] = ''
 NO_SUFFIX: Final[str] = ''
 
 SKIP_FIRST: Final[slice] = slice(1, None)
-VIDEO_QS: Final[str] = 'v'
+PROTO: Final[str] = 'https'
 
 
 class YoutubeUrl(StrEnum):
   long: Self = 'youtube.com'
   short: Self = 'youtu.be'
 
-  watch: Self = f'https://{long}/watch?v='
+  watch_endpoint: Self = 'watch'
+  playlist_endpoint: Self = 'playlist'
+
+  video_qs: Self = 'v'
+  playlist_qs: Self = 'list'
+
+  video: Self = f'{PROTO}://{long}/{watch_endpoint}?{video_qs}='
+  playlist: Self = f'{PROTO}://{long}/{playlist_endpoint}?{playlist_qs}='
 
   @classmethod
-  def get_url(cls: type[Self], content_id: str | None) -> str | None:
-    if not content_id:
-      return None
+  def get_url(cls: type[Self], content_id: str | None, playlist_id: str | None = None) -> str | None:
+    if content_id:
+      return f"{cls.video}{content_id}"
 
-    return f"{cls.watch}{content_id}"
+    elif playlist_id:
+      return f"{cls.playlist}{playlist_id}"
 
   @classmethod
   def is_youtube(cls: type[Self], uri: str | None) -> bool:
     if not uri:
       return False
 
-    return is_youtube(uri)
+    uri = uri.casefold()
+
+    return get_domain(uri) in cls
+
+  @classmethod
+  def type(cls: type[Self], uri: str | None) -> Self | None:
+    if not cls.which(uri):
+      return None
+
+    if cls.watch_endpoint in uri:
+      return cls.video
+
+    elif cls.playlist_endpoint in uri:
+      return cls.playlist
+
+    return cls.short
 
   @classmethod
   def which(cls: type[Self], uri: str | None) -> Self | None:
+    if not cls.is_youtube(uri):
+      return None
+
     if cls.long in uri:
       return cls.long
 
@@ -125,7 +151,14 @@ class Controllers(NamedTuple):
     )
 
 
-class Wrapper(Protocol):
+class ListenerIntegration(Protocol):
+  @abstractmethod
+  def on_new_status(self, *args, **kwargs):
+    """Callback for event listener"""
+    pass
+
+
+class Wrapper(ListenerIntegration, Protocol):
   device: Device
   controllers: Controllers
 
@@ -165,11 +198,6 @@ class Wrapper(Protocol):
   def titles(self) -> Titles:
     pass
 
-  @abstractmethod
-  def on_new_status(self, *args, **kwargs):
-    """Callback for event listener"""
-    pass
-
 
 class StatusMixin(Wrapper):
   @override
@@ -203,9 +231,9 @@ class ControllersMixin(Wrapper):
   def _setup_controllers(self):
     self.controllers = Controllers.new(self.device)
 
-    for ctl in self.controllers:
-      if ctl:
-        self._register(ctl)
+    for controller in self.controllers:
+      if controller:
+        self._register(controller)
 
   def _register(self, controller: BaseController):
     self.device.register_handler(controller)
@@ -221,7 +249,7 @@ class ControllersMixin(Wrapper):
 
     youtube.quick_play(video_id)
 
-  def _is_youtube_vid(self, content_id: str | None) -> bool:
+  def _is_youtube_video(self, content_id: str | None) -> bool:
     if not content_id or not self.controllers.youtube.is_active:
       return False
 
@@ -230,10 +258,10 @@ class ControllersMixin(Wrapper):
   def _get_url(self) -> str | None:
     content_id: str | None = None
 
-    if self.media_status:
-      content_id = self.media_status.content_id
+    if status := self.media_status:
+      content_id = status.content_id
 
-    if self._is_youtube_vid(content_id):
+    if self._is_youtube_video(content_id):
       return YoutubeUrl.get_url(content_id)
 
     return content_id
@@ -441,14 +469,12 @@ class IconsMixin(Wrapper):
   @singleton
   def get_desktop_entry(self) -> Paths:
     try:
-      path = create_desktop_file(self.light_icon)
+      return create_desktop_file(self.light_icon)
 
     except Exception as e:
       log.exception(e)
       log.error("Couldn't load desktop file.")
       return NO_DESKTOP_FILE
-
-    return path
 
   def set_icon(self, lighter: bool = False):
     self.light_icon: bool = lighter
@@ -538,9 +564,6 @@ class PlaybackMixin(Wrapper):
 
 
 class VolumeMixin(Wrapper):
-  #def __init__(self):
-    #super().__init__()
-
   def get_volume(self) -> Volume | None:
     if status := self.cast_status:
       return Volume(status.volume_level)
@@ -666,29 +689,33 @@ def get_media_type(
   return None
 
 
-def is_youtube(uri: str) -> bool:
-  uri = uri.casefold()
-  parsed = urlparse(uri)
+def get_domain(uri: str | ParseResult) -> str | None:
+  match uri:
+    case str():
+      uri = urlparse(uri)
 
-  return any(url in parsed.netloc for url in YoutubeUrl)
+  *_, name, tld = uri.netloc.split(".")
+
+  return f"{name}.{tld}"
 
 
 def get_content_id(uri: str) -> str | None:
   if not YoutubeUrl.is_youtube(uri):
     return None
 
-  content_id: str | None = None
   parsed = urlparse(uri)
+  content_id: str | None = None
 
-  *_, name, tld = parsed.netloc.split(".")
-  domain: str = f"{name}.{tld}"
-
-  match domain:
-    case YoutubeUrl.long:
+  match get_domain(parsed), YoutubeUrl.type(uri):
+    case YoutubeUrl.long, YoutubeUrl.video:
       qs = parse_qs(parsed.query)
-      [content_id] = qs[VIDEO_QS]
+      [content_id] = qs[YoutubeUrl.video_qs]
 
-    case YoutubeUrl.short:
+    case YoutubeUrl.long, YoutubeUrl.playlist:
+      qs = parse_qs(parsed.query)
+      [content_id] = qs[YoutubeUrl.playlist_qs]
+
+    case YoutubeUrl.short, YoutubeUrl.video | YoutubeUrl.playlist:
       content_id = parsed.path[SKIP_FIRST]
 
   return content_id

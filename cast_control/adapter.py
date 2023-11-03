@@ -208,6 +208,7 @@ class DeviceAdapter(
   DevicePlayerAdapter,
   DeviceRootAdapter,
 ):
+  @override
   def __init__(self, device: Device):
     self.wrapper = DeviceWrapper(device)
     super().__init__(self.wrapper.name)
