@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pychromecast import get_chromecast_from_host, get_chromecasts
 
-from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, Device, NO_PORT, NO_STR
+from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, Device, NO_PORT, NO_STR, Seconds
 
 
 class Host(NamedTuple):
@@ -19,7 +19,7 @@ class Host(NamedTuple):
 def get_device_via_host(
   host: str,
   name: str = DEFAULT_NAME,
-  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   if not name:
     name = DEFAULT_NAME
@@ -35,7 +35,7 @@ def get_device_via_host(
 
 
 def get_devices(
-  retry_wait: float | None = DEFAULT_RETRY_WAIT
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT
 ) -> list[Device]:
   devices, service_browser = get_chromecasts(retry_wait=retry_wait)
   service_browser.stop_discovery()
@@ -55,7 +55,7 @@ def get_first(devices: list[Device]) -> Device | None:
 
 def get_device_via_uuid(
   uuid: str | None = None,
-  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   devices = get_devices(retry_wait)
 
@@ -75,7 +75,7 @@ def get_device_via_uuid(
 
 def get_device(
   name: str | None = None,
-  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   devices = get_devices(retry_wait)
 
@@ -97,7 +97,7 @@ def find_device(
   name: str | None = DEFAULT_NAME,
   host: str | None = None,
   uuid: str | None = None,
-  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   device: Device | None = None
 

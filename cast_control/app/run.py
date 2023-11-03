@@ -22,7 +22,7 @@ def create_adapters_and_server(
   name: str | None,
   host: str | None,
   uuid: str | None,
-  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
 ) -> Server | None:
   device = find_device(name, host, uuid, retry_wait)
 
@@ -43,7 +43,7 @@ def retry_until_found(
   host: str | None,
   uuid: str | None,
   wait: Seconds | None = DEFAULT_WAIT,
-  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
 ) -> Server | None:
   """
     If the device isn't found, keep trying to find it.

@@ -8,7 +8,7 @@ import click
 from .daemon import DaemonArgs, MprisDaemon, get_daemon, get_daemon_from_args
 from .run import run_safe
 from .. import CLI_MODULE_NAME, ENTRYPOINT_NAME, HOMEPAGE, __copyright__, __version__
-from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, LOG, LOG_LEVEL, NAME, RC_NOT_RUNNING, RC_OK
+from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, LOG, LOG_LEVEL, NAME, RC_NOT_RUNNING, RC_OK, Seconds
 
 
 assert __name__ == CLI_MODULE_NAME
@@ -172,8 +172,8 @@ def connect(
   name: str | None,
   host: str | None,
   uuid: str | None,
-  wait: float | None,
-  retry_wait: float | None,
+  wait: Seconds | None,
+  retry_wait: Seconds | None,
   icon: bool,
   log_level: str
 ):
@@ -213,8 +213,8 @@ def connect(
   name: str | None,
   host: str | None,
   uuid: str | None,
-  wait: float | None,
-  retry_wait: float | None,
+  wait: Seconds | None,
+  retry_wait: Seconds | None,
   icon: bool,
   log_level: str
 ):
