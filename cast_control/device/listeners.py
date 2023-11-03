@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
-from typing import Optional, override
+from typing import Final, Optional, override
 
 from pychromecast.controllers.media import MediaStatus, MediaStatusListener
 from pychromecast.controllers.receiver import CastStatus, CastStatusListener
@@ -10,6 +11,9 @@ from mpris_server import EventAdapter, Server
 
 from ..adapter import DeviceAdapter
 from ..base import Device, Status
+
+
+log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 # status with volume attributes
@@ -46,6 +50,7 @@ class DeviceEventAdapter(EventAdapter):
   server: Server
   adapter: DeviceAdapter | None
 
+  @override
   def __init__(
     self,
     name: str,
@@ -65,10 +70,8 @@ class DeviceEventListener(
   DeviceEventListenerBase
 ):
   def _update_volume(self, status: Status):
-    if not isinstance(status, VolumeStatus):
-      return
-
-    self.on_volume()
+    if isinstance(status, VolumeStatus):
+      self.on_volume()
 
   def _update_metadata(self, status: Status):
     self._update_volume(status)
@@ -84,14 +87,17 @@ class DeviceEventListener(
 
   @override
   def new_media_status(self, status: MediaStatus):
+    log.debug(f'Handling new media status: {status}')
     self._update_metadata(status)
 
   @override
   def new_cast_status(self, status: CastStatus):
+    log.debug(f'Handling new cast status: {status}')
     self._update_metadata(status)
 
   @override
   def new_connection_status(self, status: ConnectionStatus):
+    log.debug(f'Handling new connection status: {status}')
     self._update_metadata(status)
 
 
@@ -101,5 +107,7 @@ def register_event_listener(
   adapter: DeviceAdapter
 ):
   event_listener = DeviceEventListener(device.name, device, server, adapter)
-  device.media_controller.register_status_listener(event_listener)
+
   device.register_status_listener(event_listener)
+  device.media_controller.register_status_listener(event_listener)
+  device.socket_client.register_connection_listener(event_listener)
