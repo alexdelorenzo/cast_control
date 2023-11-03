@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 import logging
-import sys
-from typing import NamedTuple, Optional, Union, Final
+from typing import Final, NamedTuple
 
 import click
 
@@ -32,7 +31,7 @@ See {HOMEPAGE} for more information.
 '''
 
 
-KwargsVal = Optional[Union[bool, str, int, float, click.ParamType]]
+type KwargsVal = bool | str | int | float | click.ParamType
 
 
 class CliArgs(NamedTuple):
@@ -114,19 +113,26 @@ LOG_ARGS: Final[CliArgs] = CliArgs(
 
 # see https://alexdelorenzo.dev/notes/click
 class OrderAsCreated(click.Group):
-  '''List `click` commands in the order they're declared.'''
+  """List `click` commands in the order they're declared."""
 
   def list_commands(self, ctx: click.Context) -> list[str]:
     return list(self.commands)
 
 
-@click.group(help=HELP, invoke_without_command=True)
-@click.option('--license', '-L',
+@click.group(
+  help=HELP,
+  invoke_without_command=True
+)
+@click.option(
+  '--license', '-L',
   is_flag=True, default=False, type=click.BOOL,
-  help="Show license and copyright information.")
-@click.option('--version', '-V',
+  help="Show license and copyright information."
+)
+@click.option(
+  '--version', '-V',
   is_flag=True, default=False, type=click.BOOL,
-  help="Show version information.")
+  help="Show version information."
+)
 @click.pass_context
 def cli(
   ctx: click.Context,
@@ -140,7 +146,7 @@ def cli(
     click.echo(VERSION_INFO)
 
   if license or version:
-    sys.exit(RC_OK)
+    quit(RC_OK)
 
   elif ctx.invoked_subcommand:
     return
@@ -163,11 +169,11 @@ assert cli.name == ENTRYPOINT_NAME
 @click.option(*ICON_ARGS.args, **ICON_ARGS.kwargs)
 @click.option(*LOG_ARGS.args, **LOG_ARGS.kwargs)
 def connect(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  wait: Optional[float],
-  retry_wait: Optional[float],
+  name: str | None,
+  host: str | None,
+  uuid: str | None,
+  wait: float | None,
+  retry_wait: float | None,
   icon: bool,
   log_level: str
 ):
@@ -204,11 +210,11 @@ def service():
 @click.option(*ICON_ARGS.args, **ICON_ARGS.kwargs)
 @click.option(*LOG_ARGS.args, **LOG_ARGS.kwargs)
 def connect(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  wait: Optional[float],
-  retry_wait: Optional[float],
+  name: str | None,
+  host: str | None,
+  uuid: str | None,
+  wait: float | None,
+  retry_wait: float | None,
   icon: bool,
   log_level: str
 ):
@@ -242,7 +248,7 @@ def disconnect():
 
   if not daemon.pid:
     log.warning(NOT_RUNNING_MSG)
-    sys.exit(RC_NOT_RUNNING)
+    quit(RC_NOT_RUNNING)
 
   daemon.stop()
   DaemonArgs.delete()
@@ -252,7 +258,7 @@ def disconnect():
   help='Reconnect the background service to the device.'
 )
 def reconnect():
-  daemon: Optional[MprisDaemon] = None
+  daemon: MprisDaemon | None = None
   args = DaemonArgs.load()
 
   if args:
@@ -260,7 +266,7 @@ def reconnect():
 
   if not args or not daemon.pid:
     log.warning(NOT_RUNNING_MSG)
-    sys.exit(RC_NOT_RUNNING)
+    quit(RC_NOT_RUNNING)
 
   daemon.restart()
 
