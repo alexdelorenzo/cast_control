@@ -297,10 +297,7 @@ class TitlesMixin(Wrapper):
     return Titles(*titles)
 
   def get_subtitle(self) -> str | None:
-    if not self.media_status:
-      return None
-
-    if not (metadata := self.media_status.media_metadata):
+    if not (status := self.media_status) or not (metadata := status.media_metadata):
       return None
 
     if subtitle := metadata.get('subtitle'):
@@ -310,7 +307,7 @@ class TitlesMixin(Wrapper):
 
 
 class TimeMixin(Wrapper):
-  _longest_duration: Microseconds | Decimal | None = NO_DURATION
+  _longest_duration: Microseconds | None = NO_DURATION
 
   def __init__(self):
     self._longest_duration = NO_DURATION
@@ -334,16 +331,14 @@ class TimeMixin(Wrapper):
     super().on_new_status(*args, **kwargs)
 
   def get_duration(self) -> Microseconds:
-    duration: int | None = None
+    if (status := self.media_status) and (duration := status.duration) is not None:
+      duration = Seconds(duration)
+      duration_us: Microseconds = duration * US_IN_SEC
 
-    if self.media_status:
-      duration = self.media_status.duration
+      return round(duration_us)
 
-    if duration is not None:
-      return duration * US_IN_SEC
-
-    longest: Microseconds | Decimal = self._longest_duration
-    current = self.get_current_position()
+    current: Microseconds = self.get_current_position()
+    longest: Microseconds = self._longest_duration
 
     if longest and longest > current:
       return longest
@@ -364,7 +359,7 @@ class TimeMixin(Wrapper):
     return round(position_us)
 
   def has_current_time(self) -> bool:
-    current_time = self.current_time
+    current_time: Seconds | int = self.current_time
 
     if current_time is None:
       return False
@@ -375,7 +370,7 @@ class TimeMixin(Wrapper):
 
   def seek(self, time: Microseconds):
     time = Decimal(time)
-    seconds = round(time / US_IN_SEC)
+    seconds = round(time / US_IN_SEC, RESOLUTION)
 
     self.media_controller.seek(seconds)
 
@@ -685,8 +680,8 @@ def get_content_id(uri: str) -> str | None:
   content_id: str | None = None
   parsed = urlparse(uri)
 
-  *_, name, gtld = parsed.netloc.split(".")
-  domain: str = f"{name}.{gtld}"
+  *_, name, tld = parsed.netloc.split(".")
+  domain: str = f"{name}.{tld}"
 
   match domain:
     case YoutubeUrl.long:
