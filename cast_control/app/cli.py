@@ -15,6 +15,8 @@ from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, LOG, LOG_LEVEL, NAME, RC_NO
 assert __name__ == CLI_MODULE_NAME
 
 
+log: Final[logging.Logger] = logging.getLogger(__name__)
+
 LOG_MODE: Final[str] = 'r'
 LOG_END: Final[str] = ''
 
@@ -226,8 +228,8 @@ def connect(
     daemon.start()
 
   except Exception as e:
-    logging.exception(e)
-    logging.warning("Error launching daemon.")
+    log.exception(e)
+    log.warning("Error launching daemon.")
 
     args.delete()
 
@@ -239,7 +241,7 @@ def disconnect():
   daemon = get_daemon()
 
   if not daemon.pid:
-    logging.warning(NOT_RUNNING_MSG)
+    log.warning(NOT_RUNNING_MSG)
     sys.exit(RC_NOT_RUNNING)
 
   daemon.stop()
@@ -257,7 +259,7 @@ def reconnect():
     daemon = get_daemon_from_args(run_safe, args)
 
   if not args or not daemon.pid:
-    logging.warning(NOT_RUNNING_MSG)
+    log.warning(NOT_RUNNING_MSG)
     sys.exit(RC_NOT_RUNNING)
 
   daemon.restart()

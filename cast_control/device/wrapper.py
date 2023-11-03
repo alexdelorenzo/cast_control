@@ -31,6 +31,9 @@ from ..base import DEFAULT_DISC_NO, DEFAULT_ICON, DEFAULT_THUMB, Device, \
   NO_DURATION, US_IN_SEC, singleton
 
 
+log: Final[logging.Logger] = logging.getLogger(__name__)
+
+
 RESOLUTION: Final[int] = 1
 MAX_TITLES: Final[int] = 3
 
@@ -412,8 +415,8 @@ class IconsMixin(Wrapper):
       path = create_desktop_file(self.light_icon)
 
     except Exception as e:
-      logging.exception(e)
-      logging.error("Couldn't load desktop file.")
+      log.exception(e)
+      log.error("Couldn't load desktop file.")
       return NO_DESKTOP_FILE
 
     return path

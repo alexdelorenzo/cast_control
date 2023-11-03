@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import sys
 from time import sleep
-from typing import Optional
+from typing import Optional, Final
 
 from mpris_server import Server
 
@@ -14,6 +14,9 @@ from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WA
   NoDevicesFound, RC_NO_CHROMECAST, Seconds
 from ..device.device import find_device
 from ..device.listeners import register_event_listener
+
+
+log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 def create_adapters_and_server(
@@ -56,7 +59,7 @@ def retry_until_found(
       return mpris
 
     device = name or host or uuid or NO_DEVICE
-    logging.info(f'{device} not found. Waiting {wait} seconds before retrying.')
+    log.info(f'{device} not found. Waiting {wait} seconds before retrying.')
     sleep(wait)
 
 
@@ -93,5 +96,5 @@ def run_safe(
     run_server(*args)
 
   except NoDevicesFound as e:
-    logging.warning(f'{e} not found')
+    log.warning(f'{e} not found')
     sys.exit(RC_NO_CHROMECAST)
