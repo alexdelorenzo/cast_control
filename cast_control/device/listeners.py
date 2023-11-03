@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Final, Optional, override
+from typing import Final, override
 
+from mpris_server import EventAdapter, Server
 from pychromecast.controllers.media import MediaStatus, MediaStatusListener
 from pychromecast.controllers.receiver import CastStatus, CastStatusListener
 from pychromecast.socket_client import ConnectionStatus, ConnectionStatusListener
-from mpris_server import EventAdapter, Server
 
 from ..adapter import DeviceAdapter
 from ..base import Device, Status

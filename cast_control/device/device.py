@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 from uuid import UUID
 
 from pychromecast import get_chromecast_from_host, get_chromecasts
@@ -10,7 +10,7 @@ from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, Device, NO_PORT, NO_STR
 
 class Host(NamedTuple):
   host: str
-  port: Optional[int] = NO_PORT
+  port: int | None = NO_PORT
   uuid: str = NO_STR
   model_name: str = NO_STR
   friendly_name: str = DEFAULT_NAME
@@ -19,8 +19,8 @@ class Host(NamedTuple):
 def get_device_via_host(
   host: str,
   name: str = DEFAULT_NAME,
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Device]:
+  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+) -> Device | None:
   if not name:
     name = DEFAULT_NAME
 
@@ -35,7 +35,7 @@ def get_device_via_host(
 
 
 def get_devices(
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT
+  retry_wait: float | None = DEFAULT_RETRY_WAIT
 ) -> list[Device]:
   devices, service_browser = get_chromecasts(retry_wait=retry_wait)
   service_browser.stop_discovery()
@@ -43,7 +43,7 @@ def get_devices(
   return devices
 
 
-def get_first(devices: list[Device]) -> Optional[Device]:
+def get_first(devices: list[Device]) -> Device | None:
   if not devices:
     return None
 
@@ -54,9 +54,9 @@ def get_first(devices: list[Device]) -> Optional[Device]:
 
 
 def get_device_via_uuid(
-  uuid: Optional[str] = None,
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Device]:
+  uuid: str | None = None,
+  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+) -> Device | None:
   devices = get_devices(retry_wait)
 
   if not uuid:
@@ -74,9 +74,9 @@ def get_device_via_uuid(
 
 
 def get_device(
-  name: Optional[str] = None,
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Device]:
+  name: str | None = None,
+  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+) -> Device | None:
   devices = get_devices(retry_wait)
 
   if not name:
@@ -94,12 +94,12 @@ def get_device(
 
 
 def find_device(
-  name: Optional[str] = DEFAULT_NAME,
-  host: Optional[str] = None,
-  uuid: Optional[str] = None,
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Device]:
-  device: Optional[Device] = None
+  name: str | None = DEFAULT_NAME,
+  host: str | None = None,
+  uuid: str | None = None,
+  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+) -> Device | None:
+  device: Device | None = None
 
   if host:
     device = get_device_via_host(host, name, retry_wait)

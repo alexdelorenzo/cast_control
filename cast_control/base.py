@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from decimal import Context, Decimal, ROUND_HALF_UP, ROUND_UP, getcontext
+from decimal import Context, Decimal, ROUND_HALF_UP, getcontext
 from enum import StrEnum, auto
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Optional, ParamSpec, TypeVar, Union, Final
+from typing import Callable, Final, ParamSpec, TypeVar, Union
 
 from app_paths import AsyncAppPaths, get_paths
 from pychromecast import Chromecast
@@ -29,7 +29,7 @@ NO_DURATION: Final[float] = 0.0
 NO_DELTA: Final[int] = 0
 NO_CHROMECAST_NAME: Final[str] = 'NO_NAME'
 NO_STR: Final[str] = ''
-NO_PORT: Final[Optional[int]] = None
+NO_PORT: Final[int | None] = None
 NO_DEVICE: Final[str] = 'Device'
 
 # older Python requires an explicit

@@ -4,7 +4,7 @@ import logging
 from abc import abstractmethod
 from enum import StrEnum
 from mimetypes import guess_type
-from typing import Any, Final, NamedTuple, Optional, Protocol, Self, override
+from typing import Any, Final, NamedTuple, Protocol, Self, override
 from urllib.parse import parse_qs, urlparse
 
 from mpris_server import (
@@ -226,7 +226,7 @@ class ControllersMixin(Wrapper):
 
     return not content_id.startswith('http')
 
-  def _get_url(self) -> Optional[str]:
+  def _get_url(self) -> str | None:
     content_id: str | None = None
 
     if self.media_status:
@@ -295,7 +295,7 @@ class TitlesMixin(Wrapper):
 
     return Titles(*titles)
 
-  def get_subtitle(self) -> Optional[str]:
+  def get_subtitle(self) -> str | None:
     if not self.media_status:
       return None
 
@@ -316,7 +316,7 @@ class TimeMixin(Wrapper):
     super().__init__()
 
   @property
-  def current_time(self) -> Optional[float]:
+  def current_time(self) -> float | None:
     status = self.media_status
 
     if not status:
@@ -332,7 +332,7 @@ class TimeMixin(Wrapper):
     super().on_new_status(*args, **kwargs)
 
   def get_duration(self) -> Microseconds:
-    duration: Optional[int] = None
+    duration: int | None = None
 
     if self.media_status:
       duration = self.media_status.duration
@@ -389,7 +389,7 @@ class TimeMixin(Wrapper):
 
 
 class IconsMixin(Wrapper):
-  def _set_cached_icon(self, url: Optional[str] = None):
+  def _set_cached_icon(self, url: str | None = None):
     if not url:
       self.cached_icon = None
       return
@@ -407,7 +407,7 @@ class IconsMixin(Wrapper):
 
     return icon.app_id == app_id and icon.title == title
 
-  def _get_icon_from_device(self) -> Optional[str]:
+  def _get_icon_from_device(self) -> str | None:
     url: str | None
 
     if images := self.media_status.images:
@@ -433,7 +433,7 @@ class IconsMixin(Wrapper):
 
     return str(DEFAULT_THUMB)
 
-  def get_art_url(self, track: Optional[int] = None) -> str:
+  def get_art_url(self, track: int | None = None) -> str:
     if icon := self._get_icon_from_device():
       return icon
 
@@ -462,7 +462,7 @@ class MetadataMixin(Wrapper):
     dbus_name: DbusObj = get_track_id(title)
     artists: list[str] = [artist] if artist else []
     comments: list[str] = []
-    track_no: Optional[int] = None
+    track_no: int | None = None
 
     if self.media_status:
       track_no = self.media_status.track
@@ -542,11 +542,11 @@ class VolumeMixin(Wrapper):
   #def __init__(self):
     #super().__init__()
 
-  def get_volume(self) -> Optional[Volume]:
-    if not (status := self.cast_status):
-      return None
+  def get_volume(self) -> Volume | None:
+    if status := self.cast_status:
+      return Volume(status.volume_level)
 
-    return Volume(status.volume_level)
+    return None
 
   def set_volume(self, val: Volume):
     val = Volume(val)
@@ -564,7 +564,7 @@ class VolumeMixin(Wrapper):
     elif delta < NO_DELTA:
       self.device.volume_down(abs(delta))
 
-  def is_mute(self) -> Optional[bool]:
+  def is_mute(self) -> bool | None:
     if status := self.cast_status:
       return status.volume_muted
 
@@ -643,7 +643,7 @@ class DeviceWrapper(
 
 def get_media_type(
   dev: DeviceWrapper
-) -> Optional[MediaType]:
+) -> MediaType | None:
   status = dev.media_status
 
   if not status:

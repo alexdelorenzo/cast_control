@@ -5,7 +5,7 @@ from asyncio import gather, run
 from functools import cache, wraps
 from os import stat_result
 from pathlib import Path
-from typing import Callable, Optional, ParamSpec, TypeVar
+from typing import Callable
 
 from aiopath import AsyncPath
 from rich.logging import RichHandler
@@ -20,7 +20,7 @@ type Decorated[**P, T] = Callable[P, T]
 
 def setup_logging(
   level: str = LOG_LEVEL,
-  file: Optional[Path] = None,
+  file: Path | None = None,
 ):
   level = level.upper()
 
