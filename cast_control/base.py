@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from decimal import Decimal, getcontext
+from decimal import Context, Decimal, ROUND_HALF_UP, ROUND_UP, getcontext
 from enum import StrEnum, auto
 from functools import lru_cache
 from pathlib import Path
@@ -87,8 +87,10 @@ TEMPLATE_SVG: Final[Path] = ICON_DIR / 'cc-template.svg'
 LIGHT_ICON = LIGHT_THUMB = LIGHT_SVG
 DEFAULT_THUMB = DARK_ICON = DARK_SVG
 
-PRECISION: Final[int] = 5
-getcontext().prec = PRECISION
+PRECISION: Final[int] = 4
+CONTEXT: Final[Context] = getcontext()
+CONTEXT.prec = PRECISION
+CONTEXT.rounding = ROUND_HALF_UP
 
 
 Device = Chromecast
