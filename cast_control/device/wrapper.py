@@ -1,28 +1,29 @@
 from __future__ import annotations
 
 import logging
-from decimal import Decimal
+from abc import abstractmethod
 from enum import StrEnum
 from mimetypes import guess_type
-from typing import Any, NamedTuple, Optional, Self, override, Final, Protocol
+from typing import Any, Final, NamedTuple, Optional, Protocol, Self, override
 from urllib.parse import parse_qs, urlparse
 
 from mpris_server import (
   BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate,
-  ValidMetadata, Volume, get_track_id
+  ValidMetadata, Volume, get_track_id,
 )
 from pychromecast.controllers.bbciplayer import BbcIplayerController
 from pychromecast.controllers.bbcsounds import BbcSoundsController
 from pychromecast.controllers.bubbleupnp import BubbleUPNPController
 from pychromecast.controllers.dashcast import DashCastController
-from pychromecast.controllers.media import BaseController, MediaController, MediaStatus, DefaultMediaReceiverController
+from pychromecast.controllers.homeassistant_media import HomeAssistantMediaController
+from pychromecast.controllers.media import BaseController, DefaultMediaReceiverController, MediaController, MediaStatus
+from pychromecast.controllers.multizone import MultizoneController
 from pychromecast.controllers.plex import PlexController
 from pychromecast.controllers.receiver import CastStatus, ReceiverController
 from pychromecast.controllers.supla import SuplaController
 from pychromecast.controllers.yleareena import YleAreenaController
 from pychromecast.controllers.youtube import YouTubeController
-from pychromecast.controllers.multizone import MultizoneController
-from pychromecast.controllers.homeassistant_media import HomeAssistantMediaController
+from pychromecast.socket_client import ConnectionStatus
 
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
@@ -64,6 +65,16 @@ class YoutubeUrl(StrEnum):
 
     return is_youtube(uri)
 
+  @classmethod
+  def which(cls: type[Self], uri: str | None) -> Self | None:
+    if cls.long in uri:
+      return cls.long
+
+    elif cls.short in uri:
+      return cls.short
+
+    return None
+
 
 class CachedIcon(NamedTuple):
   url: str
@@ -72,52 +83,55 @@ class CachedIcon(NamedTuple):
 
 
 class Titles(NamedTuple):
-  title: Optional[str] = None
-  artist: Optional[str] = None
-  album: Optional[str] = None
+  title: str | None = None
+  artist: str | None = None
+  album: str | None = None
 
 
 class Controllers(NamedTuple):
-  yt: Optional[YouTubeController] = None
-  dash: Optional[DashCastController] = None
-  plex: Optional[PlexController] = None
-  supla: Optional[SuplaController] = None
-  default: DefaultMediaReceiverController | None = None
-  receiver: ReceiverController | None = None
-  multizone: MultizoneController | None = None
   bbc_ip: BbcIplayerController | None = None
   bbc_sound: BbcSoundsController | None = None
   bubble: BubbleUPNPController | None = None
+  dash: DashCastController | None = None
+  default: DefaultMediaReceiverController | None = None
+  ha_media: HomeAssistantMediaController | None = None
+  multizone: MultizoneController | None = None
+  plex: PlexController | None = None
+  receiver: ReceiverController | None = None
+  supla: SuplaController | None = None
   yle: YleAreenaController | None = None
+  youtube: YouTubeController | None = None
+
   # plex_api: PlexApiController = None
   # ha: HomeAssistantController = None
-  ha_media: HomeAssistantMediaController | None = None
 
   @classmethod
   def new(cls: type[Self], device: Device | None) -> Self:
     return cls(
-      YouTubeController(),
-      DashCastController(),
-      PlexController(),
-      SuplaController(),
-      DefaultMediaReceiverController(),
-      ReceiverController(),
-      MultizoneController(device.uuid) if device else None,
       BbcIplayerController(),
       BbcSoundsController(),
       BubbleUPNPController(),
+      DashCastController(),
+      DefaultMediaReceiverController(),
+      HomeAssistantMediaController(),
+      MultizoneController(device.uuid) if device else None,
+      PlexController(),
+      ReceiverController(),
+      SuplaController(),
       YleAreenaController(),
+      YouTubeController(),
       # HomeAssistantController(),
-      ha_media=HomeAssistantMediaController(),
     )
 
 
 class Wrapper(Protocol):
   device: Device
   controllers: Controllers
-  cached_icon: Optional[CachedIcon] = None
+
+  cached_icon: CachedIcon | None = None
   light_icon: bool = DEFAULT_ICON
 
+  @override
   def __getattr__(self, name: str) -> Any:
     return getattr(self.device, name)
 
@@ -126,36 +140,51 @@ class Wrapper(Protocol):
     return self.device.name or NAME
 
   @property
-  def cast_status(self) -> Optional[CastStatus]:
+  @abstractmethod
+  def cast_status(self) -> CastStatus | None:
     pass
 
   @property
-  def media_status(self) -> Optional[MediaStatus]:
+  @abstractmethod
+  def media_status(self) -> MediaStatus | None:
     pass
 
   @property
+  @abstractmethod
+  def connection_status(self) -> ConnectionStatus | None:
+    pass
+
+  @property
+  @abstractmethod
   def media_controller(self) -> MediaController:
     pass
 
   @property
+  @abstractmethod
   def titles(self) -> Titles:
     pass
 
+  @abstractmethod
   def on_new_status(self, *args, **kwargs):
-    '''Callback for event listener'''
+    """Callback for event listener"""
     pass
 
 
 class StatusMixin(Wrapper):
   @override
   @property
-  def cast_status(self) -> Optional[CastStatus]:
+  def cast_status(self) -> CastStatus | None:
     return self.device.status or None
 
   @override
   @property
-  def media_status(self) -> Optional[MediaStatus]:
+  def media_status(self) -> MediaStatus | None:
     return self.media_controller.status or None
+
+  @override
+  @property
+  def connection_status(self) -> ConnectionStatus | None:
+    return self.device.socket_client.receiver_controller.status or None
 
   @override
   @property
@@ -181,18 +210,18 @@ class ControllersMixin(Wrapper):
     self.device.register_handler(controller)
 
   def _launch_youtube(self):
-    self.controllers.yt.launch()
+    self.controllers.youtube.launch()
 
   def _play_youtube(self, video_id: str):
-    yt = self.controllers.yt
+    youtube = self.controllers.youtube
 
-    if not yt.is_active:
+    if not youtube.is_active:
       self._launch_youtube()
 
-    yt.play_video(video_id)
+    youtube.quick_play(video_id)
 
   def _is_youtube_vid(self, content_id: str | None) -> bool:
-    if not content_id or not self.controllers.yt.is_active:
+    if not content_id or not self.controllers.youtube.is_active:
       return False
 
     return not content_id.startswith('http')
@@ -222,13 +251,13 @@ class ControllersMixin(Wrapper):
     after_track: DbusObj,
     set_as_current: bool
   ):
-    yt = self.controllers.yt
+    youtube = self.controllers.youtube
 
     if video_id := get_content_id(uri):
-      yt.add_to_queue(video_id)
+      youtube.add_to_queue(video_id)
 
     if video_id and set_as_current:
-      yt.play_video(video_id)
+      youtube.play_video(video_id)
 
     elif set_as_current:
       self.open_uri(uri)
@@ -297,9 +326,10 @@ class TimeMixin(Wrapper):
 
   @override
   def on_new_status(self, *args, **kwargs):
-    # super().on_new_status(*args, **kwargs)
     if not self.has_current_time():
       self._longest_duration = None
+
+    super().on_new_status(*args, **kwargs)
 
   def get_duration(self) -> Microseconds:
     duration: Optional[int] = None
@@ -513,13 +543,13 @@ class VolumeMixin(Wrapper):
     #super().__init__()
 
   def get_volume(self) -> Optional[Volume]:
-    if not self.cast_status:
+    if not (status := self.cast_status):
       return None
 
-    return Decimal(self.cast_status.volume_level)
+    return Volume(status.volume_level)
 
   def set_volume(self, val: Volume):
-    val = Decimal(val)
+    val = Volume(val)
     curr = self.get_volume()
 
     if curr is None:
@@ -535,8 +565,8 @@ class VolumeMixin(Wrapper):
       self.device.volume_down(abs(delta))
 
   def is_mute(self) -> Optional[bool]:
-    if self.cast_status:
-      return self.cast_status.volume_muted
+    if status := self.cast_status:
+      return status.volume_muted
 
     return False
 
@@ -598,7 +628,7 @@ class DeviceWrapper(
   VolumeMixin,
   AbilitiesMixin,
 ):
-  '''Wraps implementation details for device API'''
+  """Wraps implementation details for device API"""
 
   def __init__(self, device: Device):
     self.device = device
@@ -644,7 +674,7 @@ def is_youtube(uri: str) -> bool:
   return any(url in parsed.netloc for url in YoutubeUrl)
 
 
-def get_content_id(uri: str) -> Optional[str]:
+def get_content_id(uri: str) -> str | None:
   if not YoutubeUrl.is_youtube(uri):
     return None
 
