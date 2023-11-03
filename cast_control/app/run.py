@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import logging
-import sys
 from time import sleep
-from typing import Optional, Final
+from typing import Final, cast
 
 from mpris_server import Server
 
@@ -20,32 +19,32 @@ log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
 def create_adapters_and_server(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Server]:
+  name: str | None,
+  host: str | None,
+  uuid: str | None,
+  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+) -> Server | None:
   device = find_device(name, host, uuid, retry_wait)
 
   if not device:
     return None
 
   adapter = DeviceAdapter(device)
-  mpris = Server(name=device.name, adapter=adapter)
-  mpris.publish()
+  server = Server(name=device.name, adapter=adapter)
+  server.publish()
 
-  register_event_listener(device, mpris, adapter)
+  register_event_listener(device, server, adapter)
 
-  return mpris
+  return server
 
 
 def retry_until_found(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  wait: Optional[Seconds] = DEFAULT_WAIT,
-  retry_wait: Optional[float] = DEFAULT_RETRY_WAIT,
-) -> Optional[Server]:
+  name: str | None,
+  host: str | None,
+  uuid: str | None,
+  wait: Seconds | None = DEFAULT_WAIT,
+  retry_wait: float | None = DEFAULT_RETRY_WAIT,
+) -> Server | None:
   """
     If the device isn't found, keep trying to find it.
 
@@ -53,10 +52,10 @@ def retry_until_found(
   """
 
   while True:
-    mpris = create_adapters_and_server(name, host, uuid, retry_wait)
+    server = create_adapters_and_server(name, host, uuid, retry_wait)
 
-    if mpris or wait is None:
-      return mpris
+    if server or wait is None:
+      return server
 
     device = name or host or uuid or NO_DEVICE
     log.info(f'{device} not found. Waiting {wait} seconds before retrying.')
@@ -64,11 +63,11 @@ def retry_until_found(
 
 
 def run_server(
-  name: Optional[str],
-  host: Optional[str],
-  uuid: Optional[str],
-  wait: Optional[Seconds] = DEFAULT_WAIT,
-  retry_wait: Optional[Seconds] = DEFAULT_RETRY_WAIT,
+  name: str | None,
+  host: str | None,
+  uuid: str | None,
+  wait: Seconds | None = DEFAULT_WAIT,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
   icon: bool = DEFAULT_ICON,
   log_level: str = LOG_LEVEL,
   set_logging: bool = DEFAULT_SET_LOG,
@@ -76,25 +75,19 @@ def run_server(
   if set_logging:
     setup_logging(log_level)
 
-  mpris = retry_until_found(name, host, uuid, wait, retry_wait)
-
-  if mpris and icon:
-    mpris.adapter: DeviceAdapter
-    mpris.adapter.set_icon(True)
-
-  if not mpris:
+  if not (server := retry_until_found(name, host, uuid, wait, retry_wait)):
     device = name or host or uuid or NO_DEVICE
     raise NoDevicesFound(device)
 
-  mpris.loop()
+  server = cast(Server, server)
+  server.adapter.set_icon(icon)
+  server.loop()
 
 
-def run_safe(
-  args: DaemonArgs
-):
+def run_safe(args: DaemonArgs):
   try:
     run_server(*args)
 
   except NoDevicesFound as e:
-    log.warning(f'{e} not found')
-    sys.exit(RC_NO_CHROMECAST)
+    log.error(f'Device {e} not found.')
+    quit(RC_NO_CHROMECAST)
