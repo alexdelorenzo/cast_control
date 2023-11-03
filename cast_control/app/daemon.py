@@ -3,7 +3,7 @@ from __future__ import annotations
 import pickle
 from functools import partial
 from pathlib import Path
-from typing import Callable, NamedTuple, Optional
+from typing import Callable, NamedTuple
 
 from daemons.prefab.run import RunDaemon
 
@@ -12,25 +12,22 @@ from ..base import ARGS, ARGS_STEM, DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SE
   DEFAULT_WAIT, LOG, LOG_LEVEL, NO_DEVICE, PID, Seconds
 
 
-FuncMaybe = Optional[Callable]
-
-
-class MprisDaemon(RunDaemon):
-  target: FuncMaybe = None
-  args: ArgsMaybe = None
-  _logging: Optional[str] = None
+class MprisDaemon[**P, T](RunDaemon):
+  target: Callable[P, T] | None = None
+  args: DaemonArgs | None = None
+  _logging: str | None = None
 
   @property
-  def logging(self) -> Optional[str]:
+  def logging(self) -> str | None:
     return self._logging
 
   @logging.setter
-  def logging(self, val: Optional[str]):
+  def logging(self, val: str | None):
     self._logging = val
 
-  def set_target(
+  def set_target[**P, T](
     self,
-    func: FuncMaybe = None,
+    func: Callable[P, T] | None = None,
     *args,
     **kwargs
   ):
@@ -40,10 +37,10 @@ class MprisDaemon(RunDaemon):
 
     self.target = partial(func, *args, **kwargs)
 
-  def set_target_via_args(
+  def set_target_via_args[**P, T](
     self,
-    func: FuncMaybe = None,
-    args: ArgsMaybe = None
+    func: Callable[P, T] | None = None,
+    args: DaemonArgs | None = None
   ):
     if not func:
       self.target = None
@@ -71,17 +68,17 @@ class MprisDaemon(RunDaemon):
 
 
 class DaemonArgs(NamedTuple):
-  name: Optional[str] = None
-  host: Optional[str] = None
-  uuid: Optional[str] = None
-  wait: Optional[Seconds] = DEFAULT_WAIT
-  retry_wait: Optional[Seconds] = DEFAULT_RETRY_WAIT
+  name: str | None = None
+  host: str | None = None
+  uuid: str | None = None
+  wait: Seconds | None = DEFAULT_WAIT
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT
   icon: bool = DEFAULT_ICON
   log_level: str = LOG_LEVEL
   set_logging: bool = DEFAULT_SET_LOG
 
   @staticmethod
-  def load(identifier: Optional[str] = None) -> ArgsMaybe:
+  def load(identifier: str | None = None) -> DaemonArgs | None:
     if identifier:
       args = ARGS.with_stem(f'{identifier}{ARGS_STEM}')
 
@@ -113,11 +110,8 @@ class DaemonArgs(NamedTuple):
     return ARGS.with_stem(f'{device}{ARGS_STEM}')
 
 
-ArgsMaybe = Optional[DaemonArgs]
-
-
-def get_daemon(
-  func: FuncMaybe = None,
+def get_daemon[**P, T](
+  func: Callable[P, T] | None = None,
   *args,
   _pidfile: str = str(PID),
   **kwargs,
@@ -128,9 +122,9 @@ def get_daemon(
   return daemon
 
 
-def get_daemon_from_args(
-  func: FuncMaybe = None,
-  args: ArgsMaybe = None,
+def get_daemon_from_args[**P, T](
+  func: Callable[P, T] | None = None,
+  args: DaemonArgs | None = None,
   _pidfile: str = str(PID),
 ) -> MprisDaemon:
   daemon = MprisDaemon(pidfile=_pidfile)
