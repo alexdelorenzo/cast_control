@@ -4,7 +4,7 @@ from decimal import Context, Decimal, ROUND_HALF_UP, getcontext
 from enum import StrEnum, auto
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Final, ParamSpec, TypeVar, Union
+from typing import Callable, Final, Union
 
 from app_paths import AsyncAppPaths, get_paths
 from pychromecast import Chromecast
@@ -96,12 +96,9 @@ CONTEXT.rounding = ROUND_HALF_UP
 Device = Chromecast
 Status = Union[MediaStatus, CastStatus, ConnectionStatus]
 
-T = TypeVar('T')
-P = ParamSpec('P')
-
-Decorated = Callable[P, T]
-Decoratable = Callable[P, T]
-Decorator = Callable[[Decoratable], Decorated]
+type Decorated[**P, T] = Callable[P, T]
+type Decoratable[**P, T] = Callable[P, T]
+type Decorator[**P, T] = Callable[[Decoratable], Decorated]
 
 
 class NoDevicesFound(Exception):
