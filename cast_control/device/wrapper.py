@@ -370,7 +370,7 @@ class TimeMixin(Wrapper):
 
   def seek(self, time: Microseconds):
     time = Decimal(time)
-    seconds = round(time / US_IN_SEC, RESOLUTION)
+    seconds = round(time / US_IN_SEC)
 
     self.media_controller.seek(seconds)
 
