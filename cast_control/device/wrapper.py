@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from abc import abstractmethod
+from decimal import Decimal
 from enum import StrEnum
 from mimetypes import guess_type
 from typing import Any, Final, NamedTuple, Protocol, Self, override
@@ -29,7 +30,7 @@ from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
 from ..base import DEFAULT_DISC_NO, DEFAULT_ICON, DEFAULT_THUMB, Device, \
   LIGHT_THUMB, MediaType, NAME, NO_DELTA, NO_DESKTOP_FILE, \
-  NO_DURATION, US_IN_SEC, singleton
+  NO_DURATION, Seconds, US_IN_SEC, singleton
 
 
 log: Final[logging.Logger] = logging.getLogger(__name__)
@@ -309,20 +310,21 @@ class TitlesMixin(Wrapper):
 
 
 class TimeMixin(Wrapper):
-  _longest_duration: float | None = NO_DURATION
+  _longest_duration: Microseconds | Decimal | None = NO_DURATION
 
   def __init__(self):
     self._longest_duration = NO_DURATION
     super().__init__()
 
   @property
-  def current_time(self) -> float | None:
-    status = self.media_status
-
-    if not status:
+  def current_time(self) -> Seconds | None:
+    if not (status := self.media_status):
       return None
 
-    return status.adjusted_current_time or status.current_time
+    if time := status.adjusted_current_time or status.current_time:
+      return Seconds(time)
+
+    return None
 
   @override
   def on_new_status(self, *args, **kwargs):
@@ -340,7 +342,7 @@ class TimeMixin(Wrapper):
     if duration is not None:
       return duration * US_IN_SEC
 
-    longest: int | float = self._longest_duration
+    longest: Microseconds | Decimal = self._longest_duration
     current = self.get_current_position()
 
     if longest and longest > current:
@@ -353,12 +355,12 @@ class TimeMixin(Wrapper):
     return NO_DURATION
 
   def get_current_position(self) -> Microseconds:
-    position_secs = self.current_time
+    position: Seconds = self.current_time
 
-    if not position_secs:
+    if not position:
       return BEGINNING
 
-    position_us = position_secs * US_IN_SEC
+    position_us: Microseconds = position * US_IN_SEC
     return round(position_us)
 
   def has_current_time(self) -> bool:
@@ -372,14 +374,16 @@ class TimeMixin(Wrapper):
     return current_time > BEGINNING
 
   def seek(self, time: Microseconds):
-    seconds = int(round(time / US_IN_SEC))
+    time = Decimal(time)
+    seconds = round(time / US_IN_SEC)
+
     self.media_controller.seek(seconds)
 
   def get_rate(self) -> Rate:
-    if not self.media_status:
+    if not (status := self.media_status):
       return DEFAULT_RATE
 
-    if rate := self.media_status.playback_rate:
+    if rate := status.playback_rate:
       return rate
 
     return DEFAULT_RATE
@@ -681,7 +685,10 @@ def get_content_id(uri: str) -> str | None:
   content_id: str | None = None
   parsed = urlparse(uri)
 
-  match parsed.netloc:
+  *_, name, gtld = parsed.netloc.split(".")
+  domain: str = f"{name}.{gtld}"
+
+  match domain:
     case YoutubeUrl.long:
       qs = parse_qs(parsed.query)
       [content_id] = qs[VIDEO_QS]
