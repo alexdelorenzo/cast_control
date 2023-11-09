@@ -40,7 +40,8 @@ class DeviceEventListenerBase(
   def new_connection_status(self, status: ConnectionStatus):
     pass
 
-  def load_media_failed(self, *args, **kwargs):
+  @abstractmethod
+  def load_media_failed(self, item: int, error_code: int):
     pass
 
 
@@ -59,7 +60,7 @@ class DeviceEventAdapter(EventAdapter):
     adapter: DeviceAdapter | None = None
   ):
     self.name = name
-    self.dev = device
+    self.device = device
     self.server = server
     self.adapter = adapter
     super().__init__(self.server.player, self.server.root)
@@ -73,8 +74,9 @@ class DeviceEventListener(
     if isinstance(status, VolumeStatus):
       self.on_volume()
 
-  def _update_metadata(self, status: Status):
-    self._update_volume(status)
+  def _update_metadata(self, status: Status | None = None):
+    if status:
+      self._update_volume(status)
 
     # wire up mpris_server with cc events
     self.on_player_all()
@@ -100,6 +102,11 @@ class DeviceEventListener(
     log.debug(f'Handling new connection status: {status}')
     self._update_metadata(status)
 
+  @override
+  def load_media_failed(self, item: int, error_code: int):
+    log.debug(f'Load media failed: {error_code=} {item=}')
+    self._update_metadata()
+
 
 def register_event_listener(
   device: Device,
@@ -109,5 +116,5 @@ def register_event_listener(
   event_listener = DeviceEventListener(device.name, device, server, adapter)
 
   device.register_status_listener(event_listener)
+  device.register_connection_listener(event_listener)
   device.media_controller.register_status_listener(event_listener)
-  device.socket_client.register_connection_listener(event_listener)
