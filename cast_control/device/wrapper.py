@@ -25,6 +25,7 @@ from pychromecast.controllers.supla import SuplaController
 from pychromecast.controllers.yleareena import YleAreenaController
 from pychromecast.controllers.youtube import YouTubeController
 from pychromecast.socket_client import ConnectionStatus
+from validators import url
 
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
@@ -60,12 +61,18 @@ class YoutubeUrl(StrEnum):
   playlist: Self = f'{PROTO}://{long}/{playlist_endpoint}?{playlist_qs}='
 
   @classmethod
-  def get_url(cls: type[Self], content_id: str | None, playlist_id: str | None = None) -> str | None:
-    if content_id:
-      return f"{cls.video}{content_id}"
+  def get_content_id(cls: type[Self], uri: str | None) -> str | None:
+    return get_content_id(uri)
+
+  @classmethod
+  def get_url(cls: type[Self], video_id: str | None = None, playlist_id: str | None = None) -> str | None:
+    if video_id:
+      return f"{cls.video}{video_id}"
 
     elif playlist_id:
       return f"{cls.playlist}{playlist_id}"
+
+    return None
 
   @classmethod
   def is_youtube(cls: type[Self], uri: str | None) -> bool:
@@ -78,7 +85,7 @@ class YoutubeUrl(StrEnum):
 
   @classmethod
   def type(cls: type[Self], uri: str | None) -> Self | None:
-    if not cls.which(uri):
+    if not (which := cls.which(uri)):
       return None
 
     if cls.watch_endpoint in uri:
@@ -87,7 +94,7 @@ class YoutubeUrl(StrEnum):
     elif cls.playlist_endpoint in uri:
       return cls.playlist
 
-    return cls.short
+    return which
 
   @classmethod
   def which(cls: type[Self], uri: str | None) -> Self | None:
@@ -267,7 +274,7 @@ class ControllersMixin(Wrapper):
     return content_id
 
   def open_uri(self, uri: str):
-    if video_id := get_content_id(uri):
+    if video_id := YoutubeUrl.get_content_id(uri):
       self._play_youtube(video_id)
       return
 
@@ -282,7 +289,7 @@ class ControllersMixin(Wrapper):
   ):
     youtube = self.controllers.youtube
 
-    if video_id := get_content_id(uri):
+    if video_id := YoutubeUrl.get_content_id(uri):
       youtube.add_to_queue(video_id)
 
     if video_id and set_as_current:
@@ -335,7 +342,7 @@ class TitlesMixin(Wrapper):
 
 
 class TimeMixin(Wrapper):
-  _longest_duration: Microseconds | None = NO_DURATION
+  _longest_duration: Microseconds | None
 
   def __init__(self):
     self._longest_duration = NO_DURATION
@@ -398,7 +405,7 @@ class TimeMixin(Wrapper):
 
   def seek(self, time: Microseconds):
     time = Decimal(time)
-    seconds = round(time / US_IN_SEC)
+    seconds: int = round(time / US_IN_SEC)
 
     self.media_controller.seek(seconds)
 
@@ -572,9 +579,8 @@ class VolumeMixin(Wrapper):
 
   def set_volume(self, val: Volume):
     val = Volume(val)
-    curr = self.get_volume()
 
-    if curr is None:
+    if (curr := self.get_volume()) is None:
       return
 
     delta: float = float(val - curr)
@@ -663,10 +669,8 @@ class DeviceWrapper(
     return f'<{cls_name} for {self.device}>'
 
 
-def get_media_type(
-  dev: DeviceWrapper
-) -> MediaType | None:
-  status = dev.media_status
+def get_media_type(device_wrapper: DeviceWrapper) -> MediaType | None:
+  status = device_wrapper.media_status
 
   if not status:
     return None
@@ -690,9 +694,11 @@ def get_media_type(
 
 
 def get_domain(uri: str | ParseResult) -> str | None:
-  match uri:
-    case str():
-      uri = urlparse(uri)
+  if not url(uri):
+    return None
+
+  if isinstance(uri, str):
+    uri = urlparse(uri)
 
   *_, name, tld = uri.netloc.split(".")
 
@@ -700,7 +706,7 @@ def get_domain(uri: str | ParseResult) -> str | None:
 
 
 def get_content_id(uri: str) -> str | None:
-  if not YoutubeUrl.is_youtube(uri):
+  if not url(uri) or not YoutubeUrl.is_youtube(uri):
     return None
 
   parsed = urlparse(uri)
