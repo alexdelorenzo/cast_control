@@ -4,7 +4,7 @@ from decimal import Context, Decimal, ROUND_HALF_UP, getcontext
 from enum import StrEnum, auto
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Final, Union
+from typing import Callable, Final
 
 from app_paths import AsyncAppPaths, get_paths
 from pychromecast import Chromecast
@@ -76,8 +76,7 @@ LOG: Final[Path] = LOG_DIR / f'{NAME}.log'
 
 SRC_DIR: Final[Path] = Path(__file__).parent
 ASSETS_DIR: Final[Path] = SRC_DIR / 'assets'
-DESKTOP_TEMPLATE: Final[Path] = \
-  ASSETS_DIR / f'template{DESKTOP_SUFFIX}'
+DESKTOP_TEMPLATE: Final[Path] = ASSETS_DIR / f'template{DESKTOP_SUFFIX}'
 
 ICON_DIR: Final[Path] = ASSETS_DIR / 'icon'
 DARK_SVG: Final[Path] = ICON_DIR / 'cc-black.svg'
@@ -94,7 +93,7 @@ CONTEXT.rounding = ROUND_HALF_UP
 
 
 Device = Chromecast
-Status = Union[MediaStatus, CastStatus, ConnectionStatus]
+Status = MediaStatus | CastStatus | ConnectionStatus
 
 type Decorated[**P, T] = Callable[P, T]
 type Decoratable[**P, T] = Callable[P, T]
