@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from decimal import Context, Decimal, ROUND_HALF_UP, getcontext
 from enum import StrEnum, auto
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Final
+from typing import Final
 
 from app_paths import AsyncAppPaths, get_paths
 from pychromecast import Chromecast

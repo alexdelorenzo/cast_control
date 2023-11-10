@@ -578,12 +578,11 @@ class VolumeMixin(Wrapper):
     return None
 
   def set_volume(self, val: Volume):
-    val = Volume(val)
-
-    if (curr := self.get_volume()) is None:
+    if (current := self.get_volume()) is None:
       return
 
-    delta: float = float(val - curr)
+    volume = Volume(val)
+    delta: float = float(volume - current)
 
     # can't adjust vol by 0
     if delta > NO_DELTA:  # vol up

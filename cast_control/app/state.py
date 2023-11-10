@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import logging
 from asyncio import gather, run
+from collections.abc import Callable
 from functools import cache, wraps
 from os import stat_result
 from pathlib import Path
-from typing import Callable
 
 from aiopath import AsyncPath
 from rich.logging import RichHandler

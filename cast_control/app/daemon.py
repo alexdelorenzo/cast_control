@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import pickle
+from collections.abc import Callable
 from functools import partial
 from pathlib import Path
-from typing import Callable, NamedTuple
+from typing import NamedTuple
 
 from daemons.prefab.run import RunDaemon
 
