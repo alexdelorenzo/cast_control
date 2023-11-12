@@ -18,16 +18,13 @@ class Host(NamedTuple):
 
 def get_device_via_host(
   host: str,
-  name: str = DEFAULT_NAME,
+  name: str | None = DEFAULT_NAME,
   retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
-  if not name:
-    name = DEFAULT_NAME
-
+  name = name or DEFAULT_NAME
   info = Host(host, friendly_name=name)
-  device = get_chromecast_from_host(info, retry_wait=float(retry_wait))
 
-  if device:
+  if device := get_chromecast_from_host(info, retry_wait=float(retry_wait)):
     device.wait()
     return device
 
@@ -67,7 +64,7 @@ def get_first(devices: list[Device]) -> Device | None:
 
 
 def get_device_via_uuid(
-  uuid: str | UUID | None = None,
+  uuid: UUID | str | None = None,
   retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   devices = get_devices(retry_wait)
@@ -114,7 +111,7 @@ def get_device(
 def find_device(
   name: str | None = DEFAULT_NAME,
   host: str | None = None,
-  uuid: str | UUID | None = None,
+  uuid: UUID | str | None = None,
   retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   device: Device | None = None
