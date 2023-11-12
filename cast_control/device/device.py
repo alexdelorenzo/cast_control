@@ -25,7 +25,7 @@ def get_device_via_host(
     name = DEFAULT_NAME
 
   info = Host(host, friendly_name=name)
-  device = get_chromecast_from_host(info, retry_wait=retry_wait)
+  device = get_chromecast_from_host(info, retry_wait=float(retry_wait))
 
   if device:
     device.wait()
@@ -37,7 +37,7 @@ def get_device_via_host(
 def get_devices(
   retry_wait: Seconds | None = DEFAULT_RETRY_WAIT
 ) -> list[Device]:
-  devices, service_browser = get_chromecasts(retry_wait=retry_wait)
+  devices, service_browser = get_chromecasts(retry_wait=float(retry_wait))
   service_browser.stop_discovery()
 
   return devices
