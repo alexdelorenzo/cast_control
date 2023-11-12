@@ -54,11 +54,11 @@ class YoutubeUrl(StrEnum):
   watch_endpoint: Self = 'watch'
   playlist_endpoint: Self = 'playlist'
 
-  video_qs: Self = 'v'
-  playlist_qs: Self = 'list'
+  video_query: Self = 'v'
+  playlist_query: Self = 'list'
 
-  video: Self = f'{PROTO}://{long}/{watch_endpoint}?{video_qs}='
-  playlist: Self = f'{PROTO}://{long}/{playlist_endpoint}?{playlist_qs}='
+  video: Self = f'{PROTO}://{long}/{watch_endpoint}?{video_query}='
+  playlist: Self = f'{PROTO}://{long}/{playlist_endpoint}?{playlist_query}='
 
   @classmethod
   def get_content_id(cls: type[Self], uri: str | None) -> str | None:
@@ -308,8 +308,8 @@ class TitlesMixin(Wrapper):
     if title := self.media_controller.title:
       titles.append(title)
 
-    if (status := self.media_status) and (series_title := status.series_title):
-      titles.append(series_title)
+    if (status := self.media_status) and (title := status.series_title):
+      titles.append(title)
 
     if subtitle := self.get_subtitle():
       titles.append(subtitle)
@@ -348,6 +348,10 @@ class TimeMixin(Wrapper):
     self._longest_duration = NO_DURATION
     super().__init__()
 
+  def _reset_longest_duration(self):
+    if not self.has_current_time():
+      self._longest_duration = None
+
   @property
   def current_time(self) -> Seconds | None:
     if not (status := self.media_status):
@@ -360,9 +364,7 @@ class TimeMixin(Wrapper):
 
   @override
   def on_new_status(self, *args, **kwargs):
-    if not self.has_current_time():
-      self._longest_duration = None
-
+    self._reset_longest_duration()
     super().on_new_status(*args, **kwargs)
 
   def get_duration(self) -> Microseconds:
@@ -714,11 +716,11 @@ def get_content_id(uri: str) -> str | None:
   match get_domain(parsed), YoutubeUrl.type(uri):
     case YoutubeUrl.long, YoutubeUrl.video:
       qs = parse_qs(parsed.query)
-      [content_id] = qs[YoutubeUrl.video_qs]
+      [content_id] = qs[YoutubeUrl.video_query]
 
     case YoutubeUrl.long, YoutubeUrl.playlist:
       qs = parse_qs(parsed.query)
-      [content_id] = qs[YoutubeUrl.playlist_qs]
+      [content_id] = qs[YoutubeUrl.playlist_query]
 
     case YoutubeUrl.short, YoutubeUrl.video | YoutubeUrl.playlist:
       content_id = parsed.path[SKIP_FIRST]
