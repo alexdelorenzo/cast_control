@@ -123,10 +123,12 @@ def register_event_listener(
   device: Device,
   server: Server,
   adapter: DeviceAdapter
-):
+) -> DeviceEventListener:
   event_listener = DeviceEventListener(device.name, device, server, adapter)
 
   device.register_connection_listener(event_listener)
   device.register_launch_error_listener(event_listener)
   device.register_status_listener(event_listener)
   device.media_controller.register_status_listener(event_listener)
+
+  return event_listener

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import logging
 from time import sleep
-from typing import Final, cast
+from typing import Final, NamedTuple, NoReturn, cast
+from uuid import UUID
 
 from mpris_server import Server
 
@@ -12,39 +13,42 @@ from ..adapter import DeviceAdapter
 from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG_LEVEL, NO_DEVICE, \
   NoDevicesFound, RC_NO_CHROMECAST, Seconds
 from ..device.device import find_device
-from ..device.listeners import register_event_listener
+from ..device.listeners import DeviceEventListener, register_event_listener
 
 
 log: Final[logging.Logger] = logging.getLogger(__name__)
 
 
-def create_adapters_and_server(
-  name: str | None,
-  host: str | None,
-  uuid: str | None,
-  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
-) -> Server | None:
-  device = find_device(name, host, uuid, retry_wait)
+class ServerEvents(NamedTuple):
+  server: Server
+  events: DeviceEventListener
 
-  if not device:
+
+def create_server_and_listener(
+  name: str | None = None,
+  host: str | None = None,
+  uuid: UUID | str | None = None,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
+) -> ServerEvents | None:
+  if not (device := find_device(name, host, uuid, retry_wait)):
     return None
 
   adapter = DeviceAdapter(device)
   server = Server(name=device.name, adapter=adapter)
   server.publish()
 
-  register_event_listener(device, server, adapter)
+  events = register_event_listener(device, server, adapter)
 
-  return server
+  return ServerEvents(server, events)
 
 
 def retry_until_found(
-  name: str | None,
-  host: str | None,
-  uuid: str | None,
+  name: str | None = None,
+  host: str | None = None,
+  uuid: UUID | str | None = None,
   wait: Seconds | None = DEFAULT_WAIT,
   retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
-) -> Server | None:
+) -> ServerEvents | None | NoReturn:
   """
     If the device isn't found, keep trying to find it.
 
@@ -52,10 +56,9 @@ def retry_until_found(
   """
 
   while True:
-    server = create_adapters_and_server(name, host, uuid, retry_wait)
-
-    if server or wait is None:
-      return server
+    if server_events := create_server_and_listener(name, host, uuid, retry_wait):
+      if server_events.server or wait is None:
+        return server_events
 
     device = name or host or uuid or NO_DEVICE
     log.info(f'{device} not found. Waiting {wait} seconds before retrying.')
@@ -63,9 +66,9 @@ def retry_until_found(
 
 
 def run_server(
-  name: str | None,
-  host: str | None,
-  uuid: str | None,
+  name: str | None = None,
+  host: str | None = None,
+  uuid: UUID | str | None = None,
   wait: Seconds | None = DEFAULT_WAIT,
   retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
   icon: bool = DEFAULT_ICON,
@@ -75,11 +78,11 @@ def run_server(
   if set_logging:
     setup_logging(log_level)
 
-  if not (server := retry_until_found(name, host, uuid, wait, retry_wait)):
+  if not (server_events := retry_until_found(name, host, uuid, wait, retry_wait)):
     device = name or host or uuid or NO_DEVICE
     raise NoDevicesFound(device)
 
-  server = cast(Server, server)
+  server, _ = server_events
   server.adapter.set_icon(icon)
   server.loop()
 
