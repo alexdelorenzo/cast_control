@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import NamedTuple
 from uuid import UUID
 
-from pychromecast import get_chromecast_from_host, get_chromecasts
+from pychromecast import get_chromecast_from_host, get_chromecasts, get_listed_chromecasts
 
 from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, Device, NO_PORT, NO_STR, Seconds
 
@@ -34,10 +34,23 @@ def get_device_via_host(
   return None  # explicit
 
 
-def get_devices(
-  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT
-) -> list[Device]:
+def get_devices(retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT) -> list[Device]:
   devices, service_browser = get_chromecasts(retry_wait=float(retry_wait))
+  service_browser.stop_discovery()
+
+  return devices
+
+
+def get_listed_devices(
+  name: str | None = None,
+  uuid: UUID | str | None = None,
+  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
+) -> list[Device]:
+  devices, service_browser = get_listed_chromecasts(
+    friendly_names=[name],
+    uuids=[uuid],
+    retry_wait=float(retry_wait),
+  )
   service_browser.stop_discovery()
 
   return devices
@@ -70,6 +83,11 @@ def get_device_via_uuid(
 
       return device
 
+  devices = get_listed_devices(uuid=uuid, retry_wait=retry_wait)
+
+  if devices:
+    return get_first(devices)
+
   return None
 
 
@@ -81,6 +99,8 @@ def get_device(
 
   if not name:
     return get_first(devices)
+
+  devices += get_listed_devices(name, retry_wait=retry_wait)
 
   name = name.casefold()
 
