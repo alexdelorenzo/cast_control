@@ -6,7 +6,7 @@ from typing import Final, override
 
 from mpris_server import EventAdapter, Server
 from pychromecast.controllers.media import MediaStatus, MediaStatusListener
-from pychromecast.controllers.receiver import CastStatus, CastStatusListener
+from pychromecast.controllers.receiver import CastStatus, CastStatusListener, LaunchErrorListener, LaunchFailure
 from pychromecast.socket_client import ConnectionStatus, ConnectionStatusListener
 
 from ..adapter import DeviceAdapter
@@ -21,15 +21,16 @@ VolumeStatus = MediaStatus | CastStatus
 
 
 class DeviceEventListenerBase(
-  MediaStatusListener,
   CastStatusListener,
   ConnectionStatusListener,
+  LaunchErrorListener,
+  MediaStatusListener,
   ABC
 ):
   """Event listeners that conform to PyChromecast's API"""
 
   @abstractmethod
-  def new_media_status(self, status: MediaStatus):
+  def load_media_failed(self, item: int, error_code: int):
     pass
 
   @abstractmethod
@@ -41,7 +42,11 @@ class DeviceEventListenerBase(
     pass
 
   @abstractmethod
-  def load_media_failed(self, item: int, error_code: int):
+  def new_launch_error(self, status: LaunchFailure):
+    pass
+
+  @abstractmethod
+  def new_media_status(self, status: MediaStatus):
     pass
 
 
@@ -63,7 +68,8 @@ class DeviceEventAdapter(EventAdapter):
     self.device = device
     self.server = server
     self.adapter = adapter
-    super().__init__(self.server.player, self.server.root)
+
+    super().__init__(root=self.server.root, player=self.server.player)
 
 
 class DeviceEventListener(
@@ -99,12 +105,17 @@ class DeviceEventListener(
 
   @override
   def new_connection_status(self, status: ConnectionStatus):
-    log.debug(f'Handling new connection status: {status}')
+    log.info(f'Handling new connection status: {status}')
+    self._update_metadata(status)
+
+  @override
+  def new_launch_error(self, status: LaunchFailure):
+    log.error(f'Handling new launch error: {status}')
     self._update_metadata(status)
 
   @override
   def load_media_failed(self, item: int, error_code: int):
-    log.debug(f'Load media failed: {error_code=} {item=}')
+    log.error(f'Load media failed: {error_code=}, {item=}')
     self._update_metadata()
 
 
@@ -115,6 +126,7 @@ def register_event_listener(
 ):
   event_listener = DeviceEventListener(device.name, device, server, adapter)
 
-  device.register_status_listener(event_listener)
   device.register_connection_listener(event_listener)
+  device.register_launch_error_listener(event_listener)
+  device.register_status_listener(event_listener)
   device.media_controller.register_status_listener(event_listener)
