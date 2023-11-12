@@ -19,7 +19,7 @@ class Host(NamedTuple):
 def get_device_via_host(
   host: str,
   name: str = DEFAULT_NAME,
-  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   if not name:
     name = DEFAULT_NAME
@@ -44,7 +44,7 @@ def get_devices(retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT) -> list
 def get_listed_devices(
   name: str | None = None,
   uuid: UUID | str | None = None,
-  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> list[Device]:
   devices, service_browser = get_listed_chromecasts(
     friendly_names=[name],
@@ -67,8 +67,8 @@ def get_first(devices: list[Device]) -> Device | None:
 
 
 def get_device_via_uuid(
-  uuid: str | None = None,
-  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
+  uuid: str | UUID | None = None,
+  retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   devices = get_devices(retry_wait)
 
@@ -83,9 +83,7 @@ def get_device_via_uuid(
 
       return device
 
-  devices = get_listed_devices(uuid=uuid, retry_wait=retry_wait)
-
-  if devices:
+  if devices := get_listed_devices(uuid=uuid, retry_wait=retry_wait):
     return get_first(devices)
 
   return None
@@ -93,7 +91,7 @@ def get_device_via_uuid(
 
 def get_device(
   name: str | None = None,
-  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
+  retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   devices = get_devices(retry_wait)
 
@@ -116,8 +114,8 @@ def get_device(
 def find_device(
   name: str | None = DEFAULT_NAME,
   host: str | None = None,
-  uuid: str | None = None,
-  retry_wait: Seconds | None = DEFAULT_RETRY_WAIT,
+  uuid: str | UUID | None = None,
+  retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
   device: Device | None = None
 
