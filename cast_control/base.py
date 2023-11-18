@@ -10,7 +10,7 @@ from typing import Final
 from app_paths import AsyncAppPaths, get_paths
 from pychromecast import Chromecast
 from pychromecast.controllers.media import MediaStatus
-from pychromecast.controllers.receiver import CastStatus
+from pychromecast.controllers.receiver import CastStatus, LaunchFailure
 from pychromecast.socket_client import ConnectionStatus
 
 from . import NAME, __author__, __version__
@@ -94,7 +94,7 @@ CONTEXT.rounding = ROUND_HALF_UP
 
 
 Device = Chromecast
-Status = MediaStatus | CastStatus | ConnectionStatus
+Status = MediaStatus | CastStatus | ConnectionStatus | LaunchFailure
 
 type Decorated[**P, T] = Callable[P, T]
 type Decoratable[**P, T] = Callable[P, T]
