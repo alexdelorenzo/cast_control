@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from decimal import Decimal
 from enum import StrEnum
 from mimetypes import guess_type
@@ -10,14 +10,15 @@ from urllib.parse import ParseResult, parse_qs, urlparse
 
 from mpris_server import (
   BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate,
-  ValidMetadata, Volume, get_track_id,
+  ValidMetadata, Volume, get_track_id, Track, Artist, Album
 )
 from pychromecast.controllers.bbciplayer import BbcIplayerController
 from pychromecast.controllers.bbcsounds import BbcSoundsController
 from pychromecast.controllers.bubbleupnp import BubbleUPNPController
 from pychromecast.controllers.dashcast import DashCastController
 from pychromecast.controllers.homeassistant_media import HomeAssistantMediaController
-from pychromecast.controllers.media import BaseController, DefaultMediaReceiverController, MediaController, MediaStatus
+from pychromecast.controllers.media import BaseController, DefaultMediaReceiverController, MediaController, MediaImage, \
+  MediaStatus
 from pychromecast.controllers.multizone import MultizoneController
 from pychromecast.controllers.plex import PlexController
 from pychromecast.controllers.receiver import CastStatus, ReceiverController
@@ -44,7 +45,9 @@ NO_ARTIST: Final[str] = ''
 NO_SUFFIX: Final[str] = ''
 
 SKIP_FIRST: Final[slice] = slice(1, None)
-PROTO: Final[str] = 'https'
+
+PREFIX_NOT_YOUTUBE: Final[str] = 'http'
+URL_PROTO: Final[str] = 'https'
 
 
 class YoutubeUrl(StrEnum):
@@ -57,8 +60,8 @@ class YoutubeUrl(StrEnum):
   video_query: Self = 'v'
   playlist_query: Self = 'list'
 
-  video: Self = f'{PROTO}://{long}/{watch_endpoint}?{video_query}='
-  playlist: Self = f'{PROTO}://{long}/{playlist_endpoint}?{playlist_query}='
+  video: Self = f'{URL_PROTO}://{long}/{watch_endpoint}?{video_query}='
+  playlist: Self = f'{URL_PROTO}://{long}/{playlist_endpoint}?{playlist_query}='
 
   @classmethod
   def get_content_id(cls: type[Self], uri: str | None) -> str | None:
@@ -112,8 +115,8 @@ class YoutubeUrl(StrEnum):
 
 class CachedIcon(NamedTuple):
   url: str
-  app_id: str
-  title: str
+  app_id: str | None = None
+  title: str | None = None
 
 
 class Titles(NamedTuple):
@@ -171,10 +174,6 @@ class Wrapper(ListenerIntegration, Protocol):
 
   cached_icon: CachedIcon | None = None
   light_icon: bool = DEFAULT_ICON
-
-  @override
-  def __getattr__(self, name: str) -> Any:
-    return getattr(self.device, name)
 
   @property
   def name(self) -> str:
@@ -246,10 +245,14 @@ class ControllersMixin(Wrapper):
     self.device.register_handler(controller)
 
   def _launch_youtube(self):
-    self.controllers.youtube.launch()
+    if not (youtube := self.controllers.youtube):
+      return
+
+    youtube.launch()
 
   def _play_youtube(self, video_id: str):
-    youtube = self.controllers.youtube
+    if not (youtube := self.controllers.youtube):
+      return
 
     if not youtube.is_active:
       self._launch_youtube()
@@ -257,10 +260,13 @@ class ControllersMixin(Wrapper):
     youtube.quick_play(video_id)
 
   def _is_youtube_video(self, content_id: str | None) -> bool:
-    if not content_id or not self.controllers.youtube.is_active:
+    if not (youtube := self.controllers.youtube):
       return False
 
-    return not content_id.startswith('http')
+    if not content_id or not youtube.is_active:
+      return False
+
+    return not content_id.startswith(PREFIX_NOT_YOUTUBE)
 
   def _get_url(self) -> str | None:
     content_id: str | None = None
@@ -287,7 +293,9 @@ class ControllersMixin(Wrapper):
     after_track: DbusObj,
     set_as_current: bool
   ):
-    youtube = self.controllers.youtube
+    if not (youtube := self.controllers.youtube):
+      self.open_uri(uri)
+      return
 
     if video_id := YoutubeUrl.get_content_id(uri):
       youtube.add_to_queue(video_id)
@@ -387,7 +395,7 @@ class TimeMixin(Wrapper):
     return NO_DURATION
 
   def get_current_position(self) -> Microseconds:
-    position: Seconds = self.current_time
+    position: Seconds | None = self.current_time
 
     if not position:
       return BEGINNING
@@ -396,7 +404,7 @@ class TimeMixin(Wrapper):
     return round(position_us)
 
   def has_current_time(self) -> bool:
-    current_time: Seconds | int = self.current_time
+    current_time: Seconds | None = self.current_time
 
     if current_time is None:
       return False
@@ -406,8 +414,8 @@ class TimeMixin(Wrapper):
     return current_time > BEGINNING
 
   def seek(self, time: Microseconds):
-    time = Decimal(time)
-    seconds: int = round(time / US_IN_SEC)
+    microseconds = Decimal(time)
+    seconds: int = round(microseconds / US_IN_SEC)
 
     self.media_controller.seek(seconds)
 
@@ -420,11 +428,14 @@ class TimeMixin(Wrapper):
 
     return DEFAULT_RATE
 
-  def set_rate(self, val: Rate):
+  def set_rate(self, value: Rate):
     pass
 
 
 class IconsMixin(Wrapper):
+  cached_icon: CachedIcon | None
+  light_icon: bool
+
   def _set_cached_icon(self, url: str | None = None):
     if not url:
       self.cached_icon = None
@@ -446,11 +457,13 @@ class IconsMixin(Wrapper):
   def _get_icon_from_device(self) -> str | None:
     url: str | None
 
-    if images := self.media_status.images:
+    if (status := self.media_status) and (images := status.images):
+      first: MediaImage
+
       first, *_ = images
       url, *_ = first
-
       self._set_cached_icon(url)
+
       return url
 
     if (status := self.cast_status) and (url := status.icon_url):
@@ -460,7 +473,10 @@ class IconsMixin(Wrapper):
     if not self._can_use_cache():
       return None
 
-    return self.cached_icon.url
+    if icon := self.cached_icon:
+      return icon.url
+
+    return None
 
   @ensure_user_dirs_exist
   def _get_default_icon(self) -> str:
@@ -483,6 +499,7 @@ class IconsMixin(Wrapper):
     except Exception as e:
       log.exception(e)
       log.error("Couldn't load desktop file.")
+
       return NO_DESKTOP_FILE
 
   def set_icon(self, lighter: bool = False):
@@ -498,21 +515,49 @@ class MetadataMixin(Wrapper):
     comments: list[str] = []
     track_no: int | None = None
 
-    if self.media_status:
-      track_no = self.media_status.track
+    if status := self.media_status:
+      track_no = status.track
 
     return MetadataObj(
-      track_id=dbus_name,
-      length=self.get_duration(),
-      art_url=self.get_art_url(),
-      url=self._get_url(),
-      title=title,
-      artists=artists,
       album=album,
       album_artists=artists,
-      disc_number=DEFAULT_DISC_NO,
-      track_number=track_no,
+      art_url=self.get_art_url(),
+      artists=artists,
       comments=comments,
+      disc_number=DEFAULT_DISC_NO,
+      length=self.get_duration(),
+      title=title,
+      track_id=dbus_name,
+      track_number=track_no,
+      url=self._get_url(),
+    )
+
+  def get_stream_title(self) -> str:
+    if status := self.media_status:
+      return status.title
+
+    return self.titles.title
+
+  def get_current_track(self) -> Track:
+    title, artist, album = self.titles
+
+    dbus_name: DbusObj = get_track_id(title)
+    artists: list[str] = [Artist(artist)] if artist else []
+    track_no: int | None = None
+    art_url = self.get_art_url()
+
+    if status := self.media_status:
+      track_no = status.track
+
+    return Track(
+      album=Album(art_url, artists, album),
+      art_url=art_url,
+      artists=artists,
+      disc_no=DEFAULT_DISC_NO,
+      length=self.get_duration(),
+      name=title,
+      track_id=dbus_name,
+      track_no=track_no,
     )
 
 
@@ -535,7 +580,7 @@ class PlaybackMixin(Wrapper):
   def get_shuffle(self) -> bool:
     return False
 
-  def set_shuffle(self, val: bool):
+  def set_shuffle(self, value: bool):
     pass
 
   def play_next(self):
@@ -565,10 +610,10 @@ class PlaybackMixin(Wrapper):
   def play(self):
     self.media_controller.play()
 
-  def set_repeating(self, val: bool):
+  def set_repeating(self, value: bool):
     pass
 
-  def set_loop_status(self, val: str):
+  def set_loop_status(self, value: str):
     pass
 
 
@@ -579,11 +624,11 @@ class VolumeMixin(Wrapper):
 
     return None
 
-  def set_volume(self, val: Volume):
+  def set_volume(self, value: Volume):
     if (current := self.get_volume()) is None:
       return
 
-    volume = Volume(val)
+    volume = Volume(value)
     delta: float = float(volume - current)
 
     # can't adjust vol by 0
@@ -594,13 +639,13 @@ class VolumeMixin(Wrapper):
       self.device.volume_down(abs(delta))
 
   def is_mute(self) -> bool | None:
-    if status := self.cast_status:
+    if status := self.cast_status or self.media_status:
       return status.volume_muted
 
     return False
 
-  def set_mute(self, val: bool):
-    self.device.set_volume_muted(val)
+  def set_mute(self, value: bool):
+    self.device.set_volume_muted(value)
 
 
 class AbilitiesMixin(Wrapper):
@@ -670,10 +715,183 @@ class DeviceWrapper(
     return f'<{cls_name} for {self.device}>'
 
 
-def get_media_type(device_wrapper: DeviceWrapper) -> MediaType | None:
-  status = device_wrapper.media_status
+class BaseDeviceWrapper(ABC):
+  @abstractmethod
+  def add_track(
+    self,
+    uri: str,
+    after_track: DbusObj,
+    set_as_current: bool
+  ):
+    pass
 
-  if not status:
+  @abstractmethod
+  def can_control(self) -> bool:
+    pass
+
+  @abstractmethod
+  def can_edit_track(self) -> bool:
+    pass
+
+  @abstractmethod
+  def can_pause(self) -> bool:
+    pass
+
+  @abstractmethod
+  def can_play(self) -> bool:
+    pass
+
+  @abstractmethod
+  def can_play_next(self) -> bool:
+    pass
+
+  @abstractmethod
+  def can_play_prev(self) -> bool:
+    pass
+
+  @abstractmethod
+  def can_quit(self) -> bool:
+    pass
+
+  @abstractmethod
+  def can_seek(self) -> bool:
+    pass
+
+  @abstractmethod
+  def get_art_url(self, track: int | None = None) -> str:
+    pass
+
+  @abstractmethod
+  def get_desktop_entry(self) -> Paths:
+    pass
+
+  @abstractmethod
+  def get_duration(self) -> Microseconds:
+    pass
+
+  @abstractmethod
+  def get_playstate(self) -> PlayState:
+    pass
+
+  @abstractmethod
+  def get_rate(self) -> Rate:
+    pass
+
+  @abstractmethod
+  def get_shuffle(self) -> bool:
+    pass
+
+  @abstractmethod
+  def get_stream_title(self) -> str:
+    pass
+
+  @abstractmethod
+  def get_volume(self) -> Volume | None:
+    pass
+
+  @abstractmethod
+  def has_current_time(self) -> bool:
+    pass
+
+  @abstractmethod
+  def is_mute(self) -> bool | None:
+    pass
+
+  @abstractmethod
+  def is_playlist(self) -> bool:
+    pass
+
+  @abstractmethod
+  def is_repeating(self) -> bool:
+    pass
+
+  @abstractmethod
+  def metadata(self) -> ValidMetadata:
+    pass
+
+  @abstractmethod
+  def next(self):
+    pass
+
+  @abstractmethod
+  def open_uri(self, uri: str):
+    pass
+
+  @abstractmethod
+  def pause(self):
+    pass
+
+  @abstractmethod
+  def play(self):
+    pass
+
+  @abstractmethod
+  def play_next(self):
+    pass
+
+  @abstractmethod
+  def play_prev(self):
+    pass
+
+  @abstractmethod
+  def previous(self):
+    pass
+
+  @abstractmethod
+  def quit(self):
+    pass
+
+  @abstractmethod
+  def resume(self):
+    pass
+
+  @abstractmethod
+  def seek(
+    self,
+    time: Microseconds,
+    track_id: DbusObj | None = None
+  ):
+    pass
+
+  @abstractmethod
+  def set_icon(self, lighter: bool = False):
+    pass
+
+  @abstractmethod
+  def set_loop_status(self, value: str):
+    pass
+
+  @abstractmethod
+  def set_mute(self, value: bool):
+    pass
+
+  @abstractmethod
+  def set_rate(self, value: Rate):
+    pass
+
+  @abstractmethod
+  def set_repeating(self, value: bool):
+    pass
+
+  @abstractmethod
+  def set_shuffle(self, value: bool):
+    pass
+
+  @abstractmethod
+  def set_volume(self, value: Volume):
+    pass
+
+  @abstractmethod
+  def stop(self):
+    pass
+
+  @abstractmethod
+  def titles(self) -> Titles:
+    pass
+
+
+def get_media_type(device_wrapper: DeviceWrapper) -> MediaType | None:
+  if not (status := device_wrapper.media_status):
     return None
 
   if status.media_is_movie:
