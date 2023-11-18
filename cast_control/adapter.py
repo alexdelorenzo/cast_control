@@ -126,7 +126,7 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
     return self.wrapper.get_rate()
 
   @override
-  def set_rate(self, val: Rate):
+  def set_rate(self, value: Rate):
     pass
 
   @override
@@ -134,7 +134,7 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
     return False
 
   @override
-  def set_shuffle(self, val: bool):
+  def set_shuffle(self, value: bool):
     pass
 
   @override
@@ -146,16 +146,16 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
     return self.wrapper.get_volume()
 
   @override
-  def set_volume(self, val: Volume):
-    self.wrapper.set_volume(val)
+  def set_volume(self, value: Volume):
+    self.wrapper.set_volume(value)
 
   @override
   def is_mute(self) -> bool:
     return self.wrapper.is_mute()
 
   @override
-  def set_mute(self, val: bool):
-    self.wrapper.set_mute(val)
+  def set_mute(self, value: bool):
+    self.wrapper.set_mute(value)
 
   @override
   def get_stream_title(self) -> str:
@@ -187,11 +187,11 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
     return self.wrapper.can_edit_track()
 
   @override
-  def set_repeating(self, val: bool):
+  def set_repeating(self, value: bool):
     pass
 
   @override
-  def set_loop_status(self, val: str):
+  def set_loop_status(self, value: str):
     pass
 
   @override
