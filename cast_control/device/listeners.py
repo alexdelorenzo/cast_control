@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Final, override
+from typing import Final, Self, override
 
 from mpris_server import EventAdapter, Server
 from pychromecast.controllers.media import MediaStatus, MediaStatusListener
@@ -20,7 +20,7 @@ log: Final[logging.Logger] = logging.getLogger(__name__)
 VolumeStatus = MediaStatus | CastStatus
 
 
-class DeviceEventListenerBase(
+class BaseEventListener(
   CastStatusListener,
   ConnectionStatusListener,
   LaunchErrorListener,
@@ -29,53 +29,62 @@ class DeviceEventListenerBase(
 ):
   """Event listeners that conform to PyChromecast's API"""
 
+  @override
   @abstractmethod
   def load_media_failed(self, item: int, error_code: int):
     pass
 
+  @override
   @abstractmethod
   def new_cast_status(self, status: CastStatus):
     pass
 
+  @override
   @abstractmethod
   def new_connection_status(self, status: ConnectionStatus):
     pass
 
+  @override
   @abstractmethod
   def new_launch_error(self, status: LaunchFailure):
     pass
 
+  @override
   @abstractmethod
   def new_media_status(self, status: MediaStatus):
     pass
 
 
-class DeviceEventAdapter(EventAdapter):
-  name: str
-  device: Device
+class BaseEventAdapter(EventAdapter):
   server: Server
+  device: Device
+
+  name: str
   adapter: DeviceAdapter | None
 
   @override
-  def __init__(
-    self,
-    name: str,
-    device: Device,
-    server: Server,
-    adapter: DeviceAdapter | None = None
-  ):
-    self.name = name
+  def __init__(self, server: Server, device: Device):
     self.device = device
     self.server = server
-    self.adapter = adapter
+
+    self.name = self.device.name
+    self.adapter = self.server.adapter
 
     super().__init__(root=self.server.root, player=self.server.player)
 
+  @classmethod
+  def register(cls: type[Self], server: Server, device: Device) -> Self:
+    events = cls(device, server)
+    events.set_and_register()
 
-class DeviceEventListener(
-  DeviceEventAdapter,
-  DeviceEventListenerBase
-):
+    return events
+
+  def set_and_register(self):
+    self.server.set_event_adapter(self)
+    register_event_listener(self, self.device)
+
+
+class EventListener(BaseEventAdapter, BaseEventListener):
   def _update_volume(self, status: Status):
     if isinstance(status, VolumeStatus):
       self.on_volume()
@@ -94,9 +103,9 @@ class DeviceEventListener(
     self.adapter.on_new_status()
 
   @override
-  def new_media_status(self, status: MediaStatus):
-    log.debug(f'Handling new media status: {status}')
-    self._update_metadata(status)
+  def load_media_failed(self, item: int, error_code: int):
+    log.error(f'Load media failed: {error_code=}, {item=}')
+    self._update_metadata()
 
   @override
   def new_cast_status(self, status: CastStatus):
@@ -114,21 +123,13 @@ class DeviceEventListener(
     self._update_metadata(status)
 
   @override
-  def load_media_failed(self, item: int, error_code: int):
-    log.error(f'Load media failed: {error_code=}, {item=}')
-    self._update_metadata()
+  def new_media_status(self, status: MediaStatus):
+    log.debug(f'Handling new media status: {status}')
+    self._update_metadata(status)
 
 
-def register_event_listener(
-  device: Device,
-  server: Server,
-  adapter: DeviceAdapter
-) -> DeviceEventListener:
-  event_listener = DeviceEventListener(device.name, device, server, adapter)
-
-  device.register_connection_listener(event_listener)
-  device.register_launch_error_listener(event_listener)
-  device.register_status_listener(event_listener)
-  device.media_controller.register_status_listener(event_listener)
-
-  return event_listener
+def register_event_listener[E: BaseEventListener](events: E, device: Device):
+  device.register_connection_listener(events)
+  device.register_launch_error_listener(events)
+  device.register_status_listener(events)
+  device.media_controller.register_status_listener(events)
