@@ -7,11 +7,11 @@ from uuid import UUID
 
 from mpris_server import Server
 
-from .daemon import DaemonArgs
+from .daemon import DaemonArgs, get_name
 from .state import setup_logging
 from ..adapter import DeviceAdapter
-from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG_LEVEL, NO_DEVICE, \
-  NoDevicesFound, RC_NO_CHROMECAST, Seconds
+from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG_LEVEL, NoDevicesFound, \
+  RC_NO_DEVICE, Seconds
 from ..device.device import find_device
 from ..device.listeners import EventListener
 
@@ -29,7 +29,7 @@ def create_server(
     return None
 
   adapter = DeviceAdapter(device)
-  server = Server(name=device.name, adapter=adapter)
+  server = Server(device.name, adapter)
 
   EventListener.register(server, device)
   server.publish()
@@ -89,8 +89,4 @@ def run_safe(args: DaemonArgs):
 
   except NoDevicesFound as e:
     log.error(f'Device {e} not found.')
-    quit(RC_NO_CHROMECAST)
-
-
-def get_name(name: str, host: str, uuid: str) -> str:
-  return name or host or uuid or NO_DEVICE
+    quit(RC_NO_DEVICE)

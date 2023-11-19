@@ -5,6 +5,7 @@ from collections.abc import Callable
 from functools import partial
 from pathlib import Path
 from typing import NamedTuple
+from uuid import UUID
 
 from daemons.prefab.run import RunDaemon
 
@@ -71,7 +72,7 @@ class MprisDaemon[**P, T](RunDaemon):
 class DaemonArgs(NamedTuple):
   name: str | None = None
   host: str | None = None
-  uuid: str | None = None
+  uuid: UUID | str | None = None
   wait: Seconds | None = DEFAULT_WAIT
   retry_wait: Seconds | None = DEFAULT_RETRY_WAIT
   icon: bool = DEFAULT_ICON
@@ -106,7 +107,7 @@ class DaemonArgs(NamedTuple):
   @property
   def file(self) -> Path:
     name, host, uuid, *_ = self
-    device = name or host or uuid or NO_DEVICE
+    device = get_name(name, host, uuid)
 
     return ARGS.with_stem(f'{device}{ARGS_STEM}')
 
@@ -132,3 +133,7 @@ def get_daemon_from_args[**P, T](
   daemon.set_target_via_args(func, args)
 
   return daemon
+
+
+def get_name(name: str | None, host: str | None, uuid: UUID | str | None) -> str:
+  return name or host or uuid or NO_DEVICE
