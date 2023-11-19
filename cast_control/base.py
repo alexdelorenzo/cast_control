@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from decimal import Context, Decimal, ROUND_HALF_UP, getcontext
-from enum import StrEnum, auto
+from enum import IntEnum, StrEnum, auto
 from functools import lru_cache
 from pathlib import Path
 from typing import Final
@@ -18,20 +18,14 @@ from . import NAME, __author__, __version__
 
 Seconds = Decimal
 
-
 DESKTOP_NAME: Final[str] = 'Cast Control'
 LOG_LEVEL: Final[str] = 'WARN'
-
-RC_OK: Final[int] = 0
-RC_NO_DEVICE: Final[int] = 1
-RC_NOT_RUNNING: Final[int] = 2
 
 NO_DURATION: Final[float] = 0.0
 NO_DELTA: Final[int] = 0
 NO_DEVICE_NAME: Final[str] = 'NO_NAME'
 NO_STR: Final[str] = ''
 NO_PORT: Final[int | None] = None
-NO_DEVICE: Final[str] = 'Device'
 
 # older Python requires an explicit
 # maxsize param for lru_cache()
@@ -45,7 +39,8 @@ DEFAULT_DISC_NO: Final[int] = 1
 
 DEFAULT_RETRY_WAIT: Final[Seconds] = Seconds(5.0)
 DEFAULT_WAIT: Final[Seconds] = Seconds(30)
-DEFAULT_NAME: Final[str] = DESKTOP_NAME
+DEFAULT_DEVICE_NAME: Final[str] = DESKTOP_NAME
+DEFAULT_NO_DEVICE_NAME: Final[str] = 'Device'
 
 LOG_FILE_MODE: Final[str] = 'w'  # create a new log on service start
 DEFAULT_ICON: Final[bool] = False
@@ -67,7 +62,6 @@ PATHS: Final[AsyncAppPaths] = get_paths(
 DATA_DIR: Final[Path] = Path(PATHS.user_data_path)
 LOG_DIR: Final[Path] = Path(PATHS.user_log_path)
 STATE_DIR: Final[Path] = Path(PATHS.user_state_path)
-
 
 USER_DIRS: Final[tuple[Path, ...]] = DATA_DIR, LOG_DIR, STATE_DIR
 
@@ -92,13 +86,12 @@ CONTEXT: Final[Context] = getcontext()
 CONTEXT.prec = PRECISION
 CONTEXT.rounding = ROUND_HALF_UP
 
-
 Device = Chromecast
 Status = MediaStatus | CastStatus | ConnectionStatus | LaunchFailure
 
-type Decorated[**P, T] = Callable[P, T]
-type Decoratable[**P, T] = Callable[P, T]
-type Decorator[**P, T] = Callable[[Decoratable], Decorated]
+type Decorated[** P, T] = Callable[P, T]
+type Decoratable[** P, T] = Callable[P, T]
+type Decorator[** P, T] = Callable[[Decoratable], Decorated]
 
 
 class NoDevicesFound(Exception):
@@ -111,6 +104,12 @@ class MediaType(StrEnum):
   MUSICTRACK = auto()
   PHOTO = auto()
   TVSHOW = auto()
+
+
+class Rc(IntEnum):
+  OK = 0
+  NO_DEVICE = auto()
+  NOT_RUNNING = auto()
 
 
 singleton: Final[Decorator] = lru_cache(SINGLETON)

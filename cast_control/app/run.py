@@ -11,7 +11,7 @@ from .daemon import DaemonArgs, get_name
 from .state import setup_logging
 from ..adapter import DeviceAdapter
 from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG_LEVEL, NoDevicesFound, \
-  RC_NO_DEVICE, Seconds
+  Rc, Seconds
 from ..device.device import find_device
 from ..device.listeners import EventListener
 
@@ -89,4 +89,4 @@ def run_safe(args: DaemonArgs):
 
   except NoDevicesFound as e:
     log.error(f'Device {e} not found.')
-    quit(RC_NO_DEVICE)
+    quit(Rc.NO_DEVICE)

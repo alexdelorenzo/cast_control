@@ -11,7 +11,7 @@ from daemons.prefab.run import RunDaemon
 
 from .state import setup_logging
 from ..base import ARGS, ARGS_STEM, DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, \
-  DEFAULT_WAIT, LOG, LOG_LEVEL, NO_DEVICE, PID, Seconds
+  DEFAULT_WAIT, LOG, LOG_LEVEL, DEFAULT_NO_DEVICE_NAME, PID, Seconds
 
 
 class MprisDaemon[**P, T](RunDaemon):
@@ -136,4 +136,4 @@ def get_daemon_from_args[**P, T](
 
 
 def get_name(name: str | None, host: str | None, uuid: UUID | str | None) -> str:
-  return name or host or uuid or NO_DEVICE
+  return name or host or uuid or DEFAULT_NO_DEVICE_NAME

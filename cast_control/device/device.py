@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pychromecast import get_chromecast_from_host, get_chromecasts, get_listed_chromecasts
 
-from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, Device, NO_PORT, NO_STR, Seconds
+from ..base import DEFAULT_DEVICE_NAME, DEFAULT_RETRY_WAIT, Device, NO_PORT, NO_STR, Seconds
 
 
 class Host(NamedTuple):
@@ -13,15 +13,15 @@ class Host(NamedTuple):
   port: int | None = NO_PORT
   uuid: str = NO_STR
   model_name: str = NO_STR
-  friendly_name: str = DEFAULT_NAME
+  friendly_name: str = DEFAULT_DEVICE_NAME
 
 
 def get_device_via_host(
   host: str,
-  name: str | None = DEFAULT_NAME,
+  name: str | None = DEFAULT_DEVICE_NAME,
   retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,
 ) -> Device | None:
-  name = name or DEFAULT_NAME
+  name = name or DEFAULT_DEVICE_NAME
   info = Host(host, friendly_name=name)
 
   if device := get_chromecast_from_host(info, retry_wait=float(retry_wait)):
@@ -109,7 +109,7 @@ def get_device(
 
 
 def find_device(
-  name: str | None = DEFAULT_NAME,
+  name: str | None = DEFAULT_DEVICE_NAME,
   host: str | None = None,
   uuid: UUID | str | None = None,
   retry_wait: Seconds | float | None = DEFAULT_RETRY_WAIT,

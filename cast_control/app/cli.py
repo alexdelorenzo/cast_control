@@ -8,7 +8,7 @@ import click
 from .daemon import DaemonArgs, MprisDaemon, get_daemon, get_daemon_from_args
 from .run import run_safe
 from .. import CLI_MODULE_NAME, ENTRYPOINT_NAME, HOMEPAGE, __copyright__, __version__
-from ..base import DEFAULT_NAME, DEFAULT_RETRY_WAIT, LOG, LOG_LEVEL, NAME, RC_NOT_RUNNING, RC_OK, Seconds
+from ..base import DEFAULT_DEVICE_NAME, DEFAULT_RETRY_WAIT, LOG, LOG_LEVEL, NAME, Rc, Seconds
 
 
 assert __name__ == CLI_MODULE_NAME
@@ -42,7 +42,7 @@ class CliArgs(NamedTuple):
 NAME_ARGS: Final[CliArgs] = CliArgs(
   args=('--name', '-n'),
   kwargs=dict(
-    default=DEFAULT_NAME,
+    default=DEFAULT_DEVICE_NAME,
     show_default=True,
     type=click.STRING,
     help="Connect to a device via its name, otherwise control the first device found."
@@ -146,7 +146,7 @@ def cli(
     click.echo(VERSION_INFO)
 
   if license or version:
-    quit(RC_OK)
+    quit(Rc.OK)
 
   elif ctx.invoked_subcommand:
     return
@@ -248,7 +248,7 @@ def disconnect():
 
   if not daemon.pid:
     log.warning(NOT_RUNNING_MSG)
-    quit(RC_NOT_RUNNING)
+    quit(Rc.NOT_RUNNING)
 
   daemon.stop()
   DaemonArgs.delete()
@@ -266,7 +266,7 @@ def reconnect():
 
   if not args or not daemon.pid:
     log.warning(NOT_RUNNING_MSG)
-    quit(RC_NOT_RUNNING)
+    quit(Rc.NOT_RUNNING)
 
   daemon.restart()
 
