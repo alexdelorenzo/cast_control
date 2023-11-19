@@ -64,8 +64,8 @@ class BaseEventAdapter(EventAdapter):
 
   @override
   def __init__(self, server: Server, device: Device):
-    self.device = device
     self.server = server
+    self.device = device
 
     self.name = self.device.name
     self.adapter = self.server.adapter
@@ -81,26 +81,29 @@ class BaseEventAdapter(EventAdapter):
 
   def set_and_register(self):
     self.server.set_event_adapter(self)
-    register_event_listener(self, self.device)
 
 
 class EventListener(BaseEventAdapter, BaseEventListener):
-  def _update_volume(self, status: Status):
+  def _update_volume(self, status: Status | None = None):
     if isinstance(status, VolumeStatus):
       self.on_volume()
 
   def _update_metadata(self, status: Status | None = None):
-    if status:
-      self._update_volume(status)
+    self._update_volume(status)
 
     # wire up mpris_server with cc events
-    self.on_player_all()
     self.on_root_all()
+    self.on_player_all()
     # self.on_playback()
     # self.on_options()
 
     # wire up local integration with mpris
     self.adapter.on_new_status()
+
+  @override
+  def set_and_register(self):
+    super().set_and_register()
+    register_event_listener(self, self.device)
 
   @override
   def load_media_failed(self, item: int, error_code: int):
