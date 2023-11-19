@@ -23,12 +23,12 @@ DESKTOP_NAME: Final[str] = 'Cast Control'
 LOG_LEVEL: Final[str] = 'WARN'
 
 RC_OK: Final[int] = 0
-RC_NO_CHROMECAST: Final[int] = 1
+RC_NO_DEVICE: Final[int] = 1
 RC_NOT_RUNNING: Final[int] = 2
 
 NO_DURATION: Final[float] = 0.0
 NO_DELTA: Final[int] = 0
-NO_CHROMECAST_NAME: Final[str] = 'NO_NAME'
+NO_DEVICE_NAME: Final[str] = 'NO_NAME'
 NO_STR: Final[str] = ''
 NO_PORT: Final[int | None] = None
 NO_DEVICE: Final[str] = 'Device'
