@@ -279,8 +279,8 @@ def log():
 
   # a large log could hang Python or the system
   # iterate over the file instead of using Path.read_text()
-  with LOG.open(LOG_MODE) as log:
-    for line in log:
+  with LOG.open(LOG_MODE) as file:
+    for line in file:
       print(line, end=LOG_END)
 
 
