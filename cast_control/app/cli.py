@@ -5,7 +5,7 @@ from typing import Final, NamedTuple
 
 import click
 
-from .daemon import DaemonArgs, MprisDaemon, get_daemon, get_daemon_from_args
+from .daemon import Args, MprisDaemon, get_daemon, get_daemon_from_args
 from .run import run_safe
 from .. import CLI_MODULE_NAME, ENTRYPOINT_NAME, HOMEPAGE, __copyright__, __version__
 from ..base import DEFAULT_DEVICE_NAME, DEFAULT_RETRY_WAIT, LOG, LOG_LEVEL, NAME, Rc, Seconds
@@ -158,9 +158,7 @@ def cli(
 assert cli.name == ENTRYPOINT_NAME
 
 
-@cli.command(
-  help='Connect to a device and run the service in the foreground.',
-)
+@cli.command(help='Connect to a device and run the service in the foreground.')
 @click.option(*NAME_ARGS.args, **NAME_ARGS.kwargs)
 @click.option(*HOST_ARGS.args, **HOST_ARGS.kwargs)
 @click.option(*UUID_ARGS.args, **UUID_ARGS.kwargs)
@@ -177,17 +175,7 @@ def connect(
   icon: bool,
   log_level: str
 ):
-  args = DaemonArgs(
-    name,
-    host,
-    uuid,
-    wait,
-    retry_wait,
-    icon,
-    log_level,
-    set_logging=True
-  )
-
+  args = Args(name, host, uuid, wait, retry_wait, icon, log_level, set_logging=True)
   run_safe(args)
 
 
@@ -199,9 +187,7 @@ def service():
   pass
 
 
-@service.command(
-  help='Connect the background service to a device.'
-)
+@service.command(help='Connect the background service to a device.')
 @click.option(*NAME_ARGS.args, **NAME_ARGS.kwargs)
 @click.option(*HOST_ARGS.args, **HOST_ARGS.kwargs)
 @click.option(*UUID_ARGS.args, **UUID_ARGS.kwargs)
@@ -218,15 +204,7 @@ def connect(
   icon: bool,
   log_level: str
 ):
-  args = DaemonArgs(
-    name,
-    host,
-    uuid,
-    wait,
-    retry_wait,
-    icon,
-    log_level
-  )
+  args = Args(name, host, uuid, wait, retry_wait, icon, log_level)
   args.save()
 
   try:
@@ -235,45 +213,39 @@ def connect(
 
   except Exception as e:
     log.exception(e)
-    log.warning("Error launching daemon.")
+    log.error("Error launching daemon.")
 
     args.delete()
 
 
-@service.command(
-  help='Disconnect the background service from the device.'
-)
+@service.command(help='Disconnect the background service from the device.')
 def disconnect():
   daemon = get_daemon()
 
   if not daemon.pid:
-    log.warning(NOT_RUNNING_MSG)
+    log.error(NOT_RUNNING_MSG)
     quit(Rc.NOT_RUNNING)
 
   daemon.stop()
-  DaemonArgs.delete()
+  Args.delete()
 
 
-@service.command(
-  help='Reconnect the background service to the device.'
-)
+@service.command(help='Reconnect the background service to the device.')
 def reconnect():
   daemon: MprisDaemon | None = None
-  args = DaemonArgs.load()
+  args = Args.load()
 
   if args:
     daemon = get_daemon_from_args(run_safe, args)
 
   if not args or not daemon.pid:
-    log.warning(NOT_RUNNING_MSG)
+    log.error(NOT_RUNNING_MSG)
     quit(Rc.NOT_RUNNING)
 
   daemon.restart()
 
 
-@service.command(
-  help='Show the service log.'
-)
+@service.command(help='Show the service log.')
 def log():
   click.echo(f"<Log file: {LOG}>")
 

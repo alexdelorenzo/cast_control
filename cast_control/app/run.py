@@ -7,7 +7,7 @@ from uuid import UUID
 
 from mpris_server import Server
 
-from .daemon import DaemonArgs, get_name
+from .daemon import Args, get_name
 from .state import setup_logging
 from ..adapter import DeviceAdapter
 from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG_LEVEL, NoDevicesFound, \
@@ -83,7 +83,7 @@ def run_server(
   server.loop()
 
 
-def run_safe(args: DaemonArgs):
+def run_safe(args: Args):
   try:
     run_server(*args)
 

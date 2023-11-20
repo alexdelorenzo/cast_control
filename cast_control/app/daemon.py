@@ -16,7 +16,7 @@ from ..base import ARGS, ARGS_STEM, DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SE
 
 class MprisDaemon[**P, T](RunDaemon):
   target: Callable[P, T] | None = None
-  args: DaemonArgs | None = None
+  args: Args | None = None
   _logging: str | None = None
 
   @property
@@ -42,7 +42,7 @@ class MprisDaemon[**P, T](RunDaemon):
   def set_target_via_args[**P, T](
     self,
     func: Callable[P, T] | None = None,
-    args: DaemonArgs | None = None
+    args: Args | None = None
   ):
     if not func:
       self.target = None
@@ -69,7 +69,7 @@ class MprisDaemon[**P, T](RunDaemon):
     self.target()
 
 
-class DaemonArgs(NamedTuple):
+class Args(NamedTuple):
   name: str | None = None
   host: str | None = None
   uuid: UUID | str | None = None
@@ -80,7 +80,7 @@ class DaemonArgs(NamedTuple):
   set_logging: bool = DEFAULT_SET_LOG
 
   @staticmethod
-  def load(identifier: str | None = None) -> DaemonArgs | None:
+  def load(identifier: str | None = None) -> Args | None:
     if identifier:
       args = ARGS.with_stem(f'{identifier}{ARGS_STEM}')
 
@@ -126,7 +126,7 @@ def get_daemon[**P, T](
 
 def get_daemon_from_args[**P, T](
   func: Callable[P, T] | None = None,
-  args: DaemonArgs | None = None,
+  args: Args | None = None,
   _pidfile: str = str(PID),
 ) -> MprisDaemon:
   daemon = MprisDaemon(pidfile=_pidfile)
