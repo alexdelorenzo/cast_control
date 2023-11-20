@@ -6,7 +6,7 @@ from mimetypes import guess_type
 from typing import Final, override
 
 from mpris_server import (
-  Album, Artist, BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate, Track,
+  Album, Artist, BEGINNING, DEFAULT_RATE, DbusObj, LoopStatus, MetadataObj, Microseconds, Paths, PlayState, Rate, Track,
   ValidMetadata, Volume, get_track_id,
 )
 from pychromecast.controllers.media import BaseController, MediaController, MediaImage, \
@@ -101,12 +101,7 @@ class ControllersMixin(Wrapper):
     self.media_controller.play_media(uri, mimetype)
 
   @override
-  def add_track(
-    self,
-    uri: str,
-    after_track: DbusObj,
-    set_as_current: bool
-  ):
+  def add_track(self, uri: str, after_track: DbusObj, set_as_current: bool):
     if not (youtube := self.controllers.youtube):
       self.open_uri(uri)
       return
@@ -438,24 +433,16 @@ class PlaybackMixin(Wrapper):
     pass
 
   @override
-  def play_next(self):
-    self.media_controller.queue_next()
-
-  @override
-  def play_prev(self):
-    self.media_controller.queue_prev()
-
-  @override
   def quit(self):
     self.device.quit_app()
 
   @override
   def next(self):
-    self.play_next()
+    self.media_controller.queue_next()
 
   @override
   def previous(self):
-    self.play_prev()
+    self.media_controller.queue_prev()
 
   @override
   def pause(self):
@@ -478,7 +465,7 @@ class PlaybackMixin(Wrapper):
     pass
 
   @override
-  def set_loop_status(self, value: str):
+  def set_loop_status(self, value: LoopStatus):
     pass
 
 
