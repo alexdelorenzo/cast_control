@@ -9,8 +9,7 @@ from mpris_server import (
   Album, Artist, BEGINNING, DEFAULT_RATE, DbusObj, LoopStatus, MetadataObj, Microseconds, Paths, PlayState, Rate, Track,
   ValidMetadata, Volume, get_track_id,
 )
-from pychromecast.controllers.media import BaseController, MediaController, MediaImage, \
-  MediaStatus
+from pychromecast.controllers.media import MediaController, MediaImage, MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
 from validators import url
