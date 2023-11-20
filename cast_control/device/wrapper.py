@@ -1,37 +1,26 @@
 from __future__ import annotations
 
 import logging
-from abc import ABC, abstractmethod
 from decimal import Decimal
-from enum import StrEnum
 from mimetypes import guess_type
-from typing import Any, Final, NamedTuple, Protocol, Self, override
-from urllib.parse import ParseResult, parse_qs, urlparse
+from typing import Final, override
 
 from mpris_server import (
-  BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate,
-  ValidMetadata, Volume, get_track_id, Track, Artist, Album
+  Album, Artist, BEGINNING, DEFAULT_RATE, DbusObj, MetadataObj, Microseconds, Paths, PlayState, Rate, Track,
+  ValidMetadata, Volume, get_track_id,
 )
-from pychromecast.controllers.bbciplayer import BbcIplayerController
-from pychromecast.controllers.bbcsounds import BbcSoundsController
-from pychromecast.controllers.bubbleupnp import BubbleUPNPController
-from pychromecast.controllers.dashcast import DashCastController
-from pychromecast.controllers.homeassistant_media import HomeAssistantMediaController
-from pychromecast.controllers.media import BaseController, DefaultMediaReceiverController, MediaController, MediaImage, \
+from pychromecast.controllers.media import BaseController, MediaController, MediaImage, \
   MediaStatus
-from pychromecast.controllers.multizone import MultizoneController
-from pychromecast.controllers.plex import PlexController
-from pychromecast.controllers.receiver import CastStatus, ReceiverController
-from pychromecast.controllers.supla import SuplaController
-from pychromecast.controllers.yleareena import YleAreenaController
-from pychromecast.controllers.youtube import YouTubeController
+from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
 from validators import url
 
+from .base import CachedIcon, Controllers, Titles, YoutubeUrl
+from .protocols import AdapterIntegration, Wrapper
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
-from ..base import DEFAULT_DISC_NO, DEFAULT_ICON, DEFAULT_THUMB, Device, \
-  LIGHT_THUMB, MediaType, NAME, NO_DELTA, NO_DESKTOP_FILE, \
+from ..base import DEFAULT_DISC_NO, DEFAULT_THUMB, Device, \
+  LIGHT_THUMB, NO_DELTA, NO_DESKTOP_FILE, \
   NO_DURATION, Seconds, US_IN_SEC, singleton
 
 
@@ -44,165 +33,7 @@ MAX_TITLES: Final[int] = 3
 NO_ARTIST: Final[str] = ''
 NO_SUFFIX: Final[str] = ''
 
-SKIP_FIRST: Final[slice] = slice(1, None)
-
 PREFIX_NOT_YOUTUBE: Final[str] = 'http'
-URL_PROTO: Final[str] = 'https'
-
-
-class YoutubeUrl(StrEnum):
-  long: Self = 'youtube.com'
-  short: Self = 'youtu.be'
-
-  watch_endpoint: Self = 'watch'
-  playlist_endpoint: Self = 'playlist'
-
-  video_query: Self = 'v'
-  playlist_query: Self = 'list'
-
-  video: Self = f'{URL_PROTO}://{long}/{watch_endpoint}?{video_query}='
-  playlist: Self = f'{URL_PROTO}://{long}/{playlist_endpoint}?{playlist_query}='
-
-  @classmethod
-  def get_content_id(cls: type[Self], uri: str | None) -> str | None:
-    return get_content_id(uri)
-
-  @classmethod
-  def get_url(cls: type[Self], video_id: str | None = None, playlist_id: str | None = None) -> str | None:
-    if video_id:
-      return f"{cls.video}{video_id}"
-
-    elif playlist_id:
-      return f"{cls.playlist}{playlist_id}"
-
-    return None
-
-  @classmethod
-  def is_youtube(cls: type[Self], uri: str | None) -> bool:
-    if not uri:
-      return False
-
-    uri = uri.casefold()
-
-    return get_domain(uri) in cls
-
-  @classmethod
-  def type(cls: type[Self], uri: str | None) -> Self | None:
-    if not (which := cls.which(uri)):
-      return None
-
-    if cls.watch_endpoint in uri:
-      return cls.video
-
-    elif cls.playlist_endpoint in uri:
-      return cls.playlist
-
-    return which
-
-  @classmethod
-  def which(cls: type[Self], uri: str | None) -> Self | None:
-    if not cls.is_youtube(uri):
-      return None
-
-    if cls.long in uri:
-      return cls.long
-
-    elif cls.short in uri:
-      return cls.short
-
-    return None
-
-
-class CachedIcon(NamedTuple):
-  url: str
-  app_id: str | None = None
-  title: str | None = None
-
-
-class Titles(NamedTuple):
-  title: str | None = None
-  artist: str | None = None
-  album: str | None = None
-
-
-class Controllers(NamedTuple):
-  bbc_ip: BbcIplayerController | None = None
-  bbc_sound: BbcSoundsController | None = None
-  bubble: BubbleUPNPController | None = None
-  dash: DashCastController | None = None
-  default: DefaultMediaReceiverController | None = None
-  ha_media: HomeAssistantMediaController | None = None
-  multizone: MultizoneController | None = None
-  plex: PlexController | None = None
-  receiver: ReceiverController | None = None
-  supla: SuplaController | None = None
-  yle: YleAreenaController | None = None
-  youtube: YouTubeController | None = None
-
-  # plex_api: PlexApiController = None
-  # ha: HomeAssistantController = None
-
-  @classmethod
-  def new(cls: type[Self], device: Device | None) -> Self:
-    return cls(
-      BbcIplayerController(),
-      BbcSoundsController(),
-      BubbleUPNPController(),
-      DashCastController(),
-      DefaultMediaReceiverController(),
-      HomeAssistantMediaController(),
-      MultizoneController(device.uuid) if device else None,
-      PlexController(),
-      ReceiverController(),
-      SuplaController(),
-      YleAreenaController(),
-      YouTubeController(),
-      # HomeAssistantController(),
-    )
-
-
-class ListenerIntegration(Protocol):
-  @abstractmethod
-  def on_new_status(self, *args, **kwargs):
-    """Callback for event listener"""
-    pass
-
-
-class Wrapper(ListenerIntegration, Protocol):
-  device: Device
-  controllers: Controllers
-
-  cached_icon: CachedIcon | None = None
-  light_icon: bool = DEFAULT_ICON
-
-  @property
-  def name(self) -> str:
-    return self.device.name or NAME
-
-  @property
-  @abstractmethod
-  def cast_status(self) -> CastStatus | None:
-    pass
-
-  @property
-  @abstractmethod
-  def media_status(self) -> MediaStatus | None:
-    pass
-
-  @property
-  @abstractmethod
-  def connection_status(self) -> ConnectionStatus | None:
-    pass
-
-  @property
-  @abstractmethod
-  def media_controller(self) -> MediaController:
-    pass
-
-  @property
-  @abstractmethod
-  def titles(self) -> Titles:
-    pass
 
 
 class StatusMixin(Wrapper):
@@ -230,6 +61,7 @@ class StatusMixin(Wrapper):
 class ControllersMixin(Wrapper):
   controllers: Controllers
 
+  @override
   def __init__(self):
     self._setup_controllers()
     super().__init__()
@@ -259,26 +91,7 @@ class ControllersMixin(Wrapper):
 
     youtube.quick_play(video_id)
 
-  def _is_youtube_video(self, content_id: str | None) -> bool:
-    if not (youtube := self.controllers.youtube):
-      return False
-
-    if not content_id or not youtube.is_active:
-      return False
-
-    return not content_id.startswith(PREFIX_NOT_YOUTUBE)
-
-  def _get_url(self) -> str | None:
-    content_id: str | None = None
-
-    if status := self.media_status:
-      content_id = status.content_id
-
-    if self._is_youtube_video(content_id):
-      return YoutubeUrl.get_url(content_id)
-
-    return content_id
-
+  @override
   def open_uri(self, uri: str):
     if video_id := YoutubeUrl.get_content_id(uri):
       self._play_youtube(video_id)
@@ -287,6 +100,7 @@ class ControllersMixin(Wrapper):
     mimetype, _ = guess_type(uri)
     self.media_controller.play_media(uri, mimetype)
 
+  @override
   def add_track(
     self,
     uri: str,
@@ -339,6 +153,7 @@ class TitlesMixin(Wrapper):
 
     return Titles(*titles)
 
+  @override
   def get_subtitle(self) -> str | None:
     if not (status := self.media_status) or not (metadata := status.media_metadata):
       return None
@@ -352,6 +167,7 @@ class TitlesMixin(Wrapper):
 class TimeMixin(Wrapper):
   _longest_duration: Microseconds | None
 
+  @override
   def __init__(self):
     self._longest_duration = NO_DURATION
     super().__init__()
@@ -360,6 +176,7 @@ class TimeMixin(Wrapper):
     if not self.has_current_time():
       self._longest_duration = None
 
+  @override
   @property
   def current_time(self) -> Seconds | None:
     if not (status := self.media_status):
@@ -375,6 +192,7 @@ class TimeMixin(Wrapper):
     self._reset_longest_duration()
     super().on_new_status(*args, **kwargs)
 
+  @override
   def get_duration(self) -> Microseconds:
     if (status := self.media_status) and (duration := status.duration) is not None:
       duration = Seconds(duration)
@@ -394,6 +212,7 @@ class TimeMixin(Wrapper):
 
     return NO_DURATION
 
+  @override
   def get_current_position(self) -> Microseconds:
     position: Seconds | None = self.current_time
 
@@ -403,6 +222,7 @@ class TimeMixin(Wrapper):
     position_us: Microseconds = position * US_IN_SEC
     return round(position_us)
 
+  @override
   def has_current_time(self) -> bool:
     current_time: Seconds | None = self.current_time
 
@@ -413,12 +233,14 @@ class TimeMixin(Wrapper):
 
     return current_time > BEGINNING
 
-  def seek(self, time: Microseconds):
+  @override
+  def seek(self, time: Microseconds, *_):
     microseconds = Decimal(time)
     seconds: int = round(microseconds / US_IN_SEC)
 
     self.media_controller.seek(seconds)
 
+  @override
   def get_rate(self) -> Rate:
     if not (status := self.media_status):
       return DEFAULT_RATE
@@ -428,6 +250,7 @@ class TimeMixin(Wrapper):
 
     return DEFAULT_RATE
 
+  @override
   def set_rate(self, value: Rate):
     pass
 
@@ -485,12 +308,14 @@ class IconsMixin(Wrapper):
 
     return str(DEFAULT_THUMB)
 
+  @override
   def get_art_url(self, track: int | None = None) -> str:
     if icon := self._get_icon_from_device():
       return icon
 
     return self._get_default_icon()
 
+  @override
   @singleton
   def get_desktop_entry(self) -> Paths:
     try:
@@ -502,11 +327,33 @@ class IconsMixin(Wrapper):
 
       return NO_DESKTOP_FILE
 
+  @override
   def set_icon(self, lighter: bool = False):
     self.light_icon: bool = lighter
 
 
 class MetadataMixin(Wrapper):
+  def _get_url(self) -> str | None:
+    content_id: str | None = None
+
+    if status := self.media_status:
+      content_id = status.content_id
+
+    if self._is_youtube_video(content_id):
+      return YoutubeUrl.get_url(content_id)
+
+    return content_id
+
+  def _is_youtube_video(self, content_id: str | None) -> bool:
+    if not (youtube := self.controllers.youtube):
+      return False
+
+    if not content_id or not youtube.is_active:
+      return False
+
+    return not content_id.startswith(PREFIX_NOT_YOUTUBE)
+
+  @override
   def metadata(self) -> ValidMetadata:
     title, artist, album = self.titles
 
@@ -532,12 +379,14 @@ class MetadataMixin(Wrapper):
       url=self._get_url(),
     )
 
+  @override
   def get_stream_title(self) -> str:
     if status := self.media_status:
       return status.title
 
     return self.titles.title
 
+  @override
   def get_current_track(self) -> Track:
     title, artist, album = self.titles
 
@@ -562,6 +411,7 @@ class MetadataMixin(Wrapper):
 
 
 class PlaybackMixin(Wrapper):
+  @override
   def get_playstate(self) -> PlayState:
     if self.media_controller.is_playing:
       return PlayState.PLAYING
@@ -571,59 +421,76 @@ class PlaybackMixin(Wrapper):
 
     return PlayState.STOPPED
 
+  @override
   def is_repeating(self) -> bool:
     return False
 
+  @override
   def is_playlist(self) -> bool:
-    return self.can_go_next() or self.can_go_previous()
+    return self.can_play_next() or self.can_play_prev()
 
+  @override
   def get_shuffle(self) -> bool:
     return False
 
+  @override
   def set_shuffle(self, value: bool):
     pass
 
+  @override
   def play_next(self):
     self.media_controller.queue_next()
 
+  @override
   def play_prev(self):
     self.media_controller.queue_prev()
 
+  @override
   def quit(self):
     self.device.quit_app()
 
+  @override
   def next(self):
     self.play_next()
 
+  @override
   def previous(self):
     self.play_prev()
 
+  @override
   def pause(self):
     self.media_controller.pause()
 
+  @override
   def resume(self):
     self.play()
 
+  @override
   def stop(self):
     self.media_controller.stop()
 
+  @override
   def play(self):
     self.media_controller.play()
 
+  @override
   def set_repeating(self, value: bool):
     pass
 
+  @override
   def set_loop_status(self, value: str):
     pass
 
 
 class VolumeMixin(Wrapper):
+  @override
   def get_volume(self) -> Volume | None:
     if status := self.cast_status:
       return Volume(status.volume_level)
 
     return None
 
+  @override
   def set_volume(self, value: Volume):
     if (current := self.get_volume()) is None:
       return
@@ -638,52 +505,62 @@ class VolumeMixin(Wrapper):
     elif delta < NO_DELTA:
       self.device.volume_down(abs(delta))
 
+  @override
   def is_mute(self) -> bool | None:
     if status := self.cast_status or self.media_status:
       return status.volume_muted
 
     return False
 
+  @override
   def set_mute(self, value: bool):
     self.device.set_volume_muted(value)
 
 
 class AbilitiesMixin(Wrapper):
+  @override
   def can_quit(self) -> bool:
     return True
 
+  @override
   def can_play(self) -> bool:
     state = self.get_playstate()
 
     return state is not PlayState.STOPPED
 
+  @override
   def can_control(self) -> bool:
     return True
     # return self.can_play() or self.can_pause() \
     #   or self.can_play_next() or self.can_play_prev() \
     #   or self.can_seek()
 
+  @override
   def can_edit_track(self) -> bool:
     return False
 
+  @override
   def can_play_next(self) -> bool:
     if status := self.media_status:
       return status.supports_queue_next
 
     return False
 
+  @override
   def can_play_prev(self) -> bool:
     if status := self.media_status:
       return status.supports_queue_prev
 
     return False
 
+  @override
   def can_pause(self) -> bool:
     if status := self.media_status:
       return status.supports_pause
 
     return False
 
+  @override
   def can_seek(self) -> bool:
     if status := self.media_status:
       return status.supports_seek
@@ -692,18 +569,19 @@ class AbilitiesMixin(Wrapper):
 
 
 class DeviceWrapper(
-  StatusMixin,
-  TitlesMixin,
-  ControllersMixin,
-  TimeMixin,
+  AbilitiesMixin,
   IconsMixin,
+  ControllersMixin,
   MetadataMixin,
   PlaybackMixin,
+  StatusMixin,
+  TimeMixin,
+  TitlesMixin,
   VolumeMixin,
-  AbilitiesMixin,
 ):
   """Wraps implementation details for device API"""
 
+  @override
   def __init__(self, device: Device):
     self.device = device
     super().__init__()
@@ -713,234 +591,3 @@ class DeviceWrapper(
     cls_name = cls.__name__
 
     return f'<{cls_name} for {self.device}>'
-
-
-class BaseDeviceWrapper(ABC):
-  @abstractmethod
-  def add_track(
-    self,
-    uri: str,
-    after_track: DbusObj,
-    set_as_current: bool
-  ):
-    pass
-
-  @abstractmethod
-  def can_control(self) -> bool:
-    pass
-
-  @abstractmethod
-  def can_edit_track(self) -> bool:
-    pass
-
-  @abstractmethod
-  def can_pause(self) -> bool:
-    pass
-
-  @abstractmethod
-  def can_play(self) -> bool:
-    pass
-
-  @abstractmethod
-  def can_play_next(self) -> bool:
-    pass
-
-  @abstractmethod
-  def can_play_prev(self) -> bool:
-    pass
-
-  @abstractmethod
-  def can_quit(self) -> bool:
-    pass
-
-  @abstractmethod
-  def can_seek(self) -> bool:
-    pass
-
-  @abstractmethod
-  def get_art_url(self, track: int | None = None) -> str:
-    pass
-
-  @abstractmethod
-  def get_desktop_entry(self) -> Paths:
-    pass
-
-  @abstractmethod
-  def get_duration(self) -> Microseconds:
-    pass
-
-  @abstractmethod
-  def get_playstate(self) -> PlayState:
-    pass
-
-  @abstractmethod
-  def get_rate(self) -> Rate:
-    pass
-
-  @abstractmethod
-  def get_shuffle(self) -> bool:
-    pass
-
-  @abstractmethod
-  def get_stream_title(self) -> str:
-    pass
-
-  @abstractmethod
-  def get_volume(self) -> Volume | None:
-    pass
-
-  @abstractmethod
-  def has_current_time(self) -> bool:
-    pass
-
-  @abstractmethod
-  def is_mute(self) -> bool | None:
-    pass
-
-  @abstractmethod
-  def is_playlist(self) -> bool:
-    pass
-
-  @abstractmethod
-  def is_repeating(self) -> bool:
-    pass
-
-  @abstractmethod
-  def metadata(self) -> ValidMetadata:
-    pass
-
-  @abstractmethod
-  def next(self):
-    pass
-
-  @abstractmethod
-  def open_uri(self, uri: str):
-    pass
-
-  @abstractmethod
-  def pause(self):
-    pass
-
-  @abstractmethod
-  def play(self):
-    pass
-
-  @abstractmethod
-  def play_next(self):
-    pass
-
-  @abstractmethod
-  def play_prev(self):
-    pass
-
-  @abstractmethod
-  def previous(self):
-    pass
-
-  @abstractmethod
-  def quit(self):
-    pass
-
-  @abstractmethod
-  def resume(self):
-    pass
-
-  @abstractmethod
-  def seek(
-    self,
-    time: Microseconds,
-    track_id: DbusObj | None = None
-  ):
-    pass
-
-  @abstractmethod
-  def set_icon(self, lighter: bool = False):
-    pass
-
-  @abstractmethod
-  def set_loop_status(self, value: str):
-    pass
-
-  @abstractmethod
-  def set_mute(self, value: bool):
-    pass
-
-  @abstractmethod
-  def set_rate(self, value: Rate):
-    pass
-
-  @abstractmethod
-  def set_repeating(self, value: bool):
-    pass
-
-  @abstractmethod
-  def set_shuffle(self, value: bool):
-    pass
-
-  @abstractmethod
-  def set_volume(self, value: Volume):
-    pass
-
-  @abstractmethod
-  def stop(self):
-    pass
-
-  @abstractmethod
-  def titles(self) -> Titles:
-    pass
-
-
-def get_media_type(device_wrapper: DeviceWrapper) -> MediaType | None:
-  if not (status := device_wrapper.media_status):
-    return None
-
-  if status.media_is_movie:
-    return MediaType.MOVIE
-
-  elif status.media_is_tvshow:
-    return MediaType.TVSHOW
-
-  elif status.media_is_photo:
-    return MediaType.PHOTO
-
-  elif status.media_is_musictrack:
-    return MediaType.MUSICTRACK
-
-  elif status.media_is_generic:
-    return MediaType.GENERIC
-
-  return None
-
-
-def get_domain(uri: str | ParseResult) -> str | None:
-  if not url(uri):
-    return None
-
-  if isinstance(uri, str):
-    uri = urlparse(uri)
-
-  *_, name, tld = uri.netloc.split(".")
-
-  return f"{name}.{tld}"
-
-
-def get_content_id(uri: str) -> str | None:
-  if not url(uri) or not YoutubeUrl.is_youtube(uri):
-    return None
-
-  parsed = urlparse(uri)
-  content_id: str | None = None
-
-  match get_domain(parsed), YoutubeUrl.type(uri):
-    case YoutubeUrl.long, YoutubeUrl.video:
-      qs = parse_qs(parsed.query)
-      [content_id] = qs[YoutubeUrl.video_query]
-
-    case YoutubeUrl.long, YoutubeUrl.playlist:
-      qs = parse_qs(parsed.query)
-      [content_id] = qs[YoutubeUrl.playlist_query]
-
-    case YoutubeUrl.short, YoutubeUrl.video | YoutubeUrl.playlist:
-      content_id = parsed.path[SKIP_FIRST]
-
-  return content_id

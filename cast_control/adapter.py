@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import override, Protocol, runtime_checkable
+from typing import Protocol, override, runtime_checkable
 
 from mpris_server import (
   DbusObj, MIME_TYPES, Metadata, Microseconds, MprisAdapter, PlayState,
@@ -8,12 +8,13 @@ from mpris_server import (
 )
 
 from .base import Device
+from .device.protocols import AdapterIntegration
 from .device.wrapper import DeviceWrapper
 
 
 @runtime_checkable
-class DeviceIntegration(Protocol):
-  wrapper: DeviceWrapper
+class DeviceIntegration[W: AdapterIntegration](Protocol):
+  wrapper: W
 
   def set_icon(self, lighter: bool):
     self.wrapper.set_icon(lighter)
@@ -102,11 +103,7 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
     return self.wrapper.get_playstate()
 
   @override
-  def seek(
-    self,
-    time: Microseconds,
-    track_id: DbusObj | None = None
-  ):
+  def seek(self, time: Microseconds, track_id: DbusObj | None = None):
     self.wrapper.seek(time)
 
   @override
@@ -174,12 +171,7 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
     return self.wrapper.get_current_track()
 
   @override
-  def add_track(
-    self,
-    uri: str,
-    after_track: DbusObj,
-    set_as_current: bool
-  ):
+  def add_track(self, uri: str, after_track: DbusObj, set_as_current: bool):
     self.wrapper.add_track(uri, after_track, set_as_current)
 
   @override

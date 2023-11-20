@@ -1,0 +1,209 @@
+from __future__ import annotations
+
+from enum import StrEnum
+from typing import Final, NamedTuple, Self, TYPE_CHECKING
+from urllib.parse import ParseResult, parse_qs, urlparse
+
+from pychromecast.controllers.bbciplayer import BbcIplayerController
+from pychromecast.controllers.bbcsounds import BbcSoundsController
+from pychromecast.controllers.bubbleupnp import BubbleUPNPController
+from pychromecast.controllers.dashcast import DashCastController
+from pychromecast.controllers.homeassistant_media import HomeAssistantMediaController
+from pychromecast.controllers.media import DefaultMediaReceiverController
+from pychromecast.controllers.multizone import MultizoneController
+from pychromecast.controllers.plex import PlexController
+from pychromecast.controllers.receiver import ReceiverController
+from pychromecast.controllers.supla import SuplaController
+from pychromecast.controllers.yleareena import YleAreenaController
+from pychromecast.controllers.youtube import YouTubeController
+from validators import url
+
+from ..base import Device, MediaType
+
+
+if TYPE_CHECKING:
+  from .protocols import Wrapper
+
+
+URL_PROTO: Final[str] = 'https'
+SKIP_FIRST: Final[slice] = slice(1, None)
+
+
+class CachedIcon(NamedTuple):
+  url: str
+  app_id: str | None = None
+  title: str | None = None
+
+
+class Titles(NamedTuple):
+  title: str | None = None
+  artist: str | None = None
+  album: str | None = None
+
+
+class Controllers(NamedTuple):
+  bbc_ip: BbcIplayerController | None = None
+  bbc_sound: BbcSoundsController | None = None
+  bubble: BubbleUPNPController | None = None
+  dash: DashCastController | None = None
+  default: DefaultMediaReceiverController | None = None
+  ha_media: HomeAssistantMediaController | None = None
+  multizone: MultizoneController | None = None
+  plex: PlexController | None = None
+  receiver: ReceiverController | None = None
+  supla: SuplaController | None = None
+  yle: YleAreenaController | None = None
+  youtube: YouTubeController | None = None
+
+  # plex_api: PlexApiController = None
+  # ha: HomeAssistantController = None
+
+  @classmethod
+  def new(cls: type[Self], device: Device | None) -> Self:
+    return cls(
+      BbcIplayerController(),
+      BbcSoundsController(),
+      BubbleUPNPController(),
+      DashCastController(),
+      DefaultMediaReceiverController(),
+      HomeAssistantMediaController(),
+      MultizoneController(device.uuid) if device else None,
+      PlexController(),
+      ReceiverController(),
+      SuplaController(),
+      YleAreenaController(),
+      YouTubeController(),
+      # HomeAssistantController(),
+    )
+
+
+class YoutubeUrl(StrEnum):
+  long = 'youtube.com'
+  short = 'youtu.be'
+
+  watch_endpoint = 'watch'
+  playlist_endpoint = 'playlist'
+
+  video_query = 'v'
+  playlist_query = 'list'
+
+  video = f'{URL_PROTO}://{long}/{watch_endpoint}?{video_query}='
+  playlist = f'{URL_PROTO}://{long}/{playlist_endpoint}?{playlist_query}='
+
+  @classmethod
+  def domain(cls: type[Self], uri: str | ParseResult) -> Self | None:
+    match get_domain(uri):
+      case cls.long as domain:
+        return domain
+
+      case cls.short as domain:
+        return domain
+
+    return None
+
+  @classmethod
+  def get_content_id(cls: type[Self], uri: str | None) -> str | None:
+    return get_content_id(uri)
+
+  @classmethod
+  def get_url(cls: type[Self], video_id: str | None = None, playlist_id: str | None = None) -> str | None:
+    if video_id:
+      return f"{cls.video}{video_id}"
+
+    elif playlist_id:
+      return f"{cls.playlist}{playlist_id}"
+
+    return None
+
+  @classmethod
+  def is_youtube(cls: type[Self], uri: str | None) -> bool:
+    if not uri:
+      return False
+
+    uri = uri.casefold()
+
+    return get_domain(uri) in cls
+
+  @classmethod
+  def type(cls: type[Self], uri: str | None) -> Self | None:
+    if not (which := cls.which(uri)):
+      return None
+
+    if cls.watch_endpoint in uri:
+      return cls.video
+
+    elif cls.playlist_endpoint in uri:
+      return cls.playlist
+
+    return which
+
+  @classmethod
+  def which(cls: type[Self], uri: str | None) -> Self | None:
+    if not cls.is_youtube(uri):
+      return None
+
+    if cls.long in uri:
+      return cls.long
+
+    elif cls.short in uri:
+      return cls.short
+
+    return None
+
+
+def get_domain(uri: str | ParseResult) -> str | None:
+  if not url(uri):
+    return None
+
+  if isinstance(uri, str):
+    uri = urlparse(uri)
+
+  *_, name, tld = uri.netloc.split(".")
+
+  return f"{name}.{tld}"
+
+
+def get_content_id(uri: str) -> str | None:
+  if not url(uri) or not YoutubeUrl.is_youtube(uri):
+    return None
+
+  parsed = urlparse(uri)
+  content_id: str | None = None
+
+  match YoutubeUrl.domain(parsed), YoutubeUrl.type(uri):
+    case YoutubeUrl.long, YoutubeUrl.video:
+      qs = parse_qs(parsed.query)
+      [content_id] = qs[YoutubeUrl.video_query]
+
+    case YoutubeUrl.long, YoutubeUrl.playlist:
+      qs = parse_qs(parsed.query)
+      [content_id] = qs[YoutubeUrl.playlist_query]
+
+    case YoutubeUrl.short, YoutubeUrl.video | YoutubeUrl.playlist:
+      content_id = parsed.path[SKIP_FIRST]
+
+  return content_id
+
+
+def get_media_type(wrapper: Wrapper) -> MediaType | None:
+  if not (status := wrapper.media_status):
+    return None
+
+  if status.media_is_movie:
+    return MediaType.MOVIE
+
+  elif status.media_is_tvshow:
+    return MediaType.TVSHOW
+
+  elif status.media_is_photo:
+    return MediaType.PHOTO
+
+  elif status.media_is_musictrack:
+    return MediaType.MUSICTRACK
+
+  elif status.media_is_generic:
+    return MediaType.GENERIC
+
+  return None
+
+
