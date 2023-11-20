@@ -21,7 +21,7 @@ Seconds = Decimal
 DESKTOP_NAME: Final[str] = 'Cast Control'
 LOG_LEVEL: Final[str] = 'WARN'
 
-NO_DURATION: Final[float] = 0.0
+NO_DURATION: Final[int] = 0
 NO_DELTA: Final[int] = 0
 NO_DEVICE_NAME: Final[str] = 'NO_NAME'
 NO_STR: Final[str] = ''
