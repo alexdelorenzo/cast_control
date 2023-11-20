@@ -68,13 +68,7 @@ class ControllersMixin(Wrapper):
 
   def _setup_controllers(self):
     self.controllers = Controllers.new(self.device)
-
-    for controller in self.controllers:
-      if controller:
-        self._register(controller)
-
-  def _register(self, controller: BaseController):
-    self.device.register_handler(controller)
+    self.controllers.register(self.device)
 
   def _launch_youtube(self):
     if not (youtube := self.controllers.youtube):

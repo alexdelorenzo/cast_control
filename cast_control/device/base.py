@@ -54,7 +54,6 @@ class Controllers(NamedTuple):
   supla: SuplaController | None = None
   yle: YleAreenaController | None = None
   youtube: YouTubeController | None = None
-
   # plex_api: PlexApiController = None
   # ha: HomeAssistantController = None
 
@@ -75,6 +74,11 @@ class Controllers(NamedTuple):
       YouTubeController(),
       # HomeAssistantController(),
     )
+
+  def register(self, device: Device):
+    for controller in self:
+      if controller:
+        device.register_handler(controller)
 
 
 class YoutubeUrl(StrEnum):
