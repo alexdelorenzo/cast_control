@@ -10,8 +10,8 @@ from uuid import UUID
 from daemons.prefab.run import RunDaemon
 
 from .state import setup_logging
-from ..base import ARGS, ARGS_STEM, DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, \
-  DEFAULT_WAIT, LOG, LOG_LEVEL, DEFAULT_NO_DEVICE_NAME, PID, Seconds
+from ..base import ARGS, ARGS_STEM, DEFAULT_ICON, DEFAULT_NO_DEVICE_NAME, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, \
+  DEFAULT_WAIT, LOG, LOG_LEVEL, PID, Seconds
 
 
 class MprisDaemon[**P, T](RunDaemon):
