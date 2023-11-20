@@ -74,7 +74,7 @@ class BaseEventAdapter(EventAdapter):
 
   @classmethod
   def register(cls: type[Self], server: Server, device: Device) -> Self:
-    events = cls(device, server)
+    events = cls(server, device)
     events.set_and_register()
 
     return events
