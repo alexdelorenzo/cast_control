@@ -18,6 +18,11 @@ class ListenerIntegration(Protocol):
 
 
 @runtime_checkable
+class CliIntegration(Protocol):
+  def set_icon(self, lighter: bool = False): ...
+
+
+@runtime_checkable
 class Properties(Protocol):
   device: Device
   controllers: Controllers
@@ -107,8 +112,6 @@ class AdapterIntegration(Protocol):
 
   def seek(self, time: Microseconds, track_id: DbusObj | None = None): ...
 
-  def set_icon(self, lighter: bool = False): ...
-
   def set_loop_status(self, value: LoopStatus): ...
 
   def set_mute(self, value: bool): ...
@@ -125,5 +128,5 @@ class AdapterIntegration(Protocol):
 
 
 @runtime_checkable
-class Wrapper(ListenerIntegration, Properties, AdapterIntegration, Protocol):
+class Wrapper(AdapterIntegration, CliIntegration, ListenerIntegration, Properties, Protocol):
   pass

@@ -8,12 +8,12 @@ from mpris_server import (
 )
 
 from .base import Device
-from .device.protocols import AdapterIntegration
+from .device.protocols import Wrapper
 from .device.wrapper import DeviceWrapper
 
 
 @runtime_checkable
-class DeviceIntegration[W: AdapterIntegration](Protocol):
+class DeviceIntegration[W: Wrapper](Protocol):
   wrapper: W
 
   def on_new_status(self, *args, **kwargs):
