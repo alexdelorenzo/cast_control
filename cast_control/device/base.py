@@ -97,11 +97,11 @@ class YoutubeUrl(StrEnum):
   @classmethod
   def domain(cls: type[Self], uri: str | ParseResult) -> Self | None:
     match get_domain(uri):
-      case cls.long as domain:
-        return domain
+      case cls.long:
+        return cls.long
 
-      case cls.short as domain:
-        return domain
+      case cls.short:
+        return cls.short
 
     return None
 
