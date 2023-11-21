@@ -165,6 +165,11 @@ class TimeMixin(Wrapper):
       self._longest_duration = None
 
   @override
+  def on_new_status(self, *args, **kwargs):
+    self._reset_longest_duration()
+    super().on_new_status(*args, **kwargs)
+
+  @override
   @property
   def current_time(self) -> Seconds | None:
     if not (status := self.media_status):
@@ -174,11 +179,6 @@ class TimeMixin(Wrapper):
       return Seconds(time)
 
     return None
-
-  @override
-  def on_new_status(self, *args, **kwargs):
-    self._reset_longest_duration()
-    super().on_new_status(*args, **kwargs)
 
   @override
   def get_duration(self) -> Microseconds:
@@ -566,8 +566,8 @@ class DeviceWrapper(
     self.device = device
     super().__init__()
 
+  @override
   def __repr__(self) -> str:
     cls = type(self)
-    cls_name = cls.__name__
 
-    return f'<{cls_name} for {self.device}>'
+    return f'<{cls.__name__} for {self.device}>'
