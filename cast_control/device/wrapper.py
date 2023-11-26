@@ -15,7 +15,7 @@ from pychromecast.socket_client import ConnectionStatus
 from validators import url
 
 from .base import CachedIcon, Controllers, Titles, YoutubeUrl
-from .protocols import Wrapper
+from .protocols import Wrapper, CliIntegration, ListenerIntegration
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
 from ..base import DEFAULT_DISC_NO, DEFAULT_THUMB, Device, \
@@ -86,8 +86,8 @@ class ControllersMixin(Wrapper):
 
   @override
   def open_uri(self, uri: str):
-    if video_id := YoutubeUrl.get_content_id(uri):
-      self._play_youtube(video_id)
+    if content_id := YoutubeUrl.get_content_id(uri):
+      self._play_youtube(content_id)
       return
 
     mimetype, _ = guess_type(uri)
@@ -99,11 +99,11 @@ class ControllersMixin(Wrapper):
       self.open_uri(uri)
       return
 
-    if video_id := YoutubeUrl.get_content_id(uri):
-      youtube.add_to_queue(video_id)
+    if content_id := YoutubeUrl.get_content_id(uri):
+      youtube.add_to_queue(content_id)
 
-    if video_id and set_as_current:
-      youtube.play_video(video_id)
+    if content_id and set_as_current:
+      youtube.play_video(content_id)
 
     elif set_as_current:
       self.open_uri(uri)
@@ -152,7 +152,7 @@ class TitlesMixin(Wrapper):
     return None
 
 
-class TimeMixin(Wrapper):
+class TimeMixin(Wrapper, ListenerIntegration):
   _longest_duration: Microseconds | None
 
   @override
@@ -184,7 +184,7 @@ class TimeMixin(Wrapper):
   def get_duration(self) -> Microseconds:
     if (status := self.media_status) and (duration := status.duration) is not None:
       duration = Seconds(duration)
-      duration_us: Microseconds = duration * US_IN_SEC
+      duration_us = duration * US_IN_SEC
 
       return round(duration_us)
 
@@ -207,7 +207,7 @@ class TimeMixin(Wrapper):
     if not position:
       return BEGINNING
 
-    position_us: Microseconds = position * US_IN_SEC
+    position_us = position * US_IN_SEC
     return round(position_us)
 
   @override
@@ -243,7 +243,7 @@ class TimeMixin(Wrapper):
     pass
 
 
-class IconsMixin(Wrapper):
+class IconsMixin(Wrapper, CliIntegration):
   cached_icon: CachedIcon | None
   light_icon: bool
 
@@ -550,8 +550,8 @@ class AbilitiesMixin(Wrapper):
 
 class DeviceWrapper(
   AbilitiesMixin,
-  IconsMixin,
   ControllersMixin,
+  IconsMixin,
   MetadataMixin,
   PlaybackMixin,
   StatusMixin,
