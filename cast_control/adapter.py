@@ -4,7 +4,7 @@ from typing import Protocol, override, runtime_checkable
 
 from mpris_server import (
   DbusObj, LoopStatus, MIME_TYPES, Metadata, Microseconds, MprisAdapter, PlayState,
-  PlayerAdapter, Rate, RootAdapter, Track, URI, Volume,
+  PlayerAdapter, Rate, RootAdapter, Track, TrackListAdapter, URI, Volume,
 )
 
 from .base import Device
@@ -47,16 +47,8 @@ class DeviceRootAdapter(DeviceIntegration, RootAdapter):
 
 class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   @override
-  def add_track(self, uri: str, after_track: DbusObj, set_as_current: bool):
-    self.wrapper.add_track(uri, after_track, set_as_current)
-
-  @override
   def can_control(self) -> bool:
     return self.wrapper.can_control()
-
-  @override
-  def can_edit_track(self) -> bool:
-    return self.wrapper.can_edit_track()
 
   @override
   def can_go_next(self) -> bool:
@@ -91,14 +83,6 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
     return self.wrapper.get_current_track()
 
   @override
-  def get_duration(self) -> Microseconds:
-    return self.wrapper.get_duration()
-
-  @override
-  def get_mime_types(self) -> list[str]:
-    return MIME_TYPES
-
-  @override
   def get_next_track(self) -> Track:
     return self.wrapper.get_next_track()
 
@@ -121,10 +105,6 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   @override
   def get_stream_title(self) -> str:
     return self.wrapper.get_stream_title()
-
-  @override
-  def get_uri_schemes(self) -> list[str]:
-    return URI
 
   @override
   def get_volume(self) -> Volume:
@@ -167,10 +147,6 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
     self.wrapper.previous()
 
   @override
-  def quit(self):
-    self.wrapper.quit()
-
-  @override
   def resume(self):
     self.play()
 
@@ -210,9 +186,23 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   def stop(self):
     self.wrapper.stop()
 
+  def get_duration(self) -> Microseconds:
+    return self.wrapper.get_duration()
+
+
+class DeviceTrackListAdapter(DeviceIntegration, TrackListAdapter):
+  @override
+  def add_track(self, uri: str, after_track: DbusObj, set_as_current: bool):
+    self.wrapper.add_track(uri, after_track, set_as_current)
+
+  @override
+  def can_edit_tracks(self) -> bool:
+    return self.wrapper.can_edit_tracks()
+
 
 class DeviceAdapter(
   MprisAdapter,
+  DeviceTrackListAdapter,
   DevicePlayerAdapter,
   DeviceRootAdapter,
 ):
