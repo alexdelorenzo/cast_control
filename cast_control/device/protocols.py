@@ -23,7 +23,7 @@ class CliIntegration(Protocol):
 
 
 @runtime_checkable
-class DeviceIntegration(Protocol):
+class ModuleIntegration(Protocol):
   def get_duration(self) -> Microseconds: ...
 
 
@@ -131,5 +131,5 @@ class AdapterIntegration(Protocol):
 
 
 @runtime_checkable
-class Wrapper(AdapterIntegration, CliIntegration, DeviceIntegration, ListenerIntegration, Properties, Protocol):
+class Wrapper(AdapterIntegration, CliIntegration, ModuleIntegration, ListenerIntegration, Properties, Protocol):
   pass
