@@ -54,6 +54,7 @@ class Controllers(NamedTuple):
   supla: SuplaController | None = None
   yle: YleAreenaController | None = None
   youtube: YouTubeController | None = None
+
   # plex_api: PlexApiController = None
   # ha: HomeAssistantController = None
 
