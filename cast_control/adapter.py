@@ -22,6 +22,9 @@ class DeviceIntegration[W: Wrapper](Protocol):
   def set_icon(self, lighter: bool):
     self.wrapper.set_icon(lighter)
 
+  def get_duration(self) -> Microseconds:
+    return self.wrapper.get_duration()
+
 
 class DeviceRootAdapter(DeviceIntegration, RootAdapter):
   @override
@@ -185,9 +188,6 @@ class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
   @override
   def stop(self):
     self.wrapper.stop()
-
-  def get_duration(self) -> Microseconds:
-    return self.wrapper.get_duration()
 
 
 class DeviceTrackListAdapter(DeviceIntegration, TrackListAdapter):
