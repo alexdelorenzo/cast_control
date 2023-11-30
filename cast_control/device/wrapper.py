@@ -15,7 +15,7 @@ from pychromecast.socket_client import ConnectionStatus
 from validators import url
 
 from .base import CachedIcon, Controllers, Titles, YoutubeUrl
-from .protocols import Wrapper, CliIntegration, ListenerIntegration
+from .protocols import CliIntegration, ListenerIntegration, ModuleIntegration, Wrapper
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
 from ..base import DEFAULT_DISC_NO, DEFAULT_THUMB, Device, \
@@ -152,7 +152,7 @@ class TitlesMixin(Wrapper):
     return None
 
 
-class TimeMixin(Wrapper, ListenerIntegration):
+class TimeMixin(Wrapper, ListenerIntegration, ModuleIntegration):
   _longest_duration: Microseconds | None
 
   @override
