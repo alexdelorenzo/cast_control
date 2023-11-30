@@ -23,6 +23,11 @@ class CliIntegration(Protocol):
 
 
 @runtime_checkable
+class DeviceIntegration(Protocol):
+  def get_duration(self) -> Microseconds: ...
+
+
+@runtime_checkable
 class Properties(Protocol):
   device: Device
   controllers: Controllers
@@ -56,7 +61,7 @@ class AdapterIntegration(Protocol):
 
   def can_control(self) -> bool: ...
 
-  def can_edit_track(self) -> bool: ...
+  def can_edit_tracks(self) -> bool: ...
 
   def can_pause(self) -> bool: ...
 
@@ -73,8 +78,6 @@ class AdapterIntegration(Protocol):
   def get_art_url(self, track: int | None = None) -> str: ...
 
   def get_desktop_entry(self) -> Paths: ...
-
-  def get_duration(self) -> Microseconds: ...
 
   def get_playstate(self) -> PlayState: ...
 
@@ -128,5 +131,5 @@ class AdapterIntegration(Protocol):
 
 
 @runtime_checkable
-class Wrapper(AdapterIntegration, CliIntegration, ListenerIntegration, Properties, Protocol):
+class Wrapper(AdapterIntegration, CliIntegration, DeviceIntegration, ListenerIntegration, Properties, Protocol):
   pass
