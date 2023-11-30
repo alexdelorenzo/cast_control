@@ -16,14 +16,14 @@ from .device.wrapper import DeviceWrapper
 class DeviceIntegration[W: Wrapper](Protocol):
   wrapper: W
 
+  def get_duration(self) -> Microseconds:
+    return self.wrapper.get_duration()
+
   def on_new_status(self, *args, **kwargs):
     self.wrapper.on_new_status(*args, **kwargs)
 
   def set_icon(self, lighter: bool):
     self.wrapper.set_icon(lighter)
-
-  def get_duration(self) -> Microseconds:
-    return self.wrapper.get_duration()
 
 
 class DeviceRootAdapter(DeviceIntegration, RootAdapter):
