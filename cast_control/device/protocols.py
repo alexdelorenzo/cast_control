@@ -12,14 +12,14 @@ from ..base import DEFAULT_ICON, Device, NAME
 
 
 @runtime_checkable
-class ListenerIntegration(Protocol):
-  def on_new_status(self, *args, **kwargs):
-    """Callback for event listener"""
+class CliIntegration(Protocol):
+  def set_icon(self, lighter: bool = False): ...
 
 
 @runtime_checkable
-class CliIntegration(Protocol):
-  def set_icon(self, lighter: bool = False): ...
+class ListenerIntegration(Protocol):
+  def on_new_status(self, *args, **kwargs):
+    """Callback for event listener"""
 
 
 @runtime_checkable
@@ -131,5 +131,5 @@ class AdapterIntegration(Protocol):
 
 
 @runtime_checkable
-class Wrapper(AdapterIntegration, CliIntegration, ModuleIntegration, ListenerIntegration, Properties, Protocol):
+class Wrapper(AdapterIntegration, CliIntegration, ListenerIntegration, ModuleIntegration, Properties, Protocol):
   pass
