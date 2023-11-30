@@ -516,7 +516,7 @@ class AbilitiesMixin(Wrapper):
     #   or self.can_seek()
 
   @override
-  def can_edit_track(self) -> bool:
+  def can_edit_tracks(self) -> bool:
     return False
 
   @override
