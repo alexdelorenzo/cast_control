@@ -390,11 +390,11 @@ class MetadataMixin(Wrapper):
       album=Album(art_url, artists, album),
       art_url=art_url,
       artists=artists,
-      disc_no=DEFAULT_DISC_NO,
+      disc_number=DEFAULT_DISC_NO,
       length=self.get_duration(),
       name=title,
       track_id=dbus_name,
-      track_no=track_no,
+      track_number=track_no,
     )
 
 
