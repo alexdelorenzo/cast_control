@@ -199,6 +199,14 @@ class DeviceTrackListAdapter(DeviceIntegration, TrackListAdapter):
   def can_edit_tracks(self) -> bool:
     return self.wrapper.can_edit_tracks()
 
+  @override
+  def get_tracks(self) -> list[DbusObj]:
+    return self.wrapper.get_tracks()
+
+  @override
+  def has_tracklist(self) -> bool:
+    return self.wrapper.has_tracklist()
+
 
 class DeviceAdapter(
   MprisAdapter,

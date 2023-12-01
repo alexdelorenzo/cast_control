@@ -548,6 +548,21 @@ class AbilitiesMixin(Wrapper):
     return False
 
 
+class TracklistMixin(Wrapper):
+  @override
+  def has_tracklist(self) -> bool:
+    return bool(self.get_tracks())
+
+  @override
+  def get_tracks(self) -> list[DbusObj]:
+    title, *_ = self.titles
+
+    if title:
+      return [get_track_id(title)]
+
+    return []
+
+
 class DeviceWrapper(
   AbilitiesMixin,
   ControllersMixin,
@@ -557,6 +572,7 @@ class DeviceWrapper(
   StatusMixin,
   TimeMixin,
   TitlesMixin,
+  TracklistMixin,
   VolumeMixin,
 ):
   """Wraps implementation details for device API"""
