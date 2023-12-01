@@ -70,7 +70,12 @@ class BaseEventAdapter(EventAdapter):
     self.name = self.device.name
     self.adapter = self.server.adapter
 
-    super().__init__(root=self.server.root, player=self.server.player)
+    super().__init__(
+      root=self.server.root,
+      player=self.server.player,
+      tracklist=self.server.tracklist,
+      playlists=self.server.playlists,
+    )
 
   @classmethod
   def register(cls: type[Self], server: Server, device: Device) -> Self:
@@ -91,14 +96,15 @@ class EventListener(BaseEventAdapter, BaseEventListener):
   def _update_metadata(self, status: Status | None = None):
     self._update_volume(status)
 
+    # wire up local integration with mpris
+    self.adapter.on_new_status()
+
     # wire up mpris_server with cc events
     self.on_root_all()
     self.on_player_all()
-    # self.on_playback()
-    # self.on_options()
-
-    # wire up local integration with mpris
-    self.adapter.on_new_status()
+    self.on_tracklist_all()
+    # self.on_playlists_all()
+    # self.emit_all()
 
   @override
   def set_and_register(self):
