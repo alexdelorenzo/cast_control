@@ -379,7 +379,7 @@ class MetadataMixin(Wrapper):
     title, artist, album = self.titles
 
     dbus_name: DbusObj = get_track_id(title)
-    artists: list[str] = [Artist(artist)] if artist else []
+    artists: list[Artist] = [Artist(artist)] if artist else []
     track_no: int | None = None
     art_url = self.get_art_url()
 
