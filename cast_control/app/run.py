@@ -29,7 +29,7 @@ def create_server(
     return None
 
   adapter = DeviceAdapter(device)
-  server = Server(device.name, adapter)
+  server = Server(name, adapter)
 
   EventListener.register(server, device)
   server.publish()
