@@ -14,7 +14,7 @@ from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
 from validators import url
 
-from .base import CachedIcon, Controllers, Titles, YoutubeUrl
+from .base import CachedIcon, Controllers, TitleBuilder, Titles, YoutubeUrl
 from .protocols import CliIntegration, ListenerIntegration, ModuleIntegration, Wrapper
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
@@ -110,37 +110,64 @@ class ControllersMixin(Wrapper):
 
 
 class TitlesMixin(Wrapper):
+  # @override
+  # @property
+  # def titles(self) -> Titles:
+  #   titles: list[str] = list()
+  #
+  #   if title := self.media_controller.title:
+  #     titles.append(title)
+  #
+  #   if (status := self.media_status) and (title := status.series_title):
+  #     titles.append(title)
+  #
+  #   if status:
+  #     if artist := status.artist:
+  #       titles.append(artist)
+  #
+  #     if album := status.album_name:
+  #       titles.append(album)
+  #
+  #   if app_name := self.device.app_display_name:
+  #     titles.append(app_name)
+  #
+  #   if subtitle := self.get_subtitle():
+  #     titles.append(subtitle)
+  #
+  #   if not titles:
+  #     titles.append(TITLE)
+  #
+  #   titles = titles[:MAX_TITLES]
+  #
+  #   return Titles(*titles)
+
   @override
   @property
   def titles(self) -> Titles:
-    titles: list[str] = list()
+    titles: TitleBuilder = TitleBuilder()
 
     if title := self.media_controller.title:
-      titles.append(title)
+      titles.set(title=title)
 
     if (status := self.media_status) and (title := status.series_title):
-      titles.append(title)
+      titles.set(title=title, overwrite=False)
 
     if status:
       if artist := status.artist:
-        titles.append(artist)
+        titles.set(artist=artist)
 
       if album := status.album_name:
-        titles.append(album)
+        titles.set(album=album)
 
     if app_name := self.device.app_display_name:
-      titles.append(app_name)
+      titles.set(album=app_name, overwrite=False)
 
     if subtitle := self.get_subtitle():
-      titles.append(subtitle)
+      titles.add(subtitle)
 
-    if not titles:
-      titles.append(TITLE)
+    titles.add(TITLE)
 
-    log.debug(titles)
-    titles = titles[:MAX_TITLES]
-
-    return Titles(*titles)
+    return titles.build()
 
   @override
   def get_subtitle(self) -> str | None:

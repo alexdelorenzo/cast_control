@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import deque
 from enum import StrEnum
 from typing import Final, NamedTuple, Self, TYPE_CHECKING
 from urllib.parse import ParseResult, parse_qs, urlparse
@@ -24,7 +25,6 @@ from ..base import Device, MediaType
 if TYPE_CHECKING:
   from .protocols import Wrapper
 
-
 URL_PROTO: Final[str] = 'https'
 SKIP_FIRST: Final[slice] = slice(1, None)
 
@@ -33,6 +33,72 @@ class CachedIcon(NamedTuple):
   url: str
   app_id: str | None = None
   title: str | None = None
+
+
+class TitleBuilder:
+  title: str | None = None
+  artist: str | None = None
+  album: str | None = None
+
+  _titles: deque[str]
+
+  def __init__(
+    self,
+    *titles: str,
+    title: str | None = None,
+    artist: str | None = None,
+    album: str | None = None
+  ):
+    self.set(title=title, artist=artist, album=album)
+    self._titles = deque(titles)
+
+  def __bool__(self):
+    return bool(self.title or self.artist or self.album or self._titles)
+
+  def __len__(self) -> int:
+    return len(self._titles)
+
+  def add(self, *titles: str):
+    titles = (title for title in titles if title not in self._titles)
+    self._titles.extend(titles)
+
+  def set(
+    self,
+    title: str | None = None,
+    artist: str | None = None,
+    album: str | None = None,
+    *,
+    overwrite: bool = True
+  ):
+    if title:
+      if overwrite or not self.title:
+        self.title = title
+
+      else:
+        self.add(title)
+
+    if artist:
+      if overwrite or not self.artist:
+        self.artist = artist
+
+      else:
+        self.add(artist)
+
+    if album:
+      if overwrite or not self.album:
+        self.album = album
+
+      else:
+        self.add(album)
+
+  def build(self) -> Titles:
+    titles: deque[str] = self._titles.copy()
+
+    title = self.title if self.title else titles.popleft() if titles else None
+    artist = self.artist if self.artist else titles.popleft() if titles else None
+    album = self.album if self.album else titles.popleft() if titles else None
+
+    return Titles(title, artist, album)
 
 
 class Titles(NamedTuple):
@@ -210,5 +276,3 @@ def get_media_type(wrapper: Wrapper) -> MediaType | None:
     return MediaType.GENERIC
 
   return None
-
-
