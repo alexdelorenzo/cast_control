@@ -121,9 +121,6 @@ class TitlesMixin(Wrapper):
     if (status := self.media_status) and (title := status.series_title):
       titles.append(title)
 
-    if subtitle := self.get_subtitle():
-      titles.append(subtitle)
-
     if status:
       if artist := status.artist:
         titles.append(artist)
@@ -134,9 +131,13 @@ class TitlesMixin(Wrapper):
     if app_name := self.device.app_display_name:
       titles.append(app_name)
 
+    if subtitle := self.get_subtitle():
+      titles.append(subtitle)
+
     if not titles:
       titles.append(TITLE)
 
+    log.debug(titles)
     titles = titles[:MAX_TITLES]
 
     return Titles(*titles)
