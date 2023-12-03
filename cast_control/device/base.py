@@ -35,7 +35,7 @@ class CachedIcon(NamedTuple):
   title: str | None = None
 
 
-class TitleBuilder:
+class TitlesBuilder:
   title: str | None = None
   artist: str | None = None
   album: str | None = None
@@ -49,14 +49,24 @@ class TitleBuilder:
     artist: str | None = None,
     album: str | None = None
   ):
-    self.set(title=title, artist=artist, album=album)
     self._titles = deque(titles)
+    self.set(title=title, artist=artist, album=album)
 
-  def __bool__(self):
-    return bool(self.title or self.artist or self.album or self._titles)
+  def __bool__(self) -> bool:
+    return any(self.items) or bool(self._titles)
 
   def __len__(self) -> int:
-    return len(self._titles)
+    items = self._titles.copy()
+
+    for item in self.items:
+      if item:
+        items.append(item)
+
+    return len(items)
+
+  @property
+  def items(self) -> tuple[str | None, ...]:
+    return self.title, self.artist, self.album
 
   def add(self, *titles: str):
     titles = (title for title in titles if title not in self._titles)
@@ -64,11 +74,11 @@ class TitleBuilder:
 
   def set(
     self,
+    *,
     title: str | None = None,
     artist: str | None = None,
     album: str | None = None,
-    *,
-    overwrite: bool = True
+    overwrite: bool = True,
   ):
     if title:
       if overwrite or not self.title:
@@ -92,13 +102,19 @@ class TitleBuilder:
         self.add(album)
 
   def build(self) -> Titles:
-    titles: deque[str] = self._titles.copy()
+    titles = list[str]()
+    _titles: deque[str] = self._titles.copy()
 
-    title = self.title if self.title else titles.popleft() if titles else None
-    artist = self.artist if self.artist else titles.popleft() if titles else None
-    album = self.album if self.album else titles.popleft() if titles else None
+    for item in self.items:
+      titles.append(item if item else _titles.popleft() if _titles else None)
 
-    return Titles(title, artist, album)
+    return Titles(*titles)
+
+    # title = self.title if self.title else _titles.popleft() if _titles else None
+    # artist = self.artist if self.artist else _titles.popleft() if _titles else None
+    # album = self.album if self.album else _titles.popleft() if _titles else None
+
+    # return Titles(title, artist, album)
 
 
 class Titles(NamedTuple):
