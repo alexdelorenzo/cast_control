@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Protocol, override, runtime_checkable
+from typing import override
 
 from mpris_server import (
   DbusObj, LoopStatus, MIME_TYPES, Metadata, Microseconds, MprisAdapter, PlayState,
@@ -8,22 +8,8 @@ from mpris_server import (
 )
 
 from .base import Device
-from .device.protocols import Wrapper
 from .device.wrapper import DeviceWrapper
-
-
-@runtime_checkable
-class DeviceIntegration[W: Wrapper](Protocol):
-  wrapper: W
-
-  def get_duration(self) -> Microseconds:
-    return self.wrapper.get_duration()
-
-  def on_new_status(self, *args, **kwargs):
-    self.wrapper.on_new_status(*args, **kwargs)
-
-  def set_icon(self, lighter: bool):
-    self.wrapper.set_icon(lighter)
+from .protocols import DeviceIntegration
 
 
 class DeviceRootAdapter(DeviceIntegration, RootAdapter):
@@ -208,12 +194,7 @@ class DeviceTrackListAdapter(DeviceIntegration, TrackListAdapter):
     return self.wrapper.has_tracklist()
 
 
-class DeviceAdapter(
-  MprisAdapter,
-  DeviceTrackListAdapter,
-  DevicePlayerAdapter,
-  DeviceRootAdapter,
-):
+class DeviceAdapter(MprisAdapter, DevicePlayerAdapter, DeviceRootAdapter, DeviceTrackListAdapter):
   @override
   def __init__(self, device: Device):
     self.wrapper = DeviceWrapper(device)

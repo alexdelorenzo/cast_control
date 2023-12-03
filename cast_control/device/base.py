@@ -21,9 +21,9 @@ from validators import url
 
 from ..base import Device, MediaType
 
-
 if TYPE_CHECKING:
-  from .protocols import Wrapper
+  from ..protocols import Wrapper
+
 
 URL_PROTO: Final[str] = 'https'
 SKIP_FIRST: Final[slice] = slice(1, None)

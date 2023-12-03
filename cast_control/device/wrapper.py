@@ -14,13 +14,13 @@ from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
 from validators import url
 
-from .base import CachedIcon, Controllers, TitlesBuilder, Titles, YoutubeUrl
-from .protocols import CliIntegration, ListenerIntegration, ModuleIntegration, Wrapper
+from .base import CachedIcon, Controllers, Titles, TitlesBuilder, YoutubeUrl
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
 from ..base import DEFAULT_DISC_NO, DEFAULT_THUMB, Device, \
   LIGHT_THUMB, NO_DELTA, NO_DESKTOP_FILE, \
   NO_DURATION, Seconds, US_IN_SEC, singleton
+from ..protocols import CliIntegration, ListenerIntegration, ModuleIntegration, Wrapper
 
 
 log: Final[logging.Logger] = logging.getLogger(__name__)
