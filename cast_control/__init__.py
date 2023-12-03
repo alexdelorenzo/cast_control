@@ -7,7 +7,7 @@ from typing import Final
 __author__: Final[str] = 'Alex DeLorenzo <alex@alexdelorenzo.dev>'
 __license__: Final[str] = 'AGPL-3.0'
 __copyright__: Final[str] = \
-  f'Copyright 2021 {__author__}. Licensed under terms of the {__license__}.'
+  f'Copyright 2023 {__author__}. Licensed under terms of the {__license__}.'
 __version__: Final[str] = '0.14.0'
 
 NAME: Final[str] = 'cast_control'
