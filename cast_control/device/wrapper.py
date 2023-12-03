@@ -14,7 +14,7 @@ from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
 from validators import url
 
-from .base import CachedIcon, Controllers, TitleBuilder, Titles, YoutubeUrl
+from .base import CachedIcon, Controllers, TitlesBuilder, Titles, YoutubeUrl
 from .protocols import CliIntegration, ListenerIntegration, ModuleIntegration, Wrapper
 from .. import TITLE
 from ..app.state import create_desktop_file, ensure_user_dirs_exist
@@ -144,15 +144,18 @@ class TitlesMixin(Wrapper):
   @override
   @property
   def titles(self) -> Titles:
-    titles: TitleBuilder = TitleBuilder()
+    titles: TitlesBuilder = TitlesBuilder()
 
     if title := self.media_controller.title:
       titles.set(title=title)
 
-    if (status := self.media_status) and (title := status.series_title):
-      titles.set(title=title, overwrite=False)
+    if subtitle := self.get_subtitle():
+      titles.add(subtitle)
 
-    if status:
+    if status := self.media_status:
+      if title := status.series_title:
+        titles.set(title=title, overwrite=False)
+
       if artist := status.artist:
         titles.set(artist=artist)
 
@@ -161,9 +164,6 @@ class TitlesMixin(Wrapper):
 
     if app_name := self.device.app_display_name:
       titles.set(album=app_name, overwrite=False)
-
-    if subtitle := self.get_subtitle():
-      titles.add(subtitle)
 
     titles.add(TITLE)
 
