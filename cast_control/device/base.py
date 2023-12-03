@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from collections import deque
 from enum import StrEnum
-from typing import Final, NamedTuple, Self, TYPE_CHECKING
+from itertools import chain
+from typing import Any, Final, Iterable, NamedTuple, Self, TYPE_CHECKING
 from urllib.parse import ParseResult, parse_qs, urlparse
 
 from pychromecast.controllers.bbciplayer import BbcIplayerController
@@ -33,94 +34,6 @@ class CachedIcon(NamedTuple):
   url: str
   app_id: str | None = None
   title: str | None = None
-
-
-class TitlesBuilder:
-  title: str | None = None
-  artist: str | None = None
-  album: str | None = None
-
-  _titles: deque[str]
-
-  def __init__(
-    self,
-    *titles: str,
-    title: str | None = None,
-    artist: str | None = None,
-    album: str | None = None
-  ):
-    self._titles = deque(titles)
-    self.set(title=title, artist=artist, album=album)
-
-  def __bool__(self) -> bool:
-    return any(self.items) or bool(self._titles)
-
-  def __len__(self) -> int:
-    items = self._titles.copy()
-
-    for item in self.items:
-      if item:
-        items.append(item)
-
-    return len(items)
-
-  @property
-  def items(self) -> tuple[str | None, ...]:
-    return self.title, self.artist, self.album
-
-  def add(self, *titles: str):
-    titles = (title for title in titles if title not in self._titles)
-    self._titles.extend(titles)
-
-  def set(
-    self,
-    *,
-    title: str | None = None,
-    artist: str | None = None,
-    album: str | None = None,
-    overwrite: bool = True,
-  ):
-    if title:
-      if overwrite or not self.title:
-        self.title = title
-
-      else:
-        self.add(title)
-
-    if artist:
-      if overwrite or not self.artist:
-        self.artist = artist
-
-      else:
-        self.add(artist)
-
-    if album:
-      if overwrite or not self.album:
-        self.album = album
-
-      else:
-        self.add(album)
-
-  def build(self) -> Titles:
-    titles = list[str]()
-    _titles: deque[str] = self._titles.copy()
-
-    for item in self.items:
-      titles.append(item if item else _titles.popleft() if _titles else None)
-
-    return Titles(*titles)
-
-    # title = self.title if self.title else _titles.popleft() if _titles else None
-    # artist = self.artist if self.artist else _titles.popleft() if _titles else None
-    # album = self.album if self.album else _titles.popleft() if _titles else None
-
-    # return Titles(title, artist, album)
-
-
-class Titles(NamedTuple):
-  title: str | None = None
-  artist: str | None = None
-  album: str | None = None
 
 
 class Controllers(NamedTuple):
@@ -162,6 +75,92 @@ class Controllers(NamedTuple):
     for controller in self:
       if controller:
         device.register_handler(controller)
+
+
+class Titles(NamedTuple):
+  title: str | None = None
+  artist: str | None = None
+  album: str | None = None
+
+
+class TitlesBuilder:
+  title: str | None = None
+  artist: str | None = None
+  album: str | None = None
+
+  _titles: deque[str]
+
+  def __init__(
+    self,
+    *titles: str,
+    title: str | None = None,
+    artist: str | None = None,
+    album: str | None = None
+  ):
+    self._titles = deque(titles)
+    self.set(title=title, artist=artist, album=album)
+
+  def __bool__(self) -> bool:
+    return any(self)
+
+  def __contains__(self, value: Any) -> bool:
+    return value in iter(self)
+
+  def __iter__(self) -> Iterable[str]:
+    titles = chain(self.titles, self._titles)
+    return filter(bool, titles)
+
+  def __len__(self) -> int:
+    return len(tuple(self))
+
+  def __repr__(self):
+    return repr(self.build())
+
+  @property
+  def titles(self) -> tuple[str | None, ...]:
+    return self.title, self.artist, self.album
+
+  def add(self, *titles: str):
+    titles = (title for title in titles if title and title not in self)
+    self._titles.extend(titles)
+
+  def set(
+    self,
+    *,
+    title: str | None = None,
+    artist: str | None = None,
+    album: str | None = None,
+    overwrite: bool = True,
+  ):
+    if title:
+      if overwrite or not self.title:
+        self.title = title
+
+      elif title not in self._titles:
+        self.add(title)
+
+    if artist:
+      if overwrite or not self.artist:
+        self.artist = artist
+
+      else:
+        self.add(artist)
+
+    if album:
+      if overwrite or not self.album:
+        self.album = album
+
+      else:
+        self.add(album)
+
+  def build(self) -> Titles:
+    titles: list[str] = []
+    rest: deque[str] = self._titles.copy()
+
+    for item in self.titles:
+      titles.append(item if item else rest.popleft() if rest else None)
+
+    return Titles(*titles)
 
 
 class YoutubeUrl(StrEnum):
