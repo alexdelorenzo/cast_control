@@ -164,6 +164,7 @@ class TitlesMixin(Wrapper):
 
     if app_name := self.device.app_display_name:
       titles.set(album=app_name, overwrite=False)
+      titles.set(title=app_name, overwrite=False)
 
     titles.add(TITLE)
 
@@ -371,11 +372,11 @@ class MetadataMixin(Wrapper):
 
   @override
   def metadata(self) -> ValidMetadata:
-    title, artist, album = self.titles
+    title, artist, album, comments = self.titles
 
     dbus_name: DbusObj = get_track_id(title)
     artists: list[str] = [artist] if artist else []
-    comments: list[str] = []
+    comments: list[str] = [comments] if comments else []
     track_no: int | None = None
 
     if status := self.media_status:
@@ -404,7 +405,7 @@ class MetadataMixin(Wrapper):
 
   @override
   def get_current_track(self) -> Track:
-    title, artist, album = self.titles
+    title, artist, album, comments = self.titles
 
     dbus_name: DbusObj = get_track_id(title)
     artists: list[Artist] = [Artist(artist)] if artist else []
@@ -418,6 +419,7 @@ class MetadataMixin(Wrapper):
       album=Album(art_url, artists, album),
       art_url=art_url,
       artists=artists,
+      comments=[comments] if comments else [],
       disc_number=DEFAULT_DISC_NO,
       length=self.get_duration(),
       name=title,

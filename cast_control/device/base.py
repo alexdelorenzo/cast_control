@@ -6,6 +6,7 @@ from itertools import chain
 from typing import Any, Final, Iterable, NamedTuple, Self, TYPE_CHECKING
 from urllib.parse import ParseResult, parse_qs, urlparse
 
+from iteration_utilities import unique_everseen
 from pychromecast.controllers.bbciplayer import BbcIplayerController
 from pychromecast.controllers.bbcsounds import BbcSoundsController
 from pychromecast.controllers.bubbleupnp import BubbleUPNPController
@@ -81,12 +82,14 @@ class Titles(NamedTuple):
   title: str | None = None
   artist: str | None = None
   album: str | None = None
+  comments: str | None = None
 
 
 class TitlesBuilder:
   title: str | None = None
   artist: str | None = None
   album: str | None = None
+  comments: str | None = None
 
   _titles: deque[str]
 
@@ -95,10 +98,11 @@ class TitlesBuilder:
     *titles: str,
     title: str | None = None,
     artist: str | None = None,
-    album: str | None = None
+    album: str | None = None,
+    comments: str | None = None,
   ):
     self._titles = deque(titles)
-    self.set(title=title, artist=artist, album=album)
+    self.set(title=title, artist=artist, album=album, comments=comments)
 
   def __bool__(self) -> bool:
     return any(self)
@@ -118,7 +122,7 @@ class TitlesBuilder:
 
   @property
   def titles(self) -> tuple[str | None, ...]:
-    return self.title, self.artist, self.album
+    return self.title, self.artist, self.album, self.comments
 
   def add(self, *titles: str):
     titles = (title for title in titles if title and title not in self)
@@ -130,6 +134,7 @@ class TitlesBuilder:
     title: str | None = None,
     artist: str | None = None,
     album: str | None = None,
+    comments: str | None = None,
     overwrite: bool = True,
   ):
     if title:
@@ -153,9 +158,16 @@ class TitlesBuilder:
       else:
         self.add(album)
 
+    if comments:
+      if overwrite or not self.comments:
+        self.comments = comments
+
+      else:
+        self.add(comments)
+
   def build(self) -> Titles:
     titles: list[str] = []
-    rest: deque[str] = self._titles.copy()
+    rest: deque[str] = deque(unique_everseen(self._titles))
 
     for item in self.titles:
       titles.append(item if item else rest.popleft() if rest else None)
