@@ -10,8 +10,8 @@ from mpris_server import Server
 from .daemon import Args, get_name
 from .state import setup_logging
 from ..adapter import DeviceAdapter
-from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG_LEVEL, NoDevicesFound, \
-  Rc, Seconds
+from ..base import DEFAULT_ICON, DEFAULT_RETRY_WAIT, DEFAULT_SET_LOG, DEFAULT_WAIT, LOG_LEVEL, \
+  NoDevicesFound, Rc, Seconds
 from ..device.device import find_device
 from ..device.listeners import EventListener
 
