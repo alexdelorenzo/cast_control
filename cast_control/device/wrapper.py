@@ -84,6 +84,13 @@ class ControllersMixin(Wrapper):
 
     youtube.quick_play(video_id)
 
+  @property
+  def is_youtube(self) -> bool:
+    if youtube := self.controllers.youtube:
+      return youtube.is_active
+
+    return False
+
   @override
   def open_uri(self, uri: str):
     if content_id := YoutubeUrl.get_content_id(uri):
@@ -149,7 +156,10 @@ class TitlesMixin(Wrapper):
     if title := self.media_controller.title:
       titles.set(title=title)
 
-    if subtitle := self.get_subtitle():
+    if (subtitle := self.get_subtitle()) and self.is_youtube:
+      titles.set(artist=subtitle)
+
+    elif subtitle:
       titles.add(subtitle)
 
     if status := self.media_status:
@@ -163,8 +173,14 @@ class TitlesMixin(Wrapper):
         titles.set(album=album)
 
     if app_name := self.device.app_display_name:
-      titles.set(album=app_name, overwrite=False)
-      titles.set(title=app_name, overwrite=False)
+      if not titles.artist:
+        titles.set(artist=app_name)
+
+      elif not titles.album:
+        titles.set(album=app_name)
+
+      elif not titles.title:
+        titles.set(title=app_name)
 
     titles.add(TITLE)
 
