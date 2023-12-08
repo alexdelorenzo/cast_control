@@ -28,6 +28,21 @@ class ModuleIntegration(Protocol):
 
 
 @runtime_checkable
+class Statuses(Protocol):
+  @property
+  def cast_status(self) -> CastStatus | None: ...
+
+  @property
+  def connection_status(self) -> ConnectionStatus | None: ...
+
+  @property
+  def media_controller(self) -> MediaController: ...
+
+  @property
+  def media_status(self) -> MediaStatus | None: ...
+
+
+@runtime_checkable
 class Properties(Protocol):
   device: Device
   controllers: Controllers
@@ -40,16 +55,7 @@ class Properties(Protocol):
     return self.device.name or NAME
 
   @property
-  def cast_status(self) -> CastStatus | None: ...
-
-  @property
-  def media_status(self) -> MediaStatus | None: ...
-
-  @property
-  def connection_status(self) -> ConnectionStatus | None: ...
-
-  @property
-  def media_controller(self) -> MediaController: ...
+  def is_youtube(self) -> bool: ...
 
   @property
   def titles(self) -> Titles: ...
@@ -135,7 +141,15 @@ class AdapterIntegration(Protocol):
 
 
 @runtime_checkable
-class Wrapper(AdapterIntegration, CliIntegration, ListenerIntegration, ModuleIntegration, Properties, Protocol):
+class Wrapper(
+  AdapterIntegration,
+  CliIntegration,
+  ListenerIntegration,
+  ModuleIntegration,
+  Properties,
+  Statuses,
+  Protocol
+):
   pass
 
 
