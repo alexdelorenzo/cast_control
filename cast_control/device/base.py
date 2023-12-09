@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Iterable, Iterator
 from enum import StrEnum
 from itertools import chain
-from typing import Any, Final, Iterable, NamedTuple, Self, TYPE_CHECKING
+from typing import Any, Final, NamedTuple, Self, TYPE_CHECKING
 from urllib.parse import ParseResult, parse_qs, urlparse
 
 from iteration_utilities import unique_everseen
@@ -85,7 +86,7 @@ class Titles(NamedTuple):
   comments: str | None = None
 
 
-class TitlesBuilder:
+class TitlesBuilder(Iterable[str]):
   title: str | None = None
   artist: str | None = None
   album: str | None = None
@@ -110,14 +111,14 @@ class TitlesBuilder:
   def __contains__(self, value: Any) -> bool:
     return value in iter(self)
 
-  def __iter__(self) -> Iterable[str]:
+  def __iter__(self) -> Iterator[str]:
     titles = chain(self.titles, self._titles)
     return filter(bool, titles)
 
   def __len__(self) -> int:
     return len(tuple(self))
 
-  def __repr__(self):
+  def __repr__(self) -> str:
     return repr(self.build())
 
   @property
