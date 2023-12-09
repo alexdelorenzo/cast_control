@@ -52,8 +52,8 @@ class Controllers(NamedTuple):
   yle: YleAreenaController | None = None
   youtube: YouTubeController | None = None
 
-  # plex_api: PlexApiController = None
-  # ha: HomeAssistantController = None
+  # plex_api: PlexApiController | None = None
+  # ha: HomeAssistantController | None= None
 
   @classmethod
   def new(cls: type[Self], device: Device | None) -> Self:

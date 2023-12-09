@@ -117,37 +117,6 @@ class ControllersMixin(Wrapper):
 
 
 class TitlesMixin(Wrapper):
-  # @override
-  # @property
-  # def titles(self) -> Titles:
-  #   titles: list[str] = list()
-  #
-  #   if title := self.media_controller.title:
-  #     titles.append(title)
-  #
-  #   if (status := self.media_status) and (title := status.series_title):
-  #     titles.append(title)
-  #
-  #   if status:
-  #     if artist := status.artist:
-  #       titles.append(artist)
-  #
-  #     if album := status.album_name:
-  #       titles.append(album)
-  #
-  #   if app_name := self.device.app_display_name:
-  #     titles.append(app_name)
-  #
-  #   if subtitle := self.get_subtitle():
-  #     titles.append(subtitle)
-  #
-  #   if not titles:
-  #     titles.append(TITLE)
-  #
-  #   titles = titles[:MAX_TITLES]
-  #
-  #   return Titles(*titles)
-
   @override
   @property
   def titles(self) -> Titles:
@@ -186,7 +155,6 @@ class TitlesMixin(Wrapper):
 
     return titles.build()
 
-  @override
   def get_subtitle(self) -> str | None:
     if not (status := self.media_status) or not (metadata := status.media_metadata):
       return None
