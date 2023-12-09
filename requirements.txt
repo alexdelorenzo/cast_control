@@ -12,5 +12,5 @@ validators>=0.22.0, <0.23.0
 aiopath>=0.5.11; python_version <= '3.9'
 aiopath>=0.7.6; python_version >= '3.12'
 aiopath>=0.6.11; python_version >= '3.11'
-mpris_server>=0.8.1, <=0.9.0
+mpris_server>=0.9.0, <=0.10.0
 app_paths>=0.0.8, <0.1.0
