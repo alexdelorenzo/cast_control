@@ -78,6 +78,7 @@ class Args(NamedTuple):
   icon: bool = DEFAULT_ICON
   log_level: str = LOG_LEVEL
   set_logging: bool = DEFAULT_SET_LOG
+  background: bool = False
 
   @staticmethod
   def load(identifier: str | None = None) -> Args | None:

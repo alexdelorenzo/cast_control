@@ -71,6 +71,7 @@ def run_server(
   icon: bool = DEFAULT_ICON,
   log_level: str = LOG_LEVEL,
   set_logging: bool = DEFAULT_SET_LOG,
+  background: bool = False,
 ):
   if set_logging:
     setup_logging(log_level)
@@ -80,7 +81,7 @@ def run_server(
     raise NoDevicesFound(device)
 
   server.adapter.set_icon(icon)
-  server.loop()
+  server.loop(background=background)
 
 
 def run_safe(args: Args):
