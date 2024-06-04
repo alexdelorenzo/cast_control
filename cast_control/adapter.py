@@ -30,6 +30,10 @@ class DeviceRootAdapter(DeviceIntegration, RootAdapter):
     return URI
 
   @override
+  def has_tracklist(self) -> bool:
+    return self.wrapper.has_tracklist()
+
+  @override
   def quit(self):
     self.wrapper.quit()
 
@@ -188,10 +192,6 @@ class DeviceTrackListAdapter(DeviceIntegration, TrackListAdapter):
   @override
   def get_tracks(self) -> list[DbusObj]:
     return self.wrapper.get_tracks()
-
-  @override
-  def has_tracklist(self) -> bool:
-    return self.wrapper.has_tracklist()
 
 
 class DeviceAdapter(MprisAdapter, DevicePlayerAdapter, DeviceRootAdapter, DeviceTrackListAdapter):
