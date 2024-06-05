@@ -1,201 +1,268 @@
 from __future__ import annotations
 
-from typing import override
+from typing import Protocol, override, runtime_checkable
 
-from mpris_server import (
-  DbusObj, LoopStatus, MIME_TYPES, Metadata, Microseconds, MprisAdapter, PlayState,
-  PlayerAdapter, Rate, RootAdapter, Track, TrackListAdapter, URI, Volume,
-)
+from mpris_server import DbusObj, LoopStatus, Metadata, Microseconds, Paths, PlayState, Rate, Track, \
+  ValidMetadata, Volume
+from pychromecast.controllers.media import MediaController, MediaStatus
+from pychromecast.controllers.receiver import CastStatus
+from pychromecast.socket_client import ConnectionStatus
 
-from .base import Device
-from .device.wrapper import DeviceWrapper
-from .protocols import DeviceIntegration
+from .base import DEFAULT_ICON, Device, NAME
+from .device.base import CachedIcon, Controllers, Titles
 
 
-class DeviceRootAdapter(DeviceIntegration, RootAdapter):
+@runtime_checkable
+class CliIntegration(Protocol):
+  def set_icon(self, lighter: bool = False): ...
+
+
+@runtime_checkable
+class ListenerIntegration(Protocol):
+  def on_new_status(self, *args, **kwargs):
+    """Callback for event listener"""
+
+
+@runtime_checkable
+class ModuleIntegration(Protocol):
+  def get_duration(self) -> Microseconds: ...
+
+
+@runtime_checkable
+class Statuses(Protocol):
+  @property
+  def cast_status(self) -> CastStatus | None: ...
+
+  @property
+  def connection_status(self) -> ConnectionStatus | None: ...
+
+  @property
+  def media_controller(self) -> MediaController: ...
+
+  @property
+  def media_status(self) -> MediaStatus | None: ...
+
+
+@runtime_checkable
+class Properties(Protocol):
+  device: Device
+  controllers: Controllers
+
+  cached_icon: CachedIcon | None = None
+  light_icon: bool = DEFAULT_ICON
+
+  @property
+  def name(self) -> str:
+    return self.device.name or NAME
+
+  @property
+  def is_youtube(self) -> bool: ...
+
+  @property
+  def titles(self) -> Titles: ...
+
+
+@runtime_checkable
+class RootAdapterIntegration(Protocol):
+  def can_quit(self) -> bool: ...
+
+  def get_desktop_entry(self) -> str: ...
+
+  def get_mime_types(self) -> list[str]: ...
+
+  def get_uri_schemes(self) -> list[str]: ...
+
+  def has_tracklist(self) -> bool: ...
+
+  def quit(self): ...
+
+
+@runtime_checkable
+class TrackListAdapterIntegration(Protocol):
+  def add_track(self, uri: str, after_track: DbusObj, set_as_current: bool): ...
+
+  def can_edit_tracks(self) -> bool: ...
+
+  def get_tracks(self) -> list[DbusObj]: ...
+
+
+@runtime_checkable
+class PlayerAdapterIntegration(Protocol):
+  def can_control(self) -> bool: ...
+
+  def can_go_next(self) -> bool: ...
+
+  def can_go_previous(self) -> bool: ...
+
+  def can_pause(self) -> bool: ...
+
+  def can_play(self) -> bool: ...
+
+  def can_seek(self) -> bool: ...
+
+  def get_art_url(self, track: int = None) -> str: ...
+
+  def get_current_position(self) -> Microseconds: ...
+
+  def get_current_track(self) -> Track: ...
+
+  def get_next_track(self) -> Track: ...
+
+  def get_playstate(self) -> PlayState: ...
+
+  def get_previous_track(self) -> Track: ...
+
+  def get_rate(self) -> Rate: ...
+
+  def get_shuffle(self) -> bool: ...
+
+  def get_stream_title(self) -> str: ...
+
+  def get_volume(self) -> Volume: ...
+
+  def is_mute(self) -> bool: ...
+
+  def is_playlist(self) -> bool: ...
+
+  def is_repeating(self) -> bool: ...
+
+  def metadata(self) -> Metadata: ...
+
+  def next(self): ...
+
+  def open_uri(self, uri: str): ...
+
+  def pause(self): ...
+
+  def play(self): ...
+
+  def previous(self): ...
+
+  def resume(self): ...
+
+  def seek(self, time: Microseconds, track_id: DbusObj | None = None): ...
+
+  def set_icon(self, lighter: bool = False): ...
+
+  def set_loop_status(self, value: LoopStatus): ...
+
+  def set_mute(self, value: bool): ...
+
+  def set_rate(self, value: Rate): ...
+
+  def set_repeating(self, value: bool): ...
+
+  def set_shuffle(self, value: bool): ...
+
+  def set_volume(self, value: Volume): ...
+
+  def stop(self): ...
+
+
+@runtime_checkable
+class AdapterIntegration(Protocol):
+  def add_track(self, uri: str, after_track: DbusObj, set_as_current: bool): ...
+
+  def can_control(self) -> bool: ...
+
+  def can_edit_tracks(self) -> bool: ...
+
+  def can_pause(self) -> bool: ...
+
+  def can_play(self) -> bool: ...
+
+  def can_play_next(self) -> bool: ...
+
+  def can_play_prev(self) -> bool: ...
+
+  def can_quit(self) -> bool: ...
+
+  def can_seek(self) -> bool: ...
+
+  def get_art_url(self, track: int | None = None) -> str: ...
+
+  def get_desktop_entry(self) -> Paths: ...
+
+  def get_playstate(self) -> PlayState: ...
+
+  def get_rate(self) -> Rate: ...
+
+  def get_shuffle(self) -> bool: ...
+
+  def get_stream_title(self) -> str: ...
+
+  def get_tracks(self) -> list[DbusObj]: ...
+
+  def get_volume(self) -> Volume: ...
+
+  def has_tracklist(self) -> bool: ...
+
+  def has_current_time(self) -> bool: ...
+
+  def is_mute(self) -> bool: ...
+
+  def is_playlist(self) -> bool: ...
+
+  def is_repeating(self) -> bool: ...
+
+  def metadata(self) -> ValidMetadata: ...
+
+  def next(self): ...
+
+  def open_uri(self, uri: str): ...
+
+  def pause(self): ...
+
+  def play(self): ...
+
+  def previous(self): ...
+
+  def quit(self): ...
+
+  def resume(self): ...
+
+  def seek(self, time: Microseconds, track_id: DbusObj | None = None): ...
+
+  def set_loop_status(self, value: LoopStatus): ...
+
+  def set_mute(self, value: bool): ...
+
+  def set_rate(self, value: Rate): ...
+
+  def set_repeating(self, value: bool): ...
+
+  def set_shuffle(self, value: bool): ...
+
+  def set_volume(self, value: Volume): ...
+
+  def stop(self): ...
+
+
+@runtime_checkable
+class Wrapper(
+  AdapterIntegration,
+  CliIntegration,
+  ListenerIntegration,
+  ModuleIntegration,
+  Properties,
+  Statuses,
+  Protocol
+):
+  pass
+
+
+@runtime_checkable
+class DeviceIntegration[W: Wrapper](CliIntegration, ListenerIntegration, ModuleIntegration, Protocol):
+  wrapper: W
+
   @override
-  def can_quit(self) -> bool:
-    return self.wrapper.can_quit()
+  def get_duration(self) -> Microseconds:
+    return self.wrapper.get_duration()
 
   @override
-  def get_desktop_entry(self) -> str:
-    return self.wrapper.get_desktop_entry()
-
-  @override
-  def get_mime_types(self) -> list[str]:
-    return MIME_TYPES
-
-  @override
-  def get_uri_schemes(self) -> list[str]:
-    return URI
-
-  @override
-  def has_tracklist(self) -> bool:
-    return self.wrapper.has_tracklist()
-
-  @override
-  def quit(self):
-    self.wrapper.quit()
-
-
-class DevicePlayerAdapter(DeviceIntegration, PlayerAdapter):
-  @override
-  def can_control(self) -> bool:
-    return self.wrapper.can_control()
-
-  @override
-  def can_go_next(self) -> bool:
-    return self.wrapper.can_play_next()
-
-  @override
-  def can_go_previous(self) -> bool:
-    return self.wrapper.can_play_prev()
-
-  @override
-  def can_pause(self) -> bool:
-    return self.wrapper.can_pause()
-
-  @override
-  def can_play(self) -> bool:
-    return self.wrapper.can_play()
-
-  @override
-  def can_seek(self) -> bool:
-    return self.wrapper.can_seek()
-
-  @override
-  def get_art_url(self, track: int = None) -> str:
-    return self.wrapper.get_art_url(track)
-
-  @override
-  def get_current_position(self) -> Microseconds:
-    return self.wrapper.get_current_position()
-
-  @override
-  def get_current_track(self) -> Track:
-    return self.wrapper.get_current_track()
-
-  @override
-  def get_next_track(self) -> Track:
-    return self.wrapper.get_next_track()
-
-  @override
-  def get_playstate(self) -> PlayState:
-    return self.wrapper.get_playstate()
-
-  @override
-  def get_previous_track(self) -> Track:
-    return self.wrapper.get_previous_track()
-
-  @override
-  def get_rate(self) -> Rate:
-    return self.wrapper.get_rate()
-
-  @override
-  def get_shuffle(self) -> bool:
-    return False
-
-  @override
-  def get_stream_title(self) -> str:
-    return self.wrapper.get_stream_title()
-
-  @override
-  def get_volume(self) -> Volume:
-    return self.wrapper.get_volume()
-
-  @override
-  def is_mute(self) -> bool:
-    return self.wrapper.is_mute()
-
-  @override
-  def is_playlist(self) -> bool:
-    return self.wrapper.is_playlist()
-
-  @override
-  def is_repeating(self) -> bool:
-    return self.wrapper.is_repeating()
-
-  @override
-  def metadata(self) -> Metadata:
-    return self.wrapper.metadata()
-
-  @override
-  def next(self):
-    self.wrapper.next()
-
-  @override
-  def open_uri(self, uri: str):
-    self.wrapper.open_uri(uri)
-
-  @override
-  def pause(self):
-    self.wrapper.pause()
-
-  @override
-  def play(self):
-    self.wrapper.play()
-
-  @override
-  def previous(self):
-    self.wrapper.previous()
-
-  @override
-  def resume(self):
-    self.play()
-
-  @override
-  def seek(self, time: Microseconds, track_id: DbusObj | None = None):
-    self.wrapper.seek(time)
+  def on_new_status(self, *args, **kwargs):
+    self.wrapper.on_new_status(*args, **kwargs)
 
   @override
   def set_icon(self, lighter: bool = False):
     self.wrapper.set_icon(lighter)
-
-  @override
-  def set_loop_status(self, value: LoopStatus):
-    pass
-
-  @override
-  def set_mute(self, value: bool):
-    self.wrapper.set_mute(value)
-
-  @override
-  def set_rate(self, value: Rate):
-    pass
-
-  @override
-  def set_repeating(self, value: bool):
-    pass
-
-  @override
-  def set_shuffle(self, value: bool):
-    pass
-
-  @override
-  def set_volume(self, value: Volume):
-    self.wrapper.set_volume(value)
-
-  @override
-  def stop(self):
-    self.wrapper.stop()
-
-
-class DeviceTrackListAdapter(DeviceIntegration, TrackListAdapter):
-  @override
-  def add_track(self, uri: str, after_track: DbusObj, set_as_current: bool):
-    self.wrapper.add_track(uri, after_track, set_as_current)
-
-  @override
-  def can_edit_tracks(self) -> bool:
-    return self.wrapper.can_edit_tracks()
-
-  @override
-  def get_tracks(self) -> list[DbusObj]:
-    return self.wrapper.get_tracks()
-
-
-class DeviceAdapter(MprisAdapter, DevicePlayerAdapter, DeviceRootAdapter, DeviceTrackListAdapter):
-  @override
-  def __init__(self, device: Device):
-    self.wrapper = DeviceWrapper(device)
-    super().__init__(self.wrapper.name)
