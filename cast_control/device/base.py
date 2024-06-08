@@ -269,7 +269,7 @@ def get_content_id(uri: str) -> str | None:
   parsed = urlparse(uri)
   content_id: str | None = None
 
-  match YoutubeUrl.domain(parsed), YoutubeUrl.type(uri):
+  match YoutubeUrl.domain(uri), YoutubeUrl.type(uri):
     case YoutubeUrl.long, YoutubeUrl.video:
       qs = parse_qs(parsed.query)
       [content_id] = qs[YoutubeUrl.video_query]
