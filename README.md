@@ -63,6 +63,14 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 - [PyGObject](https://pypi.org/project/PyGObject/)
 - `requirements.txt`
 
+### Build requirements
+
+- Python >=3.12
+- [Rye](https://rye.astral.sh/)
+- `hatchling`
+- All requirements from the following list
+
+
 #### Installing PyGObject
 
 On Debian-derived distributions like Ubuntu, install `python3-gi` with `apt`.
