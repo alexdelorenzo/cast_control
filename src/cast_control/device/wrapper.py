@@ -12,7 +12,6 @@ from mpris_server import (
 from pychromecast.controllers.media import MediaController, MediaImage, MediaStatus
 from pychromecast.controllers.receiver import CastStatus
 from pychromecast.socket_client import ConnectionStatus
-from validators import url
 
 from .base import CachedIcon, Controllers, Titles, TitlesBuilder, YoutubeUrl
 from .. import TITLE
@@ -82,7 +81,7 @@ class ControllersMixin(Wrapper):
     if not youtube.is_active:
       self._launch_youtube()
 
-    youtube.quick_play(video_id)
+    youtube.quick_play(media_id=video_id, timeout=30)
 
   @property
   def is_youtube(self) -> bool:
