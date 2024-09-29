@@ -68,7 +68,7 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 - Python >=3.12
 - [Rye](https://rye.astral.sh/)
 - `hatchling`
-- All requirements from the following list
+- All installation requirements
 
 
 #### Installing PyGObject
