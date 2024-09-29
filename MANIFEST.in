@@ -1,8 +1,0 @@
-include setup.cfg
-include pyproject.toml
-include requirements.txt
-include README.md
-include LICENSE
-include cast_control/assets/*.desktop
-include cast_control/assets/icon/*.svg
-include cast_control/assets/icon/*.yml
