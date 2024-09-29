@@ -57,11 +57,11 @@ Controlling a Chromecast via Plasma Desktop's Media Player widget:
 
 ### Requirements
 
+- Python >= 3.12
 - Linux / *BSD / [macOS](https://github.com/zbentley/dbus-osx-examples)
 - [D-Bus](https://www.freedesktop.org/wiki/Software/dbus/)
-- Python >= 3.12
 - [PyGObject](https://pypi.org/project/PyGObject/)
-- `requirements.txt`
+- See `project.dependencies` in `pyproject.toml`
 
 ### Build requirements
 
