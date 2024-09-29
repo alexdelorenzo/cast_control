@@ -122,7 +122,7 @@ class TitlesMixin(Wrapper):
   def titles(self) -> Titles:
     titles: TitlesBuilder = TitlesBuilder()
 
-    if title := self.media_controller.title:
+    if title := self.media_status.title:
       titles.set(title=title)
 
     if (subtitle := self.get_subtitle()) and self.is_youtube:
@@ -415,10 +415,10 @@ class MetadataMixin(Wrapper):
 class PlaybackMixin(Wrapper):
   @override
   def get_playstate(self) -> PlayState:
-    if self.media_controller.is_playing:
+    if self.media_status.player_is_playing:
       return PlayState.PLAYING
 
-    elif self.media_controller.is_paused:
+    elif self.media_status.player_is_paused:
       return PlayState.PAUSED
 
     return PlayState.STOPPED
