@@ -35,12 +35,6 @@ castctl = "cast_control.app.cli:cli"
 managed = true
 dev-dependencies = []
 
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/cast_control"]
-
 [tool.rye.scripts]
 console_scripts = [
   "cast_control = cast_control.app.cli:cli",
@@ -53,6 +47,12 @@ cast_control = [
   "assets/icon/cc-*.svg",
   "assets/icon/*.yml"
 ]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cast_control"]
 
 [build-system]
 requires = ["hatchling"]
