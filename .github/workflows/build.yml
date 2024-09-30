@@ -1,0 +1,45 @@
+name: Build Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'  # Replace with the desired Python version
+
+      - name: Install the latest version of Rye
+        uses: eifinger/setup-rye@v4
+
+      - name: Sync Rye
+        run: |
+          rye sync
+
+      - name: Create build
+        run: |
+          rye build
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+
+        with:
+          repository: alexdelorenzo/cast_control
+          body: "To be updated"
+
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
