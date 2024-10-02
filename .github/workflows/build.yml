@@ -21,7 +21,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt update
-          sudo apt install build-essential python3-cairo-dev libcairo-gobject2 python3-gi-dev python3-gi
+          sudo apt install build-essential python3-cairo-dev libcairo-gobject2 python-gi-dev python3-gi
 
       - name: Install the latest version of Rye
         uses: eifinger/setup-rye@v4
