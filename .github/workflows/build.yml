@@ -20,11 +20,11 @@ jobs:
 
       - name: Install deps
         run: |
-          cat /etc/apt/sources.list
-          sudo sed -i 's/# deb-src/deb-src/' /etc/apt/sources.list
+          cat /etc/apt/sources.list.d/ubuntu.sources
+          sudo sed -i 's/# deb-src/deb-src/' /etc/apt/sources.list.d/ubuntu.sources
           sudo apt update
           sudo apt install python-gi-dev build-essential cmake gobject-introspection libegl1 libegl-dev
-          # sudo apt build-dep python-gi-dev
+          sudo apt build-dep python-gi-dev
 
       - name: Install the latest version of Rye
         uses: eifinger/setup-rye@v4
