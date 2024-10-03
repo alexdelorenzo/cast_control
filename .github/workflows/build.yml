@@ -55,6 +55,8 @@ jobs:
           path: dist/*
 
   publish-pypi:
+    needs: build-pkg
+
     runs-on: ubuntu-20.04
 
     permissions:
