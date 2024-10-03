@@ -69,8 +69,6 @@ jobs:
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
-        with:
-          name: dist
 
       - name: Publish to PyPI
         if: startsWith(github.ref, 'refs/tags/')
