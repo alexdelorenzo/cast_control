@@ -1,6 +1,6 @@
 [project]
 name = "cast_control"
-version = "0.16.0"
+version = "0.16.1"
 description = "📺 Control Chromecasts from the Linux desktop and console"
 authors = [{ name = "Alex DeLorenzo", email = "projects@alexdelorenzo.dev" }]
 license = { text = "AGPL-3.0" }
