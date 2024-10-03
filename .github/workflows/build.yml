@@ -7,6 +7,13 @@ on:
 
 jobs:
   build-linux:
+    permissions:
+      id-token: write
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/cast_control
+
     runs-on: ubuntu-20.04
 
     steps:
@@ -16,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'  # Replace with the desired Python version
+          python-version: '3.12'
 
       - name: Install deps
         run: |
@@ -47,3 +54,7 @@ jobs:
           files: |
             dist/*.tar.gz
             dist/*.whl
+
+      - name: Publish to PyPI
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: pypa/gh-action-pypi-publish@release/v1
