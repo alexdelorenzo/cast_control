@@ -55,9 +55,9 @@ jobs:
           path: dist/*
 
   publish-pypi:
-    needs: build-pkg
-
     runs-on: ubuntu-20.04
+
+    needs: build-pkg
 
     permissions:
       id-token: write

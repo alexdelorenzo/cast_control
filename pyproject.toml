@@ -1,12 +1,12 @@
 [project]
 name = "cast_control"
-version = "0.16.1"
+version = "0.17.0"
 description = "📺 Control Chromecasts from the Linux desktop and console"
 authors = [{ name = "Alex DeLorenzo", email = "projects@alexdelorenzo.dev" }]
 license = { text = "AGPL-3.0" }
 readme = "README.md"
 homepage = "https://cast.firstbyte.dev"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 
 dependencies = [
   "aiopath>=0.7.6 ; python_version >= '3.12'",
@@ -14,7 +14,7 @@ dependencies = [
   "appdirs>=1.4.4, <1.5.0",
   "click>=8.1.7, <9.0.0",
   "daemons>=1.3.2, <1.4.0",
-  "iteration_utilities>=0.12.0, <0.13.0",
+  "iteration_utilities>=0.13.0, <0.14.0",
   "mpris_server>=0.9.0, <=0.10.0",
   "PyChromecast>=14.0.2, <15.0.0",
   "pydbus>=0.6.0, <0.7.0",
